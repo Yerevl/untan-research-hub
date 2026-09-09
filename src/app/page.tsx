@@ -10,18 +10,10 @@ import Link from 'next/link';
 import {
   Search,
   BookOpen,
-  Users,
   GraduationCap,
-  Calendar,
   X,
-  FileText,
   SlidersHorizontal,
-  Briefcase,
-  Cpu,
-  Network,
-  Server,
   Lock,
-  Sparkles,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -115,8 +107,8 @@ export default function HomePage() {
       <Navbar supabaseConnected={supabaseConnected} totalArticles={totalCount} />
 
       {/* Hero Section - Neo Brutalism */}
-      <section className="relative pt-12 pb-10 px-4 sm:px-6 lg:px-8 border-b-[3px] border-black dark:border-white">
-        <div className="max-w-4xl mx-auto text-center space-y-5">
+      <section className="relative pt-10 pb-8 px-4 sm:px-6 lg:px-8 border-b-[3px] border-black dark:border-white">
+        <div className="max-w-4xl mx-auto text-center space-y-4">
           {/* Sticker Tag */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] uppercase tracking-widest transform -rotate-1">
             <GraduationCap className="w-4 h-4 stroke-[2.5]" />
@@ -124,219 +116,148 @@ export default function HomePage() {
           </div>
 
           {/* Punchy Title */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none uppercase">
-            Eksplorasi Publikasi Riset{' '}
-            <span className="inline-block mt-1 sm:mt-0 bg-[#A3E635] text-black px-3 py-1 border-[3px] border-black shadow-[5px_5px_0px_0px_#000] transform rotate-1">
-              JCSKOMMIPA
-            </span>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-none uppercase">
+            Eksplorasi Publikasi Riset
           </h1>
 
           <p className="text-sm sm:text-base font-medium text-slate-800 dark:text-slate-200 max-w-2xl mx-auto leading-relaxed">
             Koleksi riset Tugas Akhir & Skripsi mahasiswa Siskom Untan bersama dosen pembimbing.
-            Cari topik, saring bidang keahlian laboratorium, dan baca dokumen PDF secara instan.
+            Cari topik, saring bidang keahlian laboratorium, dan baca naskah PDF secara instan.
           </p>
 
-          {/* Neo-brutalist Search Bar */}
-          <div className="pt-2 max-w-2xl mx-auto">
-            <div className="relative flex items-center bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff]">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black dark:text-white">
-                <Search className="w-5 h-5 stroke-[2.5]" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari judul riset, nama mahasiswa, dosen, atau kata kunci..."
-                className="w-full pl-12 pr-10 py-4 text-sm sm:text-base font-bold bg-transparent text-black dark:text-white placeholder-slate-400 focus:outline-none"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-black dark:text-white hover:opacity-70"
-                >
-                  <X className="w-5 h-5 stroke-[2.5]" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Quick Keahlian Chips - Tactile Neo-Brutalist Buttons */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            <button
-              onClick={() => setSelectedKeahlian('all')}
-              className={`px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
-                selectedKeahlian === 'all'
-                  ? 'bg-black text-white dark:bg-white dark:text-black shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]'
-                  : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:-translate-x-0.5 hover:-translate-y-0.5'
-              }`}
-            >
-              Semua Keahlian
-            </button>
-
-            <button
-              onClick={() => setSelectedKeahlian('Automation & Embeded System (AES)')}
-              className={`inline-flex items-center px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
-                selectedKeahlian === 'Automation & Embeded System (AES)'
-                  ? 'bg-[#A3E635] text-black shadow-[4px_4px_0px_0px_#000] -translate-x-0.5 -translate-y-0.5'
-                  : 'bg-[#A3E635]/60 hover:bg-[#A3E635] text-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5'
-              }`}
-            >
-              <Cpu className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
-              <span>AES (Automation & Embedded)</span>
-            </button>
-
-            <button
-              onClick={() => setSelectedKeahlian('Network Intelligent Control (NIC)')}
-              className={`inline-flex items-center px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
-                selectedKeahlian === 'Network Intelligent Control (NIC)'
-                  ? 'bg-[#38BDF8] text-black shadow-[4px_4px_0px_0px_#000] -translate-x-0.5 -translate-y-0.5'
-                  : 'bg-[#38BDF8]/60 hover:bg-[#38BDF8] text-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5'
-              }`}
-            >
-              <Network className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
-              <span>NIC (Network & Intelligent)</span>
-            </button>
-
-            <button
-              onClick={() => setSelectedKeahlian('Edge Computing')}
-              className={`inline-flex items-center px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
-                selectedKeahlian === 'Edge Computing'
-                  ? 'bg-[#C084FC] text-black shadow-[4px_4px_0px_0px_#000] -translate-x-0.5 -translate-y-0.5'
-                  : 'bg-[#C084FC]/60 hover:bg-[#C084FC] text-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5'
-              }`}
-            >
-              <Server className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
-              <span>Edge Computing</span>
-            </button>
-          </div>
-
-          {/* Stats Bar - Sticker Boxes */}
-          <div className="pt-3 flex flex-wrap items-center justify-center gap-3 text-xs font-mono font-bold">
-            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
-              <FileText className="w-4 h-4 stroke-[2]" />
-              <span>
-                <strong>{totalCount}</strong> ARTIKEL
-              </span>
-            </div>
-            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 stroke-[2]" />
-              <span>
-                <strong>{issues.length || 1}</strong> EDISI
-              </span>
-            </div>
-            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
-              <Briefcase className="w-4 h-4 stroke-[2]" />
-              <span>
-                <strong>{dosenList.length}</strong> DOSEN SISKOM
-              </span>
-            </div>
-            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
-              <Users className="w-4 h-4 stroke-[2]" />
-              <span>
-                <strong>{stats.totalAuthors}</strong> PENULIS
-              </span>
-            </div>
-          </div>
+          {/* Subtle Informational Stats Readout (Not Button-like) */}
+          <p className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400">
+            Mengindeks <strong className="font-black text-black dark:text-white">{totalCount}</strong> artikel riset •{' '}
+            <strong className="font-black text-black dark:text-white">{dosenList.length}</strong> dosen pembimbing •{' '}
+            <strong className="font-black text-black dark:text-white">{stats.totalAuthors}</strong> penulis •{' '}
+            <strong className="font-black text-black dark:text-white">{issues.length || 1}</strong> edisi publikasi
+          </p>
         </div>
       </section>
 
       {/* Main Content & Articles Catalog */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filters & Sorting Bar - Neo-Brutalist Box */}
-        <div className="mb-8 p-5 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[5px_5px_0px_0px_#000] dark:shadow-[5px_5px_0px_0px_#fff] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* Selectors */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
-            <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
-              <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
-              <span>Filter:</span>
+        {/* Unified Search & Filters Control Panel - Neo-Brutalist Box */}
+        <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] space-y-4">
+          {/* Search Bar */}
+          <div className="relative flex items-center bg-[#FFFDF5] dark:bg-[#0D0F12] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black dark:text-white">
+              <Search className="w-5 h-5 stroke-[2.5]" />
             </div>
-
-            {/* Dosen Pembimbing Filter */}
-            <select
-              value={selectedDosen}
-              onChange={(e) => setSelectedDosen(e.target.value)}
-              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[200px] truncate"
-            >
-              <option value="all">Semua Dosen Pembimbing</option>
-              {dosenList.map((d) => (
-                <option key={d.cleanName} value={d.cleanName}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Keahlian Filter */}
-            <select
-              value={selectedKeahlian}
-              onChange={(e) => setSelectedKeahlian(e.target.value)}
-              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[220px] truncate"
-            >
-              <option value="all">Semua Bidang Keahlian</option>
-              {keahlianList.map((k) => (
-                <option key={k} value={k}>
-                  {k}
-                </option>
-              ))}
-            </select>
-
-            {/* Issue Selector */}
-            <select
-              value={selectedIssue}
-              onChange={(e) => setSelectedIssue(e.target.value)}
-              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[180px] truncate"
-            >
-              <option value="all">Semua Edisi ({issues.length})</option>
-              {issues.map((iss) => (
-                <option key={iss} value={iss}>
-                  {iss}
-                </option>
-              ))}
-            </select>
-
-            {/* Year Selector */}
-            {years.length > 0 && (
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
-              >
-                <option value="all">Semua Tahun</option>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    Tahun {y}
-                  </option>
-                ))}
-              </select>
-            )}
-
-            {/* Sort Selector */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
-              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
-            >
-              <option value="newest">Terbaru</option>
-              <option value="oldest">Terlama</option>
-              <option value="title">Judul (A-Z)</option>
-            </select>
-
-            {/* Reset Button */}
-            {hasActiveFilters && (
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari judul riset, nama mahasiswa, dosen pembimbing, atau topik..."
+              className="w-full pl-12 pr-10 py-3.5 text-sm sm:text-base font-bold bg-transparent text-black dark:text-white placeholder-slate-400 focus:outline-none"
+            />
+            {searchQuery && (
               <button
-                onClick={handleResetFilters}
-                className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-black dark:text-white hover:opacity-70"
+                title="Hapus pencarian"
               >
-                <X className="w-3.5 h-3.5 stroke-[3]" />
-                <span>Reset</span>
+                <X className="w-5 h-5 stroke-[2.5]" />
               </button>
             )}
           </div>
 
-          {/* Results Count */}
-          <div className="flex items-center justify-between lg:justify-end gap-3 text-xs font-mono font-bold text-black dark:text-white shrink-0">
-            <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 border border-black dark:border-white">
-              HASIL: <strong>{articles.length}</strong> RISET
-            </span>
+          {/* Filters & Results Counter Row */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
+            {/* Filter Dropdowns */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
+              <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
+                <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
+                <span>Filter:</span>
+              </div>
+
+              {/* Dosen Pembimbing Filter */}
+              <select
+                value={selectedDosen}
+                onChange={(e) => setSelectedDosen(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[200px] truncate"
+              >
+                <option value="all">Semua Dosen Pembimbing</option>
+                {dosenList.map((d) => (
+                  <option key={d.cleanName} value={d.cleanName}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Keahlian Filter */}
+              <select
+                value={selectedKeahlian}
+                onChange={(e) => setSelectedKeahlian(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[220px] truncate"
+              >
+                <option value="all">Semua Bidang Keahlian</option>
+                {keahlianList.map((k) => (
+                  <option key={k} value={k}>
+                    {k}
+                  </option>
+                ))}
+              </select>
+
+              {/* Issue Selector */}
+              <select
+                value={selectedIssue}
+                onChange={(e) => setSelectedIssue(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[180px] truncate"
+              >
+                <option value="all">Semua Edisi ({issues.length})</option>
+                {issues.map((iss) => (
+                  <option key={iss} value={iss}>
+                    {iss}
+                  </option>
+                ))}
+              </select>
+
+              {/* Year Selector */}
+              {years.length > 0 && (
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+                >
+                  <option value="all">Semua Tahun</option>
+                  {years.map((y) => (
+                    <option key={y} value={y}>
+                      Tahun {y}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {/* Sort Selector */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+              >
+                <option value="newest">Terbaru</option>
+                <option value="oldest">Terlama</option>
+                <option value="title">Judul (A-Z)</option>
+              </select>
+
+              {/* Reset Button */}
+              {hasActiveFilters && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
+                >
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                  <span>Reset</span>
+                </button>
+              )}
+            </div>
+
+            {/* Results Count Badge */}
+            <div className="flex items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
+              <span className="px-3 py-1.5 bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] font-black uppercase tracking-wide">
+                HASIL: {articles.length} / {totalCount} RISET
+              </span>
+            </div>
           </div>
         </div>
 
