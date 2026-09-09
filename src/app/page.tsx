@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Article } from '@/lib/types';
 import { DosenItem } from '@/lib/dosen';
 import { Navbar } from '@/components/Navbar';
@@ -10,22 +10,42 @@ import Link from 'next/link';
 import {
   Search,
   BookOpen,
-  Filter,
-  Sparkles,
-  RefreshCw,
-  Users,
   GraduationCap,
-  Calendar,
   X,
-  FileText,
   SlidersHorizontal,
-  Briefcase,
-  Cpu,
-  Network,
-  Server,
-  Layers,
   Lock,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
+  ArrowUp,
 } from 'lucide-react';
+
+const PAGE_SIZE = 10;
+
+interface CachedPageData {
+  articles: Article[];
+  issues: string[];
+  years: string[];
+  dosenList: DosenItem[];
+  keahlianList: string[];
+  total: number;
+  filteredCount: number;
+  totalPages: number;
+  supabaseConnected: boolean;
+}
+
+function getPaginationItems(current: number, total: number): (number | string)[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total];
+  }
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  }
+  return [1, '...', current - 1, current, current + 1, '...', total];
+}
 
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -34,77 +54,163 @@ export default function HomePage() {
   const [dosenList, setDosenList] = useState<DosenItem[]>([]);
   const [keahlianList, setKeahlianList] = useState<string[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [filteredCount, setFilteredCount] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [showAll, setShowAll] = useState<boolean>(false);
   const [supabaseConnected, setSupabaseConnected] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Filters State
+  // Search input state with debouncing
+  const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Filters State
+  const [selectedProdi, setSelectedProdi] = useState<string>('all');
   const [selectedIssue, setSelectedIssue] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedDosen, setSelectedDosen] = useState<string>('all');
   const [selectedKeahlian, setSelectedKeahlian] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title'>('newest');
 
-  // Modals State
+  // Modal State
   const [activePdfArticle, setActivePdfArticle] = useState<Article | null>(null);
 
-  // Fetch articles from API
-  const fetchArticles = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (searchQuery.trim()) params.set('q', searchQuery.trim());
-      if (selectedIssue !== 'all') params.set('issue', selectedIssue);
-      if (selectedYear !== 'all') params.set('year', selectedYear);
-      if (selectedDosen !== 'all') params.set('dosen', selectedDosen);
-      if (selectedKeahlian !== 'all') params.set('keahlian', selectedKeahlian);
-      params.set('sortBy', sortBy);
+  // In-memory page cache to retain visited pages and avoid redundant network calls
+  const pageCacheRef = useRef<Map<string, CachedPageData>>(new Map());
 
-      const res = await fetch(`/api/articles?${params.toString()}`);
-      const data = await res.json();
-
-      if (data.success) {
-        setArticles(data.articles || []);
-        setIssues(data.issues || []);
-        setYears(data.years || []);
-        setDosenList(data.dosenList || []);
-        setKeahlianList(data.keahlianList || []);
-        setTotalCount(data.total || 0);
-        setSupabaseConnected(data.supabaseConnected || false);
-      }
-    } catch (err) {
-      console.error('Error loading articles:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]);
-
+  // Debounce search query
   useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  // Derived statistics
-  const stats = useMemo(() => {
-    const allAuthors = new Set<string>();
-    articles.forEach((a) => {
-      a.authors?.forEach((author) => allAuthors.add(author));
-    });
-    return {
-      totalFound: articles.length,
-      totalAuthors: allAuthors.size,
-      totalIssues: issues.length || 1,
-    };
-  }, [articles, issues]);
+  // Generate cache key based on current filters and page/all mode
+  const getCacheKey = useCallback(
+    (page: number, allMode: boolean) => {
+      return [
+        searchQuery.trim().toLowerCase(),
+        selectedProdi,
+        selectedIssue,
+        selectedYear,
+        selectedDosen,
+        selectedKeahlian,
+        sortBy,
+        `p:${page}`,
+        `all:${allMode}`,
+      ].join('|');
+    },
+    [searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]
+  );
 
-  const hasActiveFilters =
-    searchQuery !== '' ||
-    selectedIssue !== 'all' ||
-    selectedYear !== 'all' ||
-    selectedDosen !== 'all' ||
-    selectedKeahlian !== 'all';
+  // Fetch or retrieve from cache
+  const loadData = useCallback(
+    async (pageToLoad: number, allMode: boolean) => {
+      const cacheKey = getCacheKey(pageToLoad, allMode);
+
+      // Check client-side memory cache first
+      if (pageCacheRef.current.has(cacheKey)) {
+        const cached = pageCacheRef.current.get(cacheKey)!;
+        setArticles(cached.articles);
+        setIssues(cached.issues);
+        setYears(cached.years);
+        setDosenList(cached.dosenList);
+        setKeahlianList(cached.keahlianList);
+        setTotalCount(cached.total);
+        setFilteredCount(cached.filteredCount);
+        setTotalPages(cached.totalPages);
+        setSupabaseConnected(cached.supabaseConnected);
+        setCurrentPage(pageToLoad);
+        setShowAll(allMode);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (searchQuery.trim()) params.set('q', searchQuery.trim());
+        if (selectedProdi !== 'all') params.set('prodi', selectedProdi);
+        if (selectedIssue !== 'all') params.set('issue', selectedIssue);
+        if (selectedYear !== 'all') params.set('year', selectedYear);
+        if (selectedDosen !== 'all') params.set('dosen', selectedDosen);
+        if (selectedKeahlian !== 'all') params.set('keahlian', selectedKeahlian);
+        params.set('sortBy', sortBy);
+
+        if (allMode) {
+          params.set('all', 'true');
+        } else {
+          params.set('page', pageToLoad.toString());
+          params.set('limit', PAGE_SIZE.toString());
+        }
+
+        const res = await fetch(`/api/articles?${params.toString()}`);
+        const data = await res.json();
+
+        if (data.success) {
+          const cacheData: CachedPageData = {
+            articles: data.articles || [],
+            issues: data.issues || [],
+            years: data.years || [],
+            dosenList: data.dosenList || [],
+            keahlianList: data.keahlianList || [],
+            total: data.total || 0,
+            filteredCount: data.filteredCount || 0,
+            totalPages: data.totalPages || 1,
+            supabaseConnected: data.supabaseConnected || false,
+          };
+
+          // Save to in-memory cache
+          pageCacheRef.current.set(cacheKey, cacheData);
+
+          setArticles(cacheData.articles);
+          setIssues(cacheData.issues);
+          setYears(cacheData.years);
+          setDosenList(cacheData.dosenList);
+          setKeahlianList(cacheData.keahlianList);
+          setTotalCount(cacheData.total);
+          setFilteredCount(cacheData.filteredCount);
+          setTotalPages(cacheData.totalPages);
+          setSupabaseConnected(cacheData.supabaseConnected);
+          setCurrentPage(pageToLoad);
+          setShowAll(allMode);
+        }
+      } catch (err) {
+        console.error('Error loading articles:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [getCacheKey, searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]
+  );
+
+  // Trigger data load when filters change (resets to page 1 in paginated mode)
+  useEffect(() => {
+    loadData(1, false);
+  }, [searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy, loadData]);
+
+  // Page navigation handlers
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
+    loadData(newPage, false);
+    document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleToggleShowAll = () => {
+    if (showAll) {
+      loadData(1, false);
+    } else {
+      loadData(1, true);
+    }
+    document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleResetFilters = () => {
+    setSearchInput('');
     setSearchQuery('');
+    setSelectedProdi('all');
     setSelectedIssue('all');
     setSelectedYear('all');
     setSelectedDosen('all');
@@ -112,317 +218,413 @@ export default function HomePage() {
     setSortBy('newest');
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
-      {/* Top Navigation */}
-      <Navbar
-        supabaseConnected={supabaseConnected}
-        totalArticles={totalCount}
-      />
+  // Scroll to catalog top on badge clicks
+  const scrollToCatalog = () => {
+    setTimeout(() => {
+      document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  };
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-indigo-900/10 via-white to-slate-50/50 dark:from-indigo-950/40 dark:via-slate-950 dark:to-slate-950 pt-12 pb-10 px-4 sm:px-6 lg:px-8 border-b border-slate-200/60 dark:border-slate-800/60">
+  const hasActiveFilters =
+    searchQuery !== '' ||
+    selectedProdi !== 'all' ||
+    selectedIssue !== 'all' ||
+    selectedYear !== 'all' ||
+    selectedDosen !== 'all' ||
+    selectedKeahlian !== 'all';
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#FFFDF5] dark:bg-[#0D0F12] text-black dark:text-white transition-colors">
+      {/* Top Navigation */}
+      <Navbar supabaseConnected={supabaseConnected} totalArticles={totalCount} />
+
+      {/* Hero Section - Neo Brutalism */}
+      <section className="relative pt-10 pb-8 px-4 sm:px-6 lg:px-8 border-b-[3px] border-black dark:border-white">
         <div className="max-w-4xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span>Katalog Riset Rekayasa Sistem Komputer • Untan</span>
+          {/* Sticker Tag */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] uppercase tracking-widest transform -rotate-1">
+            <GraduationCap className="w-4 h-4 stroke-[2.5]" />
+            <span>★ SISKOM &amp; SISFO • FMIPA UNTAN ★</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-            Eksplorasi Publikasi Ilmiah{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-400 dark:to-blue-400">
-              JCSKOMMIPA Untan
-            </span>
+          {/* Punchy Title */}
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-none uppercase">
+            Eksplorasi Publikasi Riset
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Akses hasil riset mahasiswa dan dosen pembimbing Siskom Untan. Dilengkapi pencarian instan, filter
-            dosen pembimbing, klasifikasi bidang keahlian, dan pembaca PDF online.
+          <p className="text-sm sm:text-base font-medium text-slate-800 dark:text-slate-200 max-w-2xl mx-auto leading-relaxed">
+            Koleksi riset Tugas Akhir &amp; Skripsi mahasiswa Rekayasa Sistem Komputer &amp; Sistem Informasi Untan bersama dosen pembimbing.
+            Cari topik, saring bidang keahlian laboratorium, dan baca naskah PDF secara instan.
           </p>
 
-          {/* Search Bar */}
-          <div className="pt-2 max-w-2xl mx-auto">
-            <div className="relative flex items-center shadow-lg shadow-indigo-500/5 rounded-2xl">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                <Search className="w-5 h-5" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari judul riset, nama mahasiswa, dosen pembimbing, atau topik..."
-                className="w-full pl-11 pr-10 py-3.5 text-sm sm:text-base rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Quick Keahlian Chips */}
-          <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
-            <button
-              onClick={() => setSelectedKeahlian('all')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                selectedKeahlian === 'all'
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-400'
-              }`}
-            >
-              Semua Keahlian
-            </button>
-            <button
-              onClick={() => setSelectedKeahlian('Automation & Embeded System (AES)')}
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                selectedKeahlian === 'Automation & Embeded System (AES)'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:border-emerald-400'
-              }`}
-            >
-              <Cpu className="w-3 h-3 mr-1" />
-              <span>Automation & Embeded System (AES)</span>
-            </button>
-            <button
-              onClick={() => setSelectedKeahlian('Network Intelligent Control (NIC)')}
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                selectedKeahlian === 'Network Intelligent Control (NIC)'
-                  ? 'bg-sky-600 text-white shadow-sm'
-                  : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 hover:border-sky-400'
-              }`}
-            >
-              <Network className="w-3 h-3 mr-1" />
-              <span>Network Intelligent Control (NIC)</span>
-            </button>
-            <button
-              onClick={() => setSelectedKeahlian('Edge Computing')}
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                selectedKeahlian === 'Edge Computing'
-                  ? 'bg-purple-600 text-white shadow-sm'
-                  : 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:border-purple-400'
-              }`}
-            >
-              <Server className="w-3 h-3 mr-1" />
-              <span>Edge Computing</span>
-            </button>
-          </div>
-
-          {/* Stats Badges */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-            <div className="flex items-center gap-1.5">
-              <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span>
-                <strong>{totalCount}</strong> Artikel Riset
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>
-                <strong>{issues.length || 1}</strong> Edisi Terbit
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>
-                <strong>{dosenList.length}</strong> Dosen Siskom
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-              <span>
-                <strong>{stats.totalAuthors}</strong> Total Penulis
-              </span>
-            </div>
-          </div>
+          {/* Subtle Informational Stats Readout (Not Button-like) */}
+          <p className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400">
+            Mengindeks <strong className="font-black text-black dark:text-white">{totalCount}</strong> artikel riset •{' '}
+            <strong className="font-black text-black dark:text-white">{dosenList.length}</strong> dosen pembimbing •{' '}
+            <strong className="font-black text-black dark:text-white">{keahlianList.length}</strong> bidang keahlian •{' '}
+            <strong className="font-black text-black dark:text-white">{issues.length || 1}</strong> edisi publikasi
+          </p>
         </div>
       </section>
 
       {/* Main Content & Articles Catalog */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filters & Sorting Bar */}
-        <div className="mb-8 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* Filter selectors */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm">
-            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 mr-1">
-              <SlidersHorizontal className="w-4 h-4" />
-              <span className="font-semibold">Filter:</span>
+        <div id="catalog-top" className="scroll-mt-6" />
+
+        {/* Unified Search & Filters Control Panel - Neo-Brutalist Box */}
+        <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] space-y-4">
+          {/* Search Bar */}
+          <div className="relative flex items-center bg-[#FFFDF5] dark:bg-[#0D0F12] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black dark:text-white">
+              <Search className="w-5 h-5 stroke-[2.5]" />
             </div>
-
-            {/* Dosen Pembimbing Filter */}
-            <select
-              value={selectedDosen}
-              onChange={(e) => setSelectedDosen(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[200px] truncate"
-            >
-              <option value="all">Semua Dosen Pembimbing</option>
-              {dosenList.map((d) => (
-                <option key={d.cleanName} value={d.cleanName}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Keahlian Filter */}
-            <select
-              value={selectedKeahlian}
-              onChange={(e) => setSelectedKeahlian(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[220px] truncate"
-            >
-              <option value="all">Semua Bidang Keahlian</option>
-              {keahlianList.map((k) => (
-                <option key={k} value={k}>
-                  {k}
-                </option>
-              ))}
-            </select>
-
-            {/* Issue Selector */}
-            <select
-              value={selectedIssue}
-              onChange={(e) => setSelectedIssue(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[180px] truncate"
-            >
-              <option value="all">Semua Edisi ({issues.length})</option>
-              {issues.map((iss) => (
-                <option key={iss} value={iss}>
-                  {iss}
-                </option>
-              ))}
-            </select>
-
-            {/* Year Selector */}
-            {years.length > 0 && (
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="all">Semua Tahun</option>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    Tahun {y}
-                  </option>
-                ))}
-              </select>
-            )}
-
-            {/* Sort Selector */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="newest">Terbaru</option>
-              <option value="oldest">Terlama</option>
-              <option value="title">Judul (A-Z)</option>
-            </select>
-
-            {/* Reset Button */}
-            {hasActiveFilters && (
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Cari judul riset, nama mahasiswa, dosen pembimbing, atau topik..."
+              className="w-full pl-12 pr-10 py-3.5 text-sm sm:text-base font-bold bg-transparent text-black dark:text-white placeholder-slate-400 focus:outline-none"
+            />
+            {searchInput && (
               <button
-                onClick={handleResetFilters}
-                className="px-2.5 py-1 text-xs text-rose-600 hover:text-rose-700 dark:text-rose-400 hover:underline flex items-center gap-1 font-medium"
+                onClick={() => {
+                  setSearchInput('');
+                  setSearchQuery('');
+                }}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-black dark:text-white hover:opacity-70"
+                title="Hapus pencarian"
               >
-                <X className="w-3.5 h-3.5" />
-                <span>Reset Filter</span>
+                <X className="w-5 h-5 stroke-[2.5]" />
               </button>
             )}
           </div>
 
-          {/* Results Count */}
-          <div className="flex items-center justify-between lg:justify-end gap-3 text-xs text-slate-500 dark:text-slate-400 shrink-0">
-            <span>
-              Menampilkan <strong>{articles.length}</strong> riset
-            </span>
+          {/* Filters & Results Counter Row */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
+            {/* Filter Dropdowns */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
+              <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
+                <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
+                <span>Filter:</span>
+              </div>
+
+              {/* Prodi Filter */}
+              <select
+                value={selectedProdi}
+                onChange={(e) => setSelectedProdi(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+              >
+                <option value="all">Semua Prodi</option>
+                <option value="SISKOM">Siskom</option>
+                <option value="SISFO">Sisfo</option>
+              </select>
+
+              {/* Dosen Pembimbing Filter */}
+              <select
+                value={selectedDosen}
+                onChange={(e) => setSelectedDosen(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[210px] truncate"
+              >
+                <option value="all">Semua Dosen Pembimbing</option>
+                {dosenList.map((d) => (
+                  <option key={d.cleanName} value={d.cleanName}>
+                    {d.name} [{d.prodi}]
+                  </option>
+                ))}
+              </select>
+
+              {/* Keahlian Filter */}
+              <select
+                value={selectedKeahlian}
+                onChange={(e) => setSelectedKeahlian(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[220px] truncate"
+              >
+                <option value="all">Semua Bidang Keahlian</option>
+                {keahlianList.map((k) => (
+                  <option key={k} value={k}>
+                    {k}
+                  </option>
+                ))}
+              </select>
+
+              {/* Issue Selector */}
+              <select
+                value={selectedIssue}
+                onChange={(e) => setSelectedIssue(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[180px] truncate"
+              >
+                <option value="all">Semua Edisi ({issues.length})</option>
+                {issues.map((iss) => (
+                  <option key={iss} value={iss}>
+                    {iss}
+                  </option>
+                ))}
+              </select>
+
+              {/* Year Selector */}
+              {years.length > 0 && (
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+                >
+                  <option value="all">Semua Tahun</option>
+                  {years.map((y) => (
+                    <option key={y} value={y}>
+                      Tahun {y}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {/* Sort Selector */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+              >
+                <option value="newest">Terbaru</option>
+                <option value="oldest">Terlama</option>
+                <option value="title">Judul (A-Z)</option>
+              </select>
+
+              {/* Reset Button */}
+              {hasActiveFilters && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
+                >
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                  <span>Reset</span>
+                </button>
+              )}
+            </div>
+
+            {/* Results Count Badge & Quick View Mode Toggle */}
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
+              <span className="px-3 py-1.5 bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] font-black uppercase tracking-wide">
+                HASIL: {filteredCount} / {totalCount} RISET
+              </span>
+              <button
+                onClick={handleToggleShowAll}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                  showAll
+                    ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
+                    : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
+                }`}
+                title={showAll ? 'Kembali ke mode 10 riset per halaman' : 'Tampilkan seluruh riset dalam satu halaman'}
+              >
+                <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>{showAll ? '10 PER HAL' : 'SEMUA RISET'}</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Loading State */}
         {isLoading ? (
-          <div className="py-20 flex flex-col items-center justify-center space-y-3 text-slate-500">
-            <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin" />
-            <p className="text-sm font-medium">Memuat data riset...</p>
+          <div className="py-20 flex flex-col items-center justify-center space-y-3">
+            <div className="w-10 h-10 border-4 border-black border-t-[#FACC15] rounded-full animate-spin" />
+            <p className="text-sm font-black uppercase tracking-wider">Memuat data riset...</p>
           </div>
         ) : articles.length === 0 ? (
           /* Empty State */
-          <div className="py-16 px-4 text-center rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/50 max-w-lg mx-auto">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-3">
-              <BookOpen className="w-6 h-6" />
+          <div className="py-16 px-6 text-center border-[3px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] max-w-lg mx-auto space-y-3">
+            <div className="w-14 h-14 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center mx-auto">
+              <BookOpen className="w-7 h-7 stroke-[2.5]" />
             </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">
+            <h3 className="text-lg font-black uppercase text-black dark:text-white">
               {hasActiveFilters ? 'Tidak ada artikel yang cocok' : 'Belum ada data artikel'}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-5">
+            <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300">
               {hasActiveFilters
-                ? 'Coba ganti filter dosen, bidang keahlian, atau kata kunci pencarian.'
-                : 'Data riset belum tersedia. Silakan hubungi admin untuk melakukan sinkronisasi database.'}
+                ? 'Coba ganti kata kunci pencarian atau reset filter yang aktif.'
+                : 'Data riset belum tersedia di database.'}
             </p>
             {hasActiveFilters && (
               <button
                 onClick={handleResetFilters}
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
               >
                 Reset Filter Pencarian
               </button>
             )}
           </div>
         ) : (
-          /* Articles Grid */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {articles.map((article) => (
-              <ArticleCard
-                key={article.ojs_id}
-                article={article}
-                onReadPdf={(art) => setActivePdfArticle(art)}
-                onFilterDosen={(dosenName) => setSelectedDosen(dosenName)}
-                onFilterKeahlian={(keahlianName) => setSelectedKeahlian(keahlianName)}
-              />
-            ))}
-          </div>
+          <>
+            {/* Articles Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {articles.map((article) => (
+                <ArticleCard
+                  key={article.ojs_id}
+                  article={article}
+                  onReadPdf={(art) => setActivePdfArticle(art)}
+                  onFilterDosen={(dosenName) => {
+                    setSelectedDosen(dosenName);
+                    scrollToCatalog();
+                  }}
+                  onFilterKeahlian={(keahlianName) => {
+                    setSelectedKeahlian(keahlianName);
+                    scrollToCatalog();
+                  }}
+                  onFilterProdi={(prodiName) => {
+                    setSelectedProdi(prodiName);
+                    scrollToCatalog();
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Neo-Brutalist Pagination & View Bar */}
+            <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Pagination Info Readout */}
+              <div className="text-xs font-mono font-bold text-black dark:text-white text-center md:text-left">
+                {showAll ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#A3E635] border border-black inline-block" />
+                    Menampilkan seluruh <strong className="font-black text-black dark:text-white">{filteredCount}</strong> riset (Satu Halaman)
+                  </span>
+                ) : (
+                  <span>
+                    Menampilkan riset <strong className="font-black">{(currentPage - 1) * PAGE_SIZE + 1}</strong> -{' '}
+                    <strong className="font-black">{Math.min(currentPage * PAGE_SIZE, filteredCount)}</strong> dari{' '}
+                    <strong className="font-black">{filteredCount}</strong> artikel
+                    {totalPages > 1 && (
+                      <span className="opacity-70 ml-1.5 font-normal">
+                        (Halaman {currentPage} dari {totalPages})
+                      </span>
+                    )}
+                  </span>
+                )}
+              </div>
+
+              {/* Numbered Page Controls (Active in Paginated Mode) */}
+              {!showAll && totalPages > 1 && (
+                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                  {/* Prev Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage <= 1}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
+                      currentPage <= 1
+                        ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                    }`}
+                    title="Halaman Sebelumnya"
+                  >
+                    <ChevronLeft className="w-4 h-4 stroke-[3]" />
+                    <span className="hidden sm:inline">Prev</span>
+                  </button>
+
+                  {/* Smart Windowed Page Numbers */}
+                  {getPaginationItems(currentPage, totalPages).map((item, idx) => {
+                    if (item === '...') {
+                      return (
+                        <span
+                          key={`ellipsis-${idx}`}
+                          className="px-2 py-1 text-xs font-mono font-bold opacity-60"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+                    const pageNum = Number(item);
+                    const isActive = pageNum === currentPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`min-w-[34px] px-2 py-1.5 text-xs font-black border-2 border-black dark:border-white transition-all ${
+                          isActive
+                            ? 'bg-[#FACC15] text-black shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] scale-105'
+                            : 'bg-white dark:bg-black text-black dark:text-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage >= totalPages}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
+                      currentPage >= totalPages
+                        ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                    }`}
+                    title="Halaman Selanjutnya"
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <ChevronRight className="w-4 h-4 stroke-[3]" />
+                  </button>
+                </div>
+              )}
+
+              {/* Show All Toggle Button */}
+              <button
+                onClick={handleToggleShowAll}
+                className={`inline-flex items-center gap-2 px-3.5 py-2 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all ${
+                  showAll
+                    ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
+                    : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
+                }`}
+              >
+                <Layers className="w-4 h-4 stroke-[2.5]" />
+                <span>{showAll ? 'Tampilkan Per Halaman (10 Riset)' : 'Tampilkan Semua Riset (1 Halaman)'}</span>
+              </button>
+            </div>
+          </>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="mt-16 border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 dark:text-slate-400">
+      {/* Footer - Neo-Brutalist */}
+      <footer className="mt-20 border-t-[3px] border-black dark:border-white bg-white dark:bg-[#0D0F12] py-8 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-200">
-              Untan Research Hub • JCSKOMMIPA
+            <p className="font-black text-sm uppercase tracking-wide">
+              UNTAN RESEARCH HUB • JCSKOMMIPA
             </p>
-            <p className="mt-0.5">
-              Program Studi Rekayasa Sistem Komputer, Fakultas MIPA, Universitas Tanjungpura.
+            <p className="mt-1 text-slate-600 dark:text-slate-400 font-medium">
+              Program Studi Rekayasa Sistem Komputer &amp; Sistem Informasi, Fakultas MIPA, Universitas Tanjungpura.
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 font-black">
             <a
               href="https://siskom.untan.ac.id/dosen-staf"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 dark:text-indigo-400 hover:underline"
+              className="hover:underline"
             >
-              Direktori Dosen Siskom
+              DOSEN SISKOM
             </a>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>•</span>
+            <a
+              href="https://sisfo.untan.ac.id/dosen-staff"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              DOSEN SISFO
+            </a>
+            <span>•</span>
             <a
               href="https://jurnal.untan.ac.id/index.php/jcskommipa"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 dark:text-indigo-400 hover:underline"
+              className="hover:underline"
             >
-              OJS Untan
+              OJS UNTAN
             </a>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>•</span>
             <Link
               href="/admin"
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 transition-colors"
-              title="Khusus Pengelola / Admin Database"
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none transition-all"
+              title="Panel Pengelola Database"
             >
-              <Lock className="w-3 h-3" />
-              <span>Admin Sync</span>
+              <Lock className="w-3 h-3 stroke-[2.5]" />
+              <span>ADMIN</span>
             </Link>
           </div>
         </div>
@@ -433,6 +635,27 @@ export default function HomePage() {
         article={activePdfArticle}
         onClose={() => setActivePdfArticle(null)}
       />
+
+      {/* Floating Quick Action Pill for Show All Mode */}
+      {showAll && (
+        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
+          <button
+            onClick={handleToggleShowAll}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-black uppercase bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#EAB308] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            title="Kembali ke tampilan 10 artikel per halaman"
+          >
+            <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>10 PER HALAMAN</span>
+          </button>
+          <button
+            onClick={() => document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' })}
+            className="p-2 text-xs font-black bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            title="Kembali ke Atas"
+          >
+            <ArrowUp className="w-4 h-4 stroke-[3]" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

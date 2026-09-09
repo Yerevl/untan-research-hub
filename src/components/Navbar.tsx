@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { BookOpen, RefreshCw, ExternalLink, Database, Sparkles } from 'lucide-react';
+import { BookOpen, Database } from 'lucide-react';
 
 interface NavbarProps {
   onOpenSync?: () => void;
@@ -14,24 +13,21 @@ export const Navbar: React.FC<NavbarProps> = ({
   totalArticles,
 }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full border-b-[3px] border-black dark:border-white bg-[#FFFDF5] dark:bg-[#0D0F12] transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         {/* Brand & Logo */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-            <BookOpen className="w-5 h-5" />
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-none bg-[#FACC15] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] flex items-center justify-center text-black font-extrabold transform -rotate-1 hover:rotate-0 transition-transform">
+            <BookOpen className="w-6 h-6 stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">
+              <span className="font-black text-xl text-black dark:text-white tracking-tight uppercase">
                 Untan Research Hub
               </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                JCSKOMMIPA
-              </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
-              Portal Hasil Riset Jurnal Komputer & Aplikasi Universitas Tanjungpura
+            <p className="text-xs font-medium text-slate-700 dark:text-slate-300 hidden sm:block">
+              Portal Publikasi Riset Rekayasa Sistem Komputer Universitas Tanjungpura
             </p>
           </div>
         </div>
@@ -39,29 +35,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Action Controls & Badges */}
         <div className="flex items-center space-x-3">
           {/* Supabase Status Indicator */}
-          <div className="hidden md:flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300">
+          <div className="flex items-center space-x-2 px-3 py-1 text-xs font-bold border-2 border-black dark:border-white bg-white dark:bg-black text-black dark:text-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff]">
             <span
-              className={`w-2 h-2 rounded-full ${
-                supabaseConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+              className={`w-2.5 h-2.5 rounded-full border border-black ${
+                supabaseConnected ? 'bg-[#4ADE80] animate-pulse' : 'bg-[#FBBF24]'
               }`}
             />
-            <Database className="w-3.5 h-3.5 text-slate-400" />
-            <span>{supabaseConnected ? 'Supabase Cloud' : 'Penyimpanan Lokal'}</span>
+            <Database className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span className="hidden sm:inline">{supabaseConnected ? 'SUPABASE CLOUD' : 'LOCAL STORAGE'}</span>
           </div>
-
-          {/* External Untan Link */}
-          <a
-            href="https://jurnal.untan.ac.id/index.php/jcskommipa"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Kunjungi website OJS Untan asli"
-            className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          >
-            <ExternalLink className="w-5 h-5" />
-          </a>
         </div>
       </div>
     </header>
   );
 };
-

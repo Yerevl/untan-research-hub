@@ -29,20 +29,20 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
   const pdfUrl = article.storage_pdf_url || article.original_pdf_url || '';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl h-[92vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur">
-          <div className="flex items-center space-x-3 overflow-hidden mr-4">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 rounded-lg shrink-0">
-              <FileText className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/70 backdrop-blur-[2px] animate-in fade-in duration-150">
+      <div className="relative w-full max-w-5xl h-[92vh] bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[10px_10px_0px_0px_#000] dark:shadow-[10px_10px_0px_0px_#fff] flex flex-col overflow-hidden">
+        {/* Retro Window Titlebar */}
+        <div className="flex items-center justify-between px-5 py-3 border-b-[3px] border-black dark:border-white bg-[#FACC15] text-black">
+          <div className="flex items-center space-x-3 overflow-hidden mr-3">
+            <div className="p-1 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000] shrink-0">
+              <FileText className="w-4 h-4 stroke-[2.5]" />
             </div>
             <div className="overflow-hidden">
-              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
+              <h4 className="text-sm sm:text-base font-black truncate uppercase tracking-tight">
                 {article.title}
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                {article.authors.join(', ')} • {article.issue_name || 'Jurnal Untan'}
+              <p className="text-[11px] font-bold text-slate-800 truncate font-mono">
+                {article.student ? `Mhs: ${article.student}` : ''} • {article.issue_name || 'Jurnal Untan'}
               </p>
             </div>
           </div>
@@ -54,33 +54,33 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
                   href={pdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                  title="Buka di tab baru"
+                  className="p-1.5 bg-white text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                  title="Buka tab baru"
                 >
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-4 h-4 stroke-[2.5]" />
                 </a>
                 <a
-                  href={pdfUrl}
-                  download
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors"
-                  title="Unduh file PDF"
+                  href={`/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`}
+                  className="inline-flex items-center space-x-1 px-3 py-1.5 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-xs font-black uppercase transition-all"
+                  title={`Unduh: ${article.title}`}
                 >
-                  <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">Unduh PDF</span>
+                  <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span className="hidden sm:inline">UNDUH PDF</span>
                 </a>
               </>
             )}
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-1.5 bg-[#FB7185] hover:bg-[#F43F5E] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              title="Tutup (ESC)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 stroke-[3]" />
             </button>
           </div>
         </div>
 
-        {/* Modal Body / PDF Viewer */}
-        <div className="flex-1 w-full bg-slate-100 dark:bg-slate-950 relative overflow-hidden">
+        {/* Modal Body / PDF Viewer Frame */}
+        <div className="flex-1 w-full bg-slate-200 dark:bg-slate-900 relative overflow-hidden">
           {pdfUrl ? (
             <iframe
               src={`${pdfUrl}#toolbar=1`}
@@ -88,9 +88,9 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
               title={`PDF viewer: ${article.title}`}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center text-slate-500">
-              <FileText className="w-12 h-12 mb-3 text-slate-400" />
-              <p className="text-sm font-medium">Dokumen PDF tidak ditemukan untuk artikel ini.</p>
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+              <FileText className="w-12 h-12 mb-3 text-black dark:text-white stroke-[2]" />
+              <p className="text-sm font-black uppercase">Dokumen PDF belum tersedia di penyimpanan.</p>
             </div>
           )}
         </div>
@@ -98,4 +98,3 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
     </div>
   );
 };
-

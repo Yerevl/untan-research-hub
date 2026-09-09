@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getArticles, isSupabaseConfigured } from '@/lib/supabase';
-import { getDosenList, getKeahlianList } from '@/lib/dosen';
+import { getDosenList, getKeahlianList, enrichArticleWithDosen } from '@/lib/dosen';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,9 +10,11 @@ export async function GET(request: NextRequest) {
     const year = searchParams.get('year') || undefined;
     const dosen = searchParams.get('dosen') || undefined;
     const keahlian = searchParams.get('keahlian') || undefined;
+    const prodi = searchParams.get('prodi') || undefined;
     const sortBy = searchParams.get('sortBy') || 'newest';
 
-    const allArticles = await getArticles();
+    const rawAllArticles = await getArticles();
+    const allArticles = rawAllArticles.map((a) => enrichArticleWithDosen(a));
 
     // Extract unique issues and years for filter dropdowns
     const uniqueIssues = Array.from(new Set(allArticles.map((a) => a.issue_name).filter(Boolean))) as string[];
@@ -28,7 +30,12 @@ export async function GET(request: NextRequest) {
     const dosenList = getDosenList();
     const keahlianList = getKeahlianList();
 
-    let filtered = await getArticles({ query, issue, year, dosen, keahlian });
+    const rawFiltered = await getArticles({ query, issue, year, dosen, keahlian });
+    let filtered = rawFiltered.map((a) => enrichArticleWithDosen(a));
+
+    if (prodi && prodi !== 'all') {
+      filtered = filtered.filter((a) => a.prodi?.toUpperCase() === prodi.toUpperCase());
+    }
 
     if (sortBy === 'title') {
       filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
@@ -39,16 +46,35 @@ export async function GET(request: NextRequest) {
       filtered = filtered.sort((a, b) => (b.publication_date || '').localeCompare(a.publication_date || ''));
     }
 
+    const pageParam = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+    const allParam = searchParams.get('all') === 'true';
+
+    const totalFiltered = filtered.length;
+    let paginatedArticles = filtered;
+
+    const limit = limitParam ? Math.max(1, parseInt(limitParam, 10)) : 10;
+    const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
+    const totalPages = Math.max(1, Math.ceil(totalFiltered / limit));
+
+    if (pageParam && !allParam) {
+      const startIndex = (page - 1) * limit;
+      paginatedArticles = filtered.slice(startIndex, startIndex + limit);
+    }
+
     return NextResponse.json({
       success: true,
       supabaseConnected: isSupabaseConfigured(),
       total: allArticles.length,
-      filteredCount: filtered.length,
+      filteredCount: totalFiltered,
+      page: allParam ? 1 : page,
+      limit: allParam ? totalFiltered : limit,
+      totalPages: allParam ? 1 : totalPages,
       issues: uniqueIssues,
       years: uniqueYears,
       dosenList,
       keahlianList,
-      articles: filtered,
+      articles: paginatedArticles,
     });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
