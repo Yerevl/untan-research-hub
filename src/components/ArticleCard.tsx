@@ -171,8 +171,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
             })}
 
           {formattedDate && (
-            <span className="inline-flex items-center text-xs font-mono font-bold text-slate-700 dark:text-slate-300 ml-auto bg-slate-100 dark:bg-slate-800 px-2 py-0.5 border border-black dark:border-white">
-              <Calendar className="w-3 h-3 mr-1 stroke-[2]" />
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-mono font-bold bg-white dark:bg-[#23272F] text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] ml-auto shrink-0">
+              <Calendar className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
               {formattedDate}
             </span>
           )}
@@ -295,26 +295,18 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {article.doi && (
             <a
               href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-mono font-bold text-black dark:text-white bg-[#FECDD3] px-2 py-0.5 border border-black hover:bg-[#FDA4AF] transition-colors"
+              className="text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] px-2.5 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center"
+              title={`DOI: ${article.doi}`}
             >
               DOI
             </a>
           )}
-          <a
-            href={article.original_article_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-black uppercase text-black dark:text-slate-300 hover:underline flex items-center gap-1"
-          >
-            <span>OJS</span>
-            <ExternalLink className="w-3 h-3 stroke-[2.5]" />
-          </a>
         </div>
       </div>
     </article>

@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Layers,
+  ArrowUp,
 } from 'lucide-react';
 
 const PAGE_SIZE = 10;
@@ -399,11 +400,23 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Results Count Badge */}
-            <div className="flex items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
+            {/* Results Count Badge & Quick View Mode Toggle */}
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
               <span className="px-3 py-1.5 bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] font-black uppercase tracking-wide">
                 HASIL: {filteredCount} / {totalCount} RISET
               </span>
+              <button
+                onClick={handleToggleShowAll}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                  showAll
+                    ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
+                    : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
+                }`}
+                title={showAll ? 'Kembali ke mode 10 riset per halaman' : 'Tampilkan seluruh riset dalam satu halaman'}
+              >
+                <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>{showAll ? '10 PER HAL' : 'SEMUA RISET'}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -622,6 +635,27 @@ export default function HomePage() {
         article={activePdfArticle}
         onClose={() => setActivePdfArticle(null)}
       />
+
+      {/* Floating Quick Action Pill for Show All Mode */}
+      {showAll && (
+        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
+          <button
+            onClick={handleToggleShowAll}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-black uppercase bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#EAB308] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            title="Kembali ke tampilan 10 artikel per halaman"
+          >
+            <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>10 PER HALAMAN</span>
+          </button>
+          <button
+            onClick={() => document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' })}
+            className="p-2 text-xs font-black bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            title="Kembali ke Atas"
+          >
+            <ArrowUp className="w-4 h-4 stroke-[3]" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
