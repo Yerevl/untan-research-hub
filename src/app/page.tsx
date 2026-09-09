@@ -10,9 +10,6 @@ import Link from 'next/link';
 import {
   Search,
   BookOpen,
-  Filter,
-  Sparkles,
-  RefreshCw,
   Users,
   GraduationCap,
   Calendar,
@@ -23,8 +20,8 @@ import {
   Cpu,
   Network,
   Server,
-  Layers,
   Lock,
+  Sparkles,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -45,7 +42,7 @@ export default function HomePage() {
   const [selectedKeahlian, setSelectedKeahlian] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title'>('newest');
 
-  // Modals State
+  // Modal State
   const [activePdfArticle, setActivePdfArticle] = useState<Article | null>(null);
 
   // Fetch articles from API
@@ -113,128 +110,130 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#FFFDF5] dark:bg-[#0D0F12] text-black dark:text-white transition-colors">
       {/* Top Navigation */}
-      <Navbar
-        supabaseConnected={supabaseConnected}
-        totalArticles={totalCount}
-      />
+      <Navbar supabaseConnected={supabaseConnected} totalArticles={totalCount} />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-indigo-900/10 via-white to-slate-50/50 dark:from-indigo-950/40 dark:via-slate-950 dark:to-slate-950 pt-12 pb-10 px-4 sm:px-6 lg:px-8 border-b border-slate-200/60 dark:border-slate-800/60">
-        <div className="max-w-4xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span>Katalog Riset Rekayasa Sistem Komputer • Untan</span>
+      {/* Hero Section - Neo Brutalism */}
+      <section className="relative pt-12 pb-10 px-4 sm:px-6 lg:px-8 border-b-[3px] border-black dark:border-white">
+        <div className="max-w-4xl mx-auto text-center space-y-5">
+          {/* Sticker Tag */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] uppercase tracking-widest transform -rotate-1">
+            <GraduationCap className="w-4 h-4 stroke-[2.5]" />
+            <span>★ REKAYASA SISTEM KOMPUTER • UNTAN ★</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-            Eksplorasi Publikasi Ilmiah{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-400 dark:to-blue-400">
-              JCSKOMMIPA Untan
+          {/* Punchy Title */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none uppercase">
+            Eksplorasi Publikasi Riset{' '}
+            <span className="inline-block mt-1 sm:mt-0 bg-[#A3E635] text-black px-3 py-1 border-[3px] border-black shadow-[5px_5px_0px_0px_#000] transform rotate-1">
+              JCSKOMMIPA
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Akses hasil riset mahasiswa dan dosen pembimbing Siskom Untan. Dilengkapi pencarian instan, filter
-            dosen pembimbing, klasifikasi bidang keahlian, dan pembaca PDF online.
+          <p className="text-sm sm:text-base font-medium text-slate-800 dark:text-slate-200 max-w-2xl mx-auto leading-relaxed">
+            Koleksi riset Tugas Akhir & Skripsi mahasiswa Siskom Untan bersama dosen pembimbing.
+            Cari topik, saring bidang keahlian laboratorium, dan baca dokumen PDF secara instan.
           </p>
 
-          {/* Search Bar */}
+          {/* Neo-brutalist Search Bar */}
           <div className="pt-2 max-w-2xl mx-auto">
-            <div className="relative flex items-center shadow-lg shadow-indigo-500/5 rounded-2xl">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                <Search className="w-5 h-5" />
+            <div className="relative flex items-center bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff]">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black dark:text-white">
+                <Search className="w-5 h-5 stroke-[2.5]" />
               </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari judul riset, nama mahasiswa, dosen pembimbing, atau topik..."
-                className="w-full pl-11 pr-10 py-3.5 text-sm sm:text-base rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                placeholder="Cari judul riset, nama mahasiswa, dosen, atau kata kunci..."
+                className="w-full pl-12 pr-10 py-4 text-sm sm:text-base font-bold bg-transparent text-black dark:text-white placeholder-slate-400 focus:outline-none"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-black dark:text-white hover:opacity-70"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5 stroke-[2.5]" />
                 </button>
               )}
             </div>
           </div>
 
-          {/* Quick Keahlian Chips */}
-          <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
+          {/* Quick Keahlian Chips - Tactile Neo-Brutalist Buttons */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
             <button
               onClick={() => setSelectedKeahlian('all')}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
                 selectedKeahlian === 'all'
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-400'
+                  ? 'bg-black text-white dark:bg-white dark:text-black shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]'
+                  : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:-translate-x-0.5 hover:-translate-y-0.5'
               }`}
             >
               Semua Keahlian
             </button>
+
             <button
               onClick={() => setSelectedKeahlian('Automation & Embeded System (AES)')}
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+              className={`inline-flex items-center px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
                 selectedKeahlian === 'Automation & Embeded System (AES)'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:border-emerald-400'
+                  ? 'bg-[#A3E635] text-black shadow-[4px_4px_0px_0px_#000] -translate-x-0.5 -translate-y-0.5'
+                  : 'bg-[#A3E635]/60 hover:bg-[#A3E635] text-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5'
               }`}
             >
-              <Cpu className="w-3 h-3 mr-1" />
-              <span>Automation & Embeded System (AES)</span>
+              <Cpu className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
+              <span>AES (Automation & Embedded)</span>
             </button>
+
             <button
               onClick={() => setSelectedKeahlian('Network Intelligent Control (NIC)')}
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+              className={`inline-flex items-center px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
                 selectedKeahlian === 'Network Intelligent Control (NIC)'
-                  ? 'bg-sky-600 text-white shadow-sm'
-                  : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 hover:border-sky-400'
+                  ? 'bg-[#38BDF8] text-black shadow-[4px_4px_0px_0px_#000] -translate-x-0.5 -translate-y-0.5'
+                  : 'bg-[#38BDF8]/60 hover:bg-[#38BDF8] text-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5'
               }`}
             >
-              <Network className="w-3 h-3 mr-1" />
-              <span>Network Intelligent Control (NIC)</span>
+              <Network className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
+              <span>NIC (Network & Intelligent)</span>
             </button>
+
             <button
               onClick={() => setSelectedKeahlian('Edge Computing')}
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+              className={`inline-flex items-center px-3.5 py-1.5 text-xs font-black uppercase tracking-wide border-2 border-black dark:border-white transition-all ${
                 selectedKeahlian === 'Edge Computing'
-                  ? 'bg-purple-600 text-white shadow-sm'
-                  : 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:border-purple-400'
+                  ? 'bg-[#C084FC] text-black shadow-[4px_4px_0px_0px_#000] -translate-x-0.5 -translate-y-0.5'
+                  : 'bg-[#C084FC]/60 hover:bg-[#C084FC] text-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5'
               }`}
             >
-              <Server className="w-3 h-3 mr-1" />
+              <Server className="w-3.5 h-3.5 mr-1.5 stroke-[2.5]" />
               <span>Edge Computing</span>
             </button>
           </div>
 
-          {/* Stats Badges */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-            <div className="flex items-center gap-1.5">
-              <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          {/* Stats Bar - Sticker Boxes */}
+          <div className="pt-3 flex flex-wrap items-center justify-center gap-3 text-xs font-mono font-bold">
+            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
+              <FileText className="w-4 h-4 stroke-[2]" />
               <span>
-                <strong>{totalCount}</strong> Artikel Riset
+                <strong>{totalCount}</strong> ARTIKEL
               </span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 stroke-[2]" />
               <span>
-                <strong>{issues.length || 1}</strong> Edisi Terbit
+                <strong>{issues.length || 1}</strong> EDISI
               </span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
+              <Briefcase className="w-4 h-4 stroke-[2]" />
               <span>
-                <strong>{dosenList.length}</strong> Dosen Siskom
+                <strong>{dosenList.length}</strong> DOSEN SISKOM
               </span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <div className="px-3 py-1.5 bg-white dark:bg-[#181B20] border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] flex items-center gap-1.5">
+              <Users className="w-4 h-4 stroke-[2]" />
               <span>
-                <strong>{stats.totalAuthors}</strong> Total Penulis
+                <strong>{stats.totalAuthors}</strong> PENULIS
               </span>
             </div>
           </div>
@@ -243,20 +242,20 @@ export default function HomePage() {
 
       {/* Main Content & Articles Catalog */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filters & Sorting Bar */}
-        <div className="mb-8 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* Filter selectors */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm">
-            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 mr-1">
-              <SlidersHorizontal className="w-4 h-4" />
-              <span className="font-semibold">Filter:</span>
+        {/* Filters & Sorting Bar - Neo-Brutalist Box */}
+        <div className="mb-8 p-5 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[5px_5px_0px_0px_#000] dark:shadow-[5px_5px_0px_0px_#fff] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* Selectors */}
+          <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
+            <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
+              <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
+              <span>Filter:</span>
             </div>
 
             {/* Dosen Pembimbing Filter */}
             <select
               value={selectedDosen}
               onChange={(e) => setSelectedDosen(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[200px] truncate"
+              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[200px] truncate"
             >
               <option value="all">Semua Dosen Pembimbing</option>
               {dosenList.map((d) => (
@@ -270,7 +269,7 @@ export default function HomePage() {
             <select
               value={selectedKeahlian}
               onChange={(e) => setSelectedKeahlian(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[220px] truncate"
+              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[220px] truncate"
             >
               <option value="all">Semua Bidang Keahlian</option>
               {keahlianList.map((k) => (
@@ -284,7 +283,7 @@ export default function HomePage() {
             <select
               value={selectedIssue}
               onChange={(e) => setSelectedIssue(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[180px] truncate"
+              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[180px] truncate"
             >
               <option value="all">Semua Edisi ({issues.length})</option>
               {issues.map((iss) => (
@@ -299,7 +298,7 @@ export default function HomePage() {
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
               >
                 <option value="all">Semua Tahun</option>
                 {years.map((y) => (
@@ -314,7 +313,7 @@ export default function HomePage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
-              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
             >
               <option value="newest">Terbaru</option>
               <option value="oldest">Terlama</option>
@@ -325,46 +324,46 @@ export default function HomePage() {
             {hasActiveFilters && (
               <button
                 onClick={handleResetFilters}
-                className="px-2.5 py-1 text-xs text-rose-600 hover:text-rose-700 dark:text-rose-400 hover:underline flex items-center gap-1 font-medium"
+                className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
               >
-                <X className="w-3.5 h-3.5" />
-                <span>Reset Filter</span>
+                <X className="w-3.5 h-3.5 stroke-[3]" />
+                <span>Reset</span>
               </button>
             )}
           </div>
 
           {/* Results Count */}
-          <div className="flex items-center justify-between lg:justify-end gap-3 text-xs text-slate-500 dark:text-slate-400 shrink-0">
-            <span>
-              Menampilkan <strong>{articles.length}</strong> riset
+          <div className="flex items-center justify-between lg:justify-end gap-3 text-xs font-mono font-bold text-black dark:text-white shrink-0">
+            <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 border border-black dark:border-white">
+              HASIL: <strong>{articles.length}</strong> RISET
             </span>
           </div>
         </div>
 
         {/* Loading State */}
         {isLoading ? (
-          <div className="py-20 flex flex-col items-center justify-center space-y-3 text-slate-500">
-            <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin" />
-            <p className="text-sm font-medium">Memuat data riset...</p>
+          <div className="py-20 flex flex-col items-center justify-center space-y-3">
+            <div className="w-10 h-10 border-4 border-black border-t-[#FACC15] rounded-full animate-spin" />
+            <p className="text-sm font-black uppercase tracking-wider">Memuat data riset...</p>
           </div>
         ) : articles.length === 0 ? (
           /* Empty State */
-          <div className="py-16 px-4 text-center rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900/50 max-w-lg mx-auto">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-3">
-              <BookOpen className="w-6 h-6" />
+          <div className="py-16 px-6 text-center border-[3px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] max-w-lg mx-auto space-y-3">
+            <div className="w-14 h-14 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center mx-auto">
+              <BookOpen className="w-7 h-7 stroke-[2.5]" />
             </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">
+            <h3 className="text-lg font-black uppercase text-black dark:text-white">
               {hasActiveFilters ? 'Tidak ada artikel yang cocok' : 'Belum ada data artikel'}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-5">
+            <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300">
               {hasActiveFilters
-                ? 'Coba ganti filter dosen, bidang keahlian, atau kata kunci pencarian.'
-                : 'Data riset belum tersedia. Silakan hubungi admin untuk melakukan sinkronisasi database.'}
+                ? 'Coba ganti kata kunci pencarian atau reset filter yang aktif.'
+                : 'Data riset belum tersedia di database.'}
             </p>
             {hasActiveFilters && (
               <button
                 onClick={handleResetFilters}
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
               >
                 Reset Filter Pencarian
               </button>
@@ -386,43 +385,43 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="mt-16 border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 dark:text-slate-400">
+      {/* Footer - Neo-Brutalist */}
+      <footer className="mt-20 border-t-[3px] border-black dark:border-white bg-white dark:bg-[#0D0F12] py-8 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-200">
-              Untan Research Hub • JCSKOMMIPA
+            <p className="font-black text-sm uppercase tracking-wide">
+              UNTAN RESEARCH HUB • JCSKOMMIPA
             </p>
-            <p className="mt-0.5">
+            <p className="mt-1 text-slate-600 dark:text-slate-400 font-medium">
               Program Studi Rekayasa Sistem Komputer, Fakultas MIPA, Universitas Tanjungpura.
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 font-black">
             <a
               href="https://siskom.untan.ac.id/dosen-staf"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 dark:text-indigo-400 hover:underline"
+              className="hover:underline"
             >
-              Direktori Dosen Siskom
+              DOSEN SISKOM
             </a>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>•</span>
             <a
               href="https://jurnal.untan.ac.id/index.php/jcskommipa"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 dark:text-indigo-400 hover:underline"
+              className="hover:underline"
             >
-              OJS Untan
+              OJS UNTAN
             </a>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>•</span>
             <Link
               href="/admin"
-              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 transition-colors"
-              title="Khusus Pengelola / Admin Database"
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none transition-all"
+              title="Panel Pengelola Database"
             >
-              <Lock className="w-3 h-3" />
-              <span>Admin Sync</span>
+              <Lock className="w-3 h-3 stroke-[2.5]" />
+              <span>ADMIN</span>
             </Link>
           </div>
         </div>
