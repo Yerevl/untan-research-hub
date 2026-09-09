@@ -1,0 +1,1261 @@
+[
+  {
+    "ojs_id": "88115",
+    "title": "Sistem Pemantauan Dan Kendali Pada Budidaya Moina Sp Berbasis Mikrokontroler",
+    "abstract": "Saat ini, budidaya perikanan menghadapi berbagai tantangan dalam pengembangannya, khususnya pada proses pembenihan bibit ikan. Salah satu penyebab utama adalah tingginya angka kematian larva ikan yang baru menetas akibat kekurangan pakan. Pakan alami memiliki peran yang sangat penting dalam budidaya perikanan. Moina sp, dengan kandungan nutrisinya yang tinggi, menjadi pilihan unggulan sebagai pakan alami dalam budidaya ikan air tawar. Budidaya Moina sp membutuhkan perhatian khusus terhadap kualitas air dan kondisi lingkungannya untuk menjamin ketersediaan dan kualitasnya sebagai pakan alami. Untuk mengatasi masalah ini, dikembangkan sebuah sistem berbasis mikrokontroler yang dirancang untuk memantau dan mengendalikan budidaya Moina sp. Sistem ini memanfaatkan Arduino Uno dan NodeMCU ESP32 sebagai komponen utama, memungkinkan pengendalian kondisi air dengan menjaga nilai pH dan suhu secara otomatis, serta memberikan pakan secara terjadwal. Data nilai pH dan suhu dapat dipantau secara real-time melalui sebuah website. Penelitian ini menguji tiga sensor, yaitu sensor pH, sensor suhu, dan sensor waktu. Hasil pengujian menunjukkan akurasi sensor pH sebesar 96% dan sensor suhu 98%, sementara sensor waktu RTC berfungsi optimal dalam menjadwalkan pemberian pakan. Sistem ini diharapkan dapat membantu petani ikan dalam memastikan ketersediaan pakan alami secara konsisten, sehingga dapat menekan angka kematian larva akibat kekurangan nutrisi. Kata kunci : Moina sp, Budidaya, Arduino Uno, NodeMCU, Sistem Kendali.",
+    "authors": [
+      "Yoga Saputra",
+      "Suhardi Suhardi",
+      "Rahmi Hidayati"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.88115",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/88115",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/88115/75676605391",
+    "storage_pdf_path": "public/storage/pdfs/88115.pdf",
+    "storage_pdf_url": "/storage/pdfs/88115.pdf",
+    "id": "local-88115",
+    "updated_at": "2026-09-09T10:34:57.394Z",
+    "created_at": "2026-09-09T10:34:57.394Z",
+    "student": "Yoga Saputra",
+    "supervisors": [
+      {
+        "name": "Suhardi, S.T., M.Eng.",
+        "cleanName": "Suhardi",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      },
+      {
+        "name": "Rahmi Hidayati, S.Kom., M.Cs.",
+        "cleanName": "Rahmi Hidayati",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Automation & Embeded System (AES)"
+    ]
+  },
+  {
+    "ojs_id": "88332",
+    "title": "Rancang Bangun Pemilah Telur Fertil dan Infertil Pada Telur Bebek Menggunakan Sensor Infrared dan Image Processing",
+    "abstract": "Hasil pengeraman pada telur dapat dibedakan menjadi 2 kategori yaitu telur fertil dan infertil. Telur fertil adalah telur yang mengalami perkembangan embrio yang berbentuk nokta darah pada saat pengeraman. Sedangkan telur infertil merupakan telur yang tidak mengalami perkembangan embrio karena gagal dalam proses pembuahan. Oleh sebab itu, dalam melakukan penyeleksian telur fertil dan telur infertil harus melakukan uji fertilitas terlebih dahulu. Saat ini, pengujian fertilitas masih banyak menggunakan cara manual yaitu dengan memanfaatkan peneropongan menggunakan senter secara satu persatu. Pada penelitian ini membangun sebuah sistem yang dapat membedakan kondisi telur fertil dan infertil menggunakan proses image processing. Dengan memanfaatkan sensor infrared yang digunakan untuk mendeteksi keberadaan objek dan webcam yang digunakan untuk mengambil gambar telur. Proses image processing dilakukan di website setelah webcam mengambil gambar. Proses tersebut akan mengubah gambar berdasarkan warna HSV. Hasil yang diperoleh dari penelitian ini adalah sebuah sistem yang digunakan untuk memisahkan telur berdasarkan telur fertil dan infertil. Hasil tersebut akan ditampilkan di LCD berdasarkan jumlah telur fertil dan jumlah telur infertil. Akurasi yang diperoleh dari 45 kali pengujian sebesar 88,8%. Kata kunci\"” fertil, infertil, image processing, sensor infrared, website",
+    "authors": [
+      "Reni Astuti",
+      "Tedy Rismawan",
+      "Cucu Suhery"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.88332",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/88332",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/88332/75676605392",
+    "storage_pdf_path": "public/storage/pdfs/88332.pdf",
+    "storage_pdf_url": "/storage/pdfs/88332.pdf",
+    "id": "local-88332",
+    "updated_at": "2026-09-09T10:35:00.524Z",
+    "created_at": "2026-09-09T10:35:00.524Z",
+    "student": "Reni Astuti",
+    "supervisors": [
+      {
+        "name": "Tedy Rismawan, S.Kom., M.Cs.",
+        "cleanName": "Tedy Rismawan",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      },
+      {
+        "name": "Cucu Suhery, M.A.",
+        "cleanName": "Cucu Suhery",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Automation & Embeded System (AES)"
+    ]
+  },
+  {
+    "ojs_id": "89735",
+    "title": "Sistem Otomatisasi Berbasis IoT Pada Budidaya Udang Galah Menggunakan Website Dan Push Notification",
+    "abstract": "Kualitas air adalah aspek penting dalam budidaya udang galah, karena penurunan kualitas air dapat menyebabkan udang menjadi sensitif dan mudah stres. Kualitas air pada budidaya ini melibatkan tiga variabel utama, yaitu suhu, pH, dan salinitas. Sebagian besar petambak udang galah masih memantau dan mengendalikan kualitas air secara manual. Oleh karena itu, sistem otomatis dibutuhkan untuk pemantauan dan pengendalian. Penelitian ini, sistem otomatis menggunakan website dan notifikasi Telegram dibangun. sistem ini dirancang agar mampu meningkatkan efisiensi dan efektivitas dalam budidaya, sekaligus meminimalkan risiko kematian udang akibat perubahan kualitas air yang tidak terpantau. Pemantauan kualitas air kolam dilakukan melalui website, di mana sensor berhasil membaca variabel yang ditentukan. Rata-rata galat relatif untuk sensor suhu adalah 1,85%, pH 2,11%, dan salinitas 25,71%. Ketika variabel tidak dalam kondisi normal, sistem kendali otomatis akan berfungsi sesuai dengan parameter yang ditetapkan, dengan status true menandakan sistem aktif, dan false menandakan sistem tidak aktif. Penerapan notifikasi Telegram juga berjalan baik, terutama saat nilai pH air tidak normal, dengan jeda waktu antar notifikasi setiap 5 menit, serta rata-rata delay sebesar 1,03 detik. Kata kunci \"” Budidaya Udang, Notifikasi Telegram, Otomatisasi",
+    "authors": [
+      "Muhammad Catur Indrawan",
+      "Dwi Marisa Midyanti",
+      "Uray Ristian"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.89735",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/89735",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/89735/75676605393",
+    "storage_pdf_path": "public/storage/pdfs/89735.pdf",
+    "storage_pdf_url": "/storage/pdfs/89735.pdf",
+    "id": "local-89735",
+    "updated_at": "2026-09-09T10:35:03.255Z",
+    "created_at": "2026-09-09T10:35:03.255Z",
+    "student": "Muhammad Catur Indrawan",
+    "supervisors": [
+      {
+        "name": "Dwi Marisa Midyanti, S.T., M.Cs.",
+        "cleanName": "Dwi Marisa Midyanti",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Uray Ristian, S.Kom., M.Kom.",
+        "cleanName": "Uray Ristian",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ]
+  },
+  {
+    "ojs_id": "90762",
+    "title": "Implementasi WSN Untuk Monitoring Arus Listrik Lampu Pada Purwarupa Ruangan Berbasis LAN",
+    "abstract": "Wireless Sensor Network (WSN) adalah jaringan sensor nirkabel yang digunakan untuk memantau kondisi tertentu dan mengirimkan data secara real-time ke pusat monitoring. Penelitian ini memanfaatkan NodeMCU ESP32 sebagai pengendali utama dan sensor PZEM-004T untuk mengukur parameter listrik seperti arus. Sistem ini dikembangkan untuk memantau status perangkat listrik secara real-time dan memberikan notifikasi jika terjadi perubahan kondisi. Tujuan penelitian ini adalah mengevaluasi performa sistem monitoring dalam pengiriman data, termasuk delay komunikasi ke website dan buzzer. Hasil pengujian menunjukkan bahwa rata-rata delay pengiriman data ke website di Ruang 1 adalah 3.250 ms, Ruang 2 3.900 ms, dan Ruang 3 3.150 ms. Untuk notifikasi buzzer, rata-rata delay di Ruang 1 adalah 3.400 ms, Ruang 2 3.800 ms, dan Ruang 3 3.300 ms. Berdasarkan standar TIPHON, semua ruangan masuk kategori \"BURUK\" dengan indeks 1. Sistem berhasil mendeteksi arus listrik sebesar 0,02 ampere secara konsisten saat perangkat menyala, memberikan notifikasi melalui buzzer saat arus terputus, serta menampilkan informasi real-time di website. Hasil ini menunjukkan bahwa sistem mampu bekerja efektif dalam mendeteksi arus listrik, namun masih memiliki keterbatasan dalam waktu respons, terutama terkait delay pengiriman data yang tinggi. Kata kunci\"” WSN, delay, PZEM-004T, buzzer, real-time",
+    "authors": [
+      "Sarah Oktaviani",
+      "Uray Ristian",
+      "Hirzen Hasfani"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.90762",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/90762",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/90762/75676605394",
+    "storage_pdf_path": "public/storage/pdfs/90762.pdf",
+    "storage_pdf_url": "/storage/pdfs/90762.pdf",
+    "id": "local-90762",
+    "updated_at": "2026-09-09T10:35:06.468Z",
+    "created_at": "2026-09-09T10:35:06.468Z",
+    "student": "Sarah Oktaviani",
+    "supervisors": [
+      {
+        "name": "Uray Ristian, S.Kom., M.Kom.",
+        "cleanName": "Uray Ristian",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hirzen Hasfani, S.Kom., M.Cs.",
+        "cleanName": "Hirzen Hasfani",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ]
+  },
+  {
+    "ojs_id": "90769",
+    "title": "Optimasi Pengiriman Data Sensor Menggunakan Pemrosesan Paralel Berbasis Internet of Things (IoT)",
+    "abstract": "Dalam ranah Internet of Things (IoT), proses pengiriman data merupakan transfer informasi dari satu titik ke titik lainnya melalui berbagai media dengan tujuan untuk memindahkan data secara cepat, aman, dan akurat. Secara umum, pengiriman data masih mengandalkan pemrosesan serial yang memiliki keunggulan dalam kesederhanaan penggunaan perangkat dengan jumlah yang sedikit. Namun, seiring bertambahnya jumlah perangkat, waktu pengiriman data menjadi lebih lama dan data yang dihasilkan menjadi kurang maksimal. Penelitian ini bertujuan untuk mengatasi permasalahan lamanya waktu pengiriman data dan peningkatan jumlah data dengan menggunakan pemrosesan paralel. Penelitian dilakukan selama 48 jam dengan hasil menunjukkan bahwa optimasi pengiriman data menggunakan pemrosesan paralel berhasil dicapai, dengan aspek-aspek seperti jumlah data yang dihasilkan pada pemrosesan paralel mencapai 25.750 data, sementara pada pemrosesan serial hanya menghasilkan 23.158 data. . Selain itu, delay rata-rata pada pemrosesan paralel adalah 760,9 ms dalam standar TIPHON termasuk kategori \"jelek\", sedangkan pada pemrosesan serial mencapai 4864,7 ms dalam standar TIPHON termasuk kategori \"jelek\". Rata-rata throughput yang dihasilkan oleh pemrosesan paralel adalah 1517,1 bps dalam standar TIPHON termasuk kategori \"sangat bagus\", sementara pemrosesan serial hanya menghasilkan 233,94 bps dalam standar TIPHON termasuk kategori \"sangat bagus\". Namun, dalam optimasi pengiriman data menggunakan pemrosesan paralel, terdapat kekurangan pada bagian jitter, di mana jitter pada pemrosesan serial mencapai 115,97 ms dalam standar TIPHON termasuk kategori \"sedang\", sementara pada pemrosesan paralel hanya menghasilkan 125,64 ms dalam standar TIPHON kategori termasuk kategori \"jelek\". Kata kunci\"”Delay, Jitter, Paralel, Serial, Throughput",
+    "authors": [
+      "Rachmat Ali Akbar",
+      "Syamsul Bahri",
+      "Hirzen Hasfani"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.90769",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/90769",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/90769/75676615226",
+    "storage_pdf_path": "public/storage/pdfs/90769.pdf",
+    "storage_pdf_url": "/storage/pdfs/90769.pdf",
+    "id": "local-90769",
+    "updated_at": "2026-09-09T10:35:08.803Z",
+    "created_at": "2026-09-09T10:35:08.803Z",
+    "student": "Rachmat Ali Akbar",
+    "supervisors": [
+      {
+        "name": "Syamsul Bahri, S.Kom., M.Cs.",
+        "cleanName": "Syamsul Bahri",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hirzen Hasfani, S.Kom., M.Cs.",
+        "cleanName": "Hirzen Hasfani",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ]
+  },
+  {
+    "ojs_id": "90829",
+    "title": "Perancangan Tuner Gitar Otomatis Menggunakan Motor Stepper Berbasis Internet of Things",
+    "abstract": "Proses penyeteman/tuning gitar secara manual sering kali memerlukan keterampilan khusus dan waktu yang lama, terutama bagi pemain gitar pemula. Hal ini menjadi hambatan dalam menghasilkan suara senar gitar yang selaras atau harmoni. Penelitian ini bertujuan untuk merancang tuner gitar otomatis berbasis Internet of Things (IoT) yang dapat mempermudah pemain gitar dalam melakukan penyeteman senar gitar. Sistem ini menggunakan NodeMCU ESP8266 sebagai microcontroller utama, sensor microphone GY-MAX4466 untuk membaca frekuensi senar gitar yang dipetik, serta motor stepper Nema 17 yang dikendalikan oleh driver motor stepper TB6600 sebagai penggerak dalam menyesuaikan senar gitar yang akan dilakukan penyeteman. Aplikasi android berbasis bluetooth HC-05 digunakan sebagai antarmuka/interface untuk memilih senar gitar yang akan dilakukan penyeteman sekaligus memantau perubahan frekuensi yang masuk dari sensor. Tahap pengujian dilakukan dengan total sebanyak 90 kali pada 3 buah gitar akustik yang masing-masing senarnya diuji sebanyak 5 kali untuk mendapatkan nilai akurasi dari setiap senar. Hasil pengujian menunjukkan bahwa sistem mampu mendeteksi frekuensi senar gitar dengan tingkat akurasi rata-rata galat di bawah 1%. Motor stepper berhasil menyesuaikan nada senar mencapai frekuensi tuning standar secara otomatis. Sementara itu aplikasi android mempermudah pengguna dalam mengendalikan sistem dan memantau data yang masuk. Kata kunci\"” Tuner gitar otomatis, Internet of Things, GY-MAX4466, Modul Bluetooth HC-05, Android",
+    "authors": [
+      "Edwan Damiyanto",
+      "Irma Nirmala",
+      "Tedy Rismawan"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.90829",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/90829",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/90829/75676615249",
+    "storage_pdf_path": "public/storage/pdfs/90829.pdf",
+    "storage_pdf_url": "/storage/pdfs/90829.pdf",
+    "id": "local-90829",
+    "updated_at": "2026-09-09T10:35:11.869Z",
+    "created_at": "2026-09-09T10:35:11.869Z",
+    "student": "Edwan Damiyanto",
+    "supervisors": [
+      {
+        "name": "Irma Nirmala, S.T., M.T.",
+        "cleanName": "Irma Nirmala",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      },
+      {
+        "name": "Tedy Rismawan, S.Kom., M.Cs.",
+        "cleanName": "Tedy Rismawan",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Automation & Embeded System (AES)"
+    ]
+  },
+  {
+    "ojs_id": "90905",
+    "title": "Sistem Pemantauan dan Kendali Penggunaan Daya Listrik pada Kamar Kos Berbasis Internet of Things",
+    "abstract": "Penggunaan listrik menjadi salah satu kebutuhan pokok diberbagai aspek kegiatan dari gedung perkantoran hingga pada kamar kos. Permasalahannya, terkadang alat elektronik dan lampu lupa atau dibiarkan menyala saat ditinggal penghuni kos yang menyebabkan pemborosan listrik. Kemudian untuk menyelesaikan permasalah ini dibangun suatu sistem yang mampu memantau dan mengendalikan penggunaan daya listrik berbasis IoT. Tujuan penelitian ini adalah memberi informasi penggunaan daya serta biaya penggunaan listrik dan kontrol otomatis listrik pada kamar kos yang dapat diakses melalui website oleh pemilik kos. Hasil dari pengujian sistem kendali daya listrik dapat berjalan dengan baik, sistem dapat memutus daya listrik saat tidak terdeteksi orang didalam kamar kos. Hasil dari pengujian sistem pemantauan daya listrik menggunakan sensor PZEM-004T didapati rata-rata error relatif 0,12% dan akurasi 99,88% untuk tegangan, error relatif 2,72% dan akurasi 97,28% untuk arus dan pengujian daya didapati error relatif 0,37% dan akurasi 99,63%.. Kata kunci: Listrik, Daya, Kamar Kos, Internet of Things.",
+    "authors": [
+      "Indra Sukma Fratama",
+      "Suhardi Suhardi",
+      "Tedy Rismawan"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.90905",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/90905",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/90905/75676605397",
+    "storage_pdf_path": "public/storage/pdfs/90905.pdf",
+    "storage_pdf_url": "/storage/pdfs/90905.pdf",
+    "id": "local-90905",
+    "updated_at": "2026-09-09T10:35:14.292Z",
+    "created_at": "2026-09-09T10:35:14.292Z",
+    "student": "Indra Sukma Fratama",
+    "supervisors": [
+      {
+        "name": "Suhardi, S.T., M.Eng.",
+        "cleanName": "Suhardi",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      },
+      {
+        "name": "Tedy Rismawan, S.Kom., M.Cs.",
+        "cleanName": "Tedy Rismawan",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Automation & Embeded System (AES)"
+    ]
+  },
+  {
+    "ojs_id": "91165",
+    "title": "Penerapan Protokol Automatic Packet Reporting System Pada Tracking System Mobil Damkar Kawasan Kota Pontianak",
+    "abstract": "Dinas Pemadam kebakaran (Damkar) merupakan orang atau pasukan yang bertugas memadamkan kebakaran, penyelamatan dan menanggulangi bencana. Umumnya Damkar akan beroperasi untuk menyelesaikan kasus seperti kebakaran dan bencara lainnya, namun adanya keterbatasan dalam menemukan lokasi kendaraan Damkar pada saat bergerak, karena belum tersedianya sistem yang berfungsi melacak mobil Damkar. Tujuan penelitian ini adalah menerapkan komunikasi APRS pada tracking system pada mobil Damkar dengan melakukan pengujian selisih jarak GPS, RSSI, SNR, dan delay pengiriman. Hasil penelitian ini, pengujian selisih jarak GPS tracker yang telah diuji yaitu 4,82 meter atau 90,35% dengan membandingkan data tracker dengan Google Maps. Nilai rata-rata RSSI LOS -104 dB lebih baik dibandingkan NLOS -112 dB, sedangkan rata-rata SNR LOS 4 dBm lebih baik dibandingkan NLOS -0,38 dBm dengan kategori RSSI dan SNR kedua kondisi yaitu \"Bad\" menurut standar TIPHON. Jarak yang dapat dijangkau tracker secara LOS 353 meter, sedangkan NLOS 341 meter. Adapun rata-rata delay LOS mencapai 38,76 milisekon dan NLOS mencapai 38,14 milisekon dengan kategori dikedua kondisi yaitu \"Sangat Baik\" menurut standar TIPHON. Walaupun terjadi lonjakan delay pada kondisi LOS, nilai delay cenderung konsisten di rentang 38-39 milisekon. Kata kunci\"” Kendaraan Damkar, Tracking System, APRS, RSSI, SNR, Delay",
+    "authors": [
+      "Muhammad Taufik Ridwan",
+      "Ikhwan Ruslianto",
+      "Hirzen Hasfani"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.91165",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/91165",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/91165/75676605398",
+    "storage_pdf_path": "public/storage/pdfs/91165.pdf",
+    "storage_pdf_url": "/storage/pdfs/91165.pdf",
+    "id": "local-91165",
+    "updated_at": "2026-09-09T10:35:17.873Z",
+    "created_at": "2026-09-09T10:35:17.873Z",
+    "student": "Muhammad Taufik Ridwan",
+    "supervisors": [
+      {
+        "name": "Ikhwan Ruslianto, S.Kom., M.Cs.",
+        "cleanName": "Ikhwan Ruslianto",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hirzen Hasfani, S.Kom., M.Cs.",
+        "cleanName": "Hirzen Hasfani",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ]
+  },
+  {
+    "ojs_id": "91218",
+    "title": "Sistem Pemantauan Kemajuan Tugas Akhir Mahasiswa Menggunakan WhatsApp Gateway dan IoT",
+    "abstract": "Pemantauan tugas akhir adalah sebuah proses dimana akademik melakukan pengawasan dan evaluasi terkait pengerjaan tugas akhir mahasiswa. Dalam lingkungan akademik, pemantauan pengerjaan tugas akhir mahasiswa sering kali menjadi tantangan, terutama karena mahasiswa tidak diwajibkan untuk menyelesaikan tugas akhir mereka di kampus. Hal ini dapat menyebabkan kurangnya pengawasan yang berdampak pada rendahnya tingkat kelulusan tepat waktu di setiap angkatan. Oleh karena itu, diperlukan sebuah solusi yang dapat meningkatkan pengawasan melalui sistem pemantauan kemajuan tugas akhir mahasiswa melalui integrasi antara perangkat IoT dan platform WhatsApp Gateway. Sistem yang dibuat bekerja dengan cara mengambil data kehadiran mahasiswa melalui sensor fingerprint dan mengirimkan permintaan untuk validasi ke cloud server sebagai presensi masuk, data yang telah valid akan membuka form penguploadan progres dimana hasil dari progres tersebut kemudian akan dikirim melalui Whatsapp Gateway ke nomor wali dan dosen terkait. Setelah mengirimkan progres, mahasiswa dapat melakukan presensi pulang melalui sensor fingerprint kembali. Hasil penelitian menunjukkan bahwa sistem dapat bekerja dalam kategori puas (satisfied). Berdasarkan tiga puluh percobaan yang dilakukan untuk setiap kategori pengujian, waktu respons masuk rata-rata adalah 1,396 detik dan waktu respons pulang adalah 1,364 detik. Adapun waktu rata-rata yang dalam satu kali pengiriman progres yang didapatkan dari 30 kali percobaan melalui WhatsApp Gateway adalah 3,44 detik. Kata kunci: Fingerprint, Internet of Things, Pemantauan Tugas Akhir, WhatsApp Gateway.",
+    "authors": [
+      "Habi Islami",
+      "Uray Ristian",
+      "Hafiz Muhardi"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.91218",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/91218",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/91218/75676605399",
+    "storage_pdf_path": "public/storage/pdfs/91218.pdf",
+    "storage_pdf_url": "/storage/pdfs/91218.pdf",
+    "id": "local-91218",
+    "updated_at": "2026-09-09T10:35:19.929Z",
+    "created_at": "2026-09-09T10:35:19.929Z",
+    "student": "Habi Islami",
+    "supervisors": [
+      {
+        "name": "Uray Ristian, S.Kom., M.Kom.",
+        "cleanName": "Uray Ristian",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hafiz Muhardi, S.T., M.Kom.",
+        "cleanName": "Hafiz Muhardi",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ]
+  },
+  {
+    "ojs_id": "91233",
+    "title": "Implementasi Protokol HTTPS dengan Kriptografi Elliptic-Curve pada Proses Pengiriman Data Kelembaban Tanah dengan IoT",
+    "abstract": "Dalam sistem penyiraman tanaman otomatis, data sensor kelembaban tanah memegang peran penting misalnya untuk menentukan kapan tanaman memerlukan air atau tidak. Permasalahan yang muncul dengan penerapan IoT adalah aspek keamanan yang sering terlewatkan. Setiap perangkat IoT seharusnya mengantisipasi bahwa perangkat tersebut mungkin akan diserang selama masa pemakaiannya. Penelitian yang akan dilaksanakan berfokus pada penerapan protokol HTTPS dengan algoritma enkripsi Elliptic-Curve Cryptography (ECC), dalam proses transmisi data kelembaban tanah dengan perangkat IoT melalui internet. Tujuan dari penelitian ini adalah untuk mengamankan pengiriman data kelembaban tanah selama proses transmisi dari perangkat IoT menuju web server. Hal yang perlu diperhatikan dalam aspek keamanan pada proses transmisi data adalah bentuk data yang dikirimkan harus berupa ciphertext. Ciphertext sendiri merupakan bentuk data yang tidak dapat dibaca baik oleh manusia ataupun mesin, sehingga tidak dapat diperoleh informasi dari data tersebut kecuali data tersebut berhasil di dekripsi. Dengan menggunakan pendekatan brute force, hal ini akan menghabiskan waktu yang sangat lama. Dari pengujian yang dilaksanakan, dapat diperoleh hasil bahwa data kelembaban tanah yang dikirimkan ketika dibandingkan dengan data yang disimpan pada server, telah bernilai sama. Kemudian data dikirimkan dalam bentuk ciphertext sehingga informasi berupa tingkat kelembaban tanah dari data yang dikirimkan tidak dapat diperoleh ataupun diubah. Kata kunci\"”HTTPS, Elliptic-Curve Cryptography, Ciphertext, Kelembaban Tanah, Internet of Things.",
+    "authors": [
+      "Youngky Youngky",
+      "Syamsul Bahri",
+      "Kasliono Kasliono"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2025/04/26",
+    "doi": "10.26418/coding.v13i1.91233",
+    "issue_name": "Vol. 13 No. 1 (2025): Edisi April 2025",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/91233",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/91233/75676605400",
+    "storage_pdf_path": "public/storage/pdfs/91233.pdf",
+    "storage_pdf_url": "/storage/pdfs/91233.pdf",
+    "id": "local-91233",
+    "updated_at": "2026-09-09T10:35:23.792Z",
+    "created_at": "2026-09-09T10:35:23.792Z",
+    "student": "Youngky Youngky",
+    "supervisors": [
+      {
+        "name": "Syamsul Bahri, S.Kom., M.Cs.",
+        "cleanName": "Syamsul Bahri",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Kasliono, S.Mat., M.Cs.",
+        "cleanName": "Kasliono",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ]
+  },
+  {
+    "ojs_id": "90853",
+    "title": "Perancangan UI/UX Sistem Informasi Penjadwalan Mata Pelajaran Menggunakan Metode Double Diamond (Studi Kasus: MIN 2 Pontianak)",
+    "abstract": "MIN 2 Pontianak merupakan salah satu institusi pendidikan Islam tingkat sekolah dasar yang diatur langsung oleh pemerintah melalui Kementerian Agama. Saat ini MIN 2 Pontianak masih menggunakan cara manual dalam menyusun jadwal mata pelajaran sehingga hasil penjadwalan menjadi kurang informatif, efektif, dan sulit dibaca. Oleh karena itu, penelitian ini mengusulkan adanya perancangan desain UI/UX untuk Sistem Informasi Penjadwalan Mata Pelajaran di sekolah MIN 2 Pontianak yang memungkinkan keterlibatan secara aktif dari pihak pengguna dalam proses pengembangan. Dengan menghasilkan desain prototipe Sistem Informasi Penjadwalan Mata Pelajaran, pengguna dapat lebih mudah memahami bagaimana sistem akan beroperasi dan berinteraksi dengan sistem tersebut. Pada proses penelitian, metode Double Diamond digunakan dengan menerapkan langkah-langkah secara berurutan, mulai dari pemahaman terkait permasalahan, identifikasi kebutuhan pengguna dan solusi permasalahan, penerjemahan solusi menjadi desain sampai evaluasi prototipe. Hasil pada penelitian ini adalah prototipe Sistem Informasi Penjadwalan Mata Pelajaran yang telah diuji kepada pengguna menggunakan metode A/B Testing untuk bagian desain dan System Usability Scale untuk evaluasi prototipe secara keseluruhan dengan memperoleh skor rata-rata sebesar 70,07%. Di mana berdasarkan interpretasi skor System Usability Scale, didapatkan Acceptable Ranges termasuk Acceptable, Grade Scale kategori C, dan Adjective Rating bersifat Good. Maka dapat disimpulkan bahwa penelitian ini berhasil menghasilkan rekomendasi untuk menjadi solusi bagi MIN 2 Pontianak. Kata kunci: Double Diamond, UI/UX, A/B Testing, System Usability Scale",
+    "authors": [
+      "Kafi Fadil Juhdi",
+      "Ilhamsyah Ilhamsyah",
+      "Ibnur Rusi"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.90853",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/90853",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/90853/75676608780",
+    "storage_pdf_path": "public/storage/pdfs/90853.pdf",
+    "storage_pdf_url": "/storage/pdfs/90853.pdf",
+    "student": "Kafi Fadil Juhdi",
+    "supervisors": [
+      {
+        "name": "Ilhamsyah Ilhamsyah",
+        "cleanName": "Ilhamsyah Ilhamsyah",
+        "keahlian": []
+      },
+      {
+        "name": "Ibnur Rusi",
+        "cleanName": "Ibnur Rusi",
+        "keahlian": []
+      }
+    ],
+    "keahlian": [],
+    "id": "local-90853",
+    "updated_at": "2026-09-09T11:06:19.881Z",
+    "created_at": "2026-09-09T11:06:19.881Z"
+  },
+  {
+    "ojs_id": "92363",
+    "title": "Pemanfaatan Protokol WebSocket IoT Pada Sistem Pendeteksi Ketinggian Air di Sumur Serapan Lahan Gambut",
+    "abstract": "Lahan gambut adalah salah satu objek yang mudah terbakar dan menyebabkan kebakaran hutan yang sulit dipadamkan baik masyarakat maupun petugas kebakaran. Kendala utama dalam memantau kondisi lahan gambut adalah kurangnya informasi real-time tentang ketinggian air di sumur serapan, yang masih dilakukan secara manual. Pada penelitian ini mengembangkan sistem pendeteksi ketinggian air berbasis WebSocket IoT menggunakan NodeMCU ESP32 dan sensor pelampung pada level 20 cm, 40 cm, 60 cm, 80 cm, dan 100 cm. Sistem ini memungkinkan pemantauan real-time melalui website yang mudah diakses menggunakan IP Address masing-masing node ESP32. Data ketinggian air bisa diakses lewat perangkat komputer maupun smartphone oleh petugas secara real-time tanpa melakukan pengukuran secara manual pada sumur serapan. Hasil pengujian menunjukkan bahwa penerapan protokol WebSocket IoT dengan 2 node ESP32 menghasilkan nilai delay rata-rata 3321 ms yakni 3,3 detik dan 2678 ms yakni 2,7 detik pada masing-masing sumur serapan. Pada pengujian ke cloud server dengan jarak 15 meter dari router, diperoleh nilai delay rata-rata 1668 ms yakni 1,7 detik dan 1742 ms yakni 1,7 detik, dengan nilai packet loss rata-rata 0,00% untuk kedua sumur serapan. Hasil ini menunjukkan sistem memiliki kategori sangat baik berdasarkan standar TIPHON, mendukung pemantauan ketinggian air secara real-time untuk pencegahan kebakaran lahan gambut. Kata kunci : WebSocket, Sumur Serapan, Lahan Gambut, Internet of Things (IoT).",
+    "authors": [
+      "Yasman Halawa",
+      "Uray Ristian",
+      "Ikhwan Ruslianto"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.92363",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/92363",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/92363/75676608783",
+    "storage_pdf_path": "public/storage/pdfs/92363.pdf",
+    "storage_pdf_url": "/storage/pdfs/92363.pdf",
+    "student": "Yasman Halawa",
+    "supervisors": [
+      {
+        "name": "Uray Ristian, S.Kom., M.Kom.",
+        "cleanName": "Uray Ristian",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Ikhwan Ruslianto, S.Kom., M.Cs.",
+        "cleanName": "Ikhwan Ruslianto",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-92363",
+    "updated_at": "2026-09-09T11:06:22.715Z",
+    "created_at": "2026-09-09T11:06:22.715Z"
+  },
+  {
+    "ojs_id": "89803",
+    "title": "Analisis Tingkat Kapabilitas Manaemen Tata Kelola Data Menggunakan Framework DAMA DMBOK dan Process Assesment Model (PAM) (Studi Kasus: Dinas Pendidikan dan Kebudayaan Kabupaten Kubu Raya)",
+    "abstract": "Pengelolaan data dan informasi menjadi tantangan yang krusial bagi organisasi, termasuk Dinas Pendidikan dan Kebudayaan Kabupaten Kubu Raya. Ketidakefektifan dalam pengelolaan data, seperti redudansi data, serta kualitas data, sering kali menghambat proses pengambilan keputusan. Penelitian ini bertujuan menganalisis tingkat kapabilitas manajemen tata kelola data pada Dinas Pendidikan dan Kebudayaan Kabupaten Kubu Raya menggunakan framework DAMA DMBOK dan Process Assessment Model (PAM). Untuk merealisasikan tujuan tersebut, penelitian ini memetakan framework DAMA DMBOK ke dalam PAM untuk mengevaluasi dan mengukur tingkat kapabilitas tata kelola data serta menyusun rekomendasi perbaikan sesuai dengan standar ISO/IEC 38505-1. Berdasarkan hasil evaluasi dan pengukuran yang dilakukan, rata-rata tingkat kapabilitas manajemen tata kelola data di Dinas Pendidikan dan Kebudayaan Kabupaten Kubu Raya berada pada level 1.1, yang menunjukkan bahwa seluruh proses tata kelola data berada pada kategori Performed Process. Hal ini menunjukkan organisasi telah melakukan proses manajemen tata kelola data, namun memerlukan penguatan pada aspek implementasi dan pengawasan. Rekomendasi perbaikan disusun berdasarkan ISO/IEC 38505-1,diharapkan membantu meningkatkan kualitas tata kelola data guna mendukung pengambilan keputusan yang lebih baik dan optimal, sesuai dengan Peraturan Presiden Nomor 39 Tahun 2019 tentang Satu Data Indonesia. Kata Kunci: Manajemen Tata Kelola Data, DAMA DMBOK, ISO/IEC 38505-1, Process Assessment Model (PAM)",
+    "authors": [
+      "Defa Adelia Putri",
+      "Nurul Mutiah",
+      "Dian Prawira"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.89803",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/89803",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/89803/75676608822",
+    "storage_pdf_path": "public/storage/pdfs/89803.pdf",
+    "storage_pdf_url": "/storage/pdfs/89803.pdf",
+    "student": "Defa Adelia Putri",
+    "supervisors": [
+      {
+        "name": "Nurul Mutiah",
+        "cleanName": "Nurul Mutiah",
+        "keahlian": []
+      },
+      {
+        "name": "Dian Prawira",
+        "cleanName": "Dian Prawira",
+        "keahlian": []
+      }
+    ],
+    "keahlian": [],
+    "id": "local-89803",
+    "updated_at": "2026-09-09T11:06:25.164Z",
+    "created_at": "2026-09-09T11:06:25.164Z"
+  },
+  {
+    "ojs_id": "90736",
+    "title": "Penerapan Metode Goal Directed Design pada Perancangan UI/UX Sistem Informasi Manajemen Supplier Kelapa Sawit",
+    "abstract": "Pengelolaan data supplier pada Koperasi Tapang Dadap yang bergerak di sektor perkebunan kelapa sawit masih dilakukan secara manual. Hal ini menyebabkan berbagai permasalahan seperti ketidakefisienan waktu dan risiko kesalahan pencatatan. Dari permasalahan yang dialami Koperasi Tapang Dadap ini dapat diminimalisir dengan memanfaatkan kemajuan teknologi yang ada di zaman sekarang. Oleh karena itu, penelitian ini bertujuan untuk merancang prototype UI/UX Sistem Informasi Manajemen Supplier Kelapa Sawit menggunakan metode Goal Directed Design (GDD). Metode ini terdiri dari beberapa tahapan yaitu research, modeling, requirement, framework, refinement, dan support, yang membantu dalam merancang antarmuka berdasarkan kebutuhan pengguna. Penelitian ini menghasilkan prototype yang diharapkan mampu meningkatkan efisiensi dalam pengelolaan data supplier, meminimalkan kesalahan, serta mempercepat proses administrasi di Koperasi Tapang Dadap. Evaluasi prototype dilakukan menggunakan System Usability Scale (SUS) untuk mengukur tingkat kegunaan antarmuka. Hasil penelitian menunjukkan bahwa nilai rata-rata tampilan antarmuka sistem informasi manajemen supplier (SIMAMPU) adalah 76,83, hasil antarmuka SIMAMPU yang masuk rentang nilai ACCEPTABLE (diterima). Nilai 76,83 ini juga masuk kedalam kategori GOOD pada metode pengujian System Usability Scale (SUS). Kata kunci— Goal Directed Design, UI/UX, Sistem Informasi Manajemen, Supplier Kelapa Sawit, Prototyping",
+    "authors": [
+      "Muhamad Adelia Farhaturlah",
+      "Nurul Mutiah",
+      "Ilhamsyah Ilhamsyah"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.90736",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/90736",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/90736/75676608823",
+    "storage_pdf_path": "public/storage/pdfs/90736.pdf",
+    "storage_pdf_url": "/storage/pdfs/90736.pdf",
+    "student": "Muhamad Adelia Farhaturlah",
+    "supervisors": [
+      {
+        "name": "Nurul Mutiah",
+        "cleanName": "Nurul Mutiah",
+        "keahlian": []
+      },
+      {
+        "name": "Ilhamsyah Ilhamsyah",
+        "cleanName": "Ilhamsyah Ilhamsyah",
+        "keahlian": []
+      }
+    ],
+    "keahlian": [],
+    "id": "local-90736",
+    "updated_at": "2026-09-09T11:06:27.998Z",
+    "created_at": "2026-09-09T11:06:27.998Z"
+  },
+  {
+    "ojs_id": "90988",
+    "title": "Perancangan Ulang UI/UX Website DNA Indonesia Menggunakan  Metode Design Thinking (Studi Kasus: PT. Digital Niaga Aksesindo)",
+    "abstract": "PT. Digital Niaga Aksesindo Indonesia atau DNA Indonesia merupakan sebuah perusahaan digital marketing yang menyediakan layanan jasa pemasaran secara digital khususnya melalui sosial media. Satu diantara upaya yang dilakukan DNA Indonesia untuk menjangkau khalayak yang lebih luas yaitu melalui media online berupa website yang memiliki fungsi sebagai media informasi. Namun, dalam penggunaannya ditemukan permasalahan yang mempengaruhi pengalaman pengguna seperti tombol interaktif tidak berfungsi dengan baik, konten kurang informatif, dan navigasi yang tidak intuitif. Oleh karena itu, dilakukan perancangan ulang UI/UX website untuk dapat memenuhi kebutuhan perusahaan dan kebutuhan pengguna. Adapun tahapan penelitian yang dilakukan menggunakan metode design thinking yang memiliki tahapan empathize, define, ideate, prototype, dan test. Metode ini berfokus pada inovasi yang berpusat pada pengguna, dengan menekankan pada desain produk dan layanan yang mampu menarik perhatian dalam dunia bisnis. Pada tahap pengujian, penelitian ini menggunakan A/B Testing dan evaluasi kepuasan pengguna menggunakan PSSUQ. A/B Testing menghasilkan prototype final berisi gabungan dari versi A dan B kemudian diuji menggunakan PSSUQ. Pada pengujian PSSUQ prototype pengguna menghasilkan nilai keseluruhan sebesar 2,147 dan prototype admin menghasilkan nilai 1,4375, nilai tersebut berada dalam kategori “lower limit”, yang menunjukkan bahwa perancangan ulang UI/UX website DNA Indonesia telah memuaskan pengguna. Kata kunci— UI/UX, Design Thinking, A/B Testing, PSSUQ",
+    "authors": [
+      "Nasywa Adinda",
+      "Dian Prawira",
+      "Syahru Rahmayuda"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.90988",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/90988",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/90988/75676608824",
+    "storage_pdf_path": "public/storage/pdfs/90988.pdf",
+    "storage_pdf_url": "/storage/pdfs/90988.pdf",
+    "student": "Nasywa Adinda",
+    "supervisors": [
+      {
+        "name": "Dian Prawira",
+        "cleanName": "Dian Prawira",
+        "keahlian": []
+      },
+      {
+        "name": "Syahru Rahmayuda",
+        "cleanName": "Syahru Rahmayuda",
+        "keahlian": []
+      }
+    ],
+    "keahlian": [],
+    "id": "local-90988",
+    "updated_at": "2026-09-09T11:06:31.539Z",
+    "created_at": "2026-09-09T11:06:31.539Z"
+  },
+  {
+    "ojs_id": "97703",
+    "title": "Perbandingan Konsumsi Daya terhadap Kinerja Jaringan CoAP dan HTTP pada Sistem Pemantauan Tanaman",
+    "abstract": "Internet of Things (IoT) menawarkan solusi efektif untuk meningkatkan produktivitas tanaman melalui sistem pemantauan dan kontrol otomatis. Namun, bertambahnya perangkat IoT berdampak pada peningkatan kebutuhan daya listrik. Penelitian ini menganalisis perbandingan konsumsi daya, delay, dan throughput pada sistem pemantauan tanaman menggunakan protokol CoAP dengan HTTP. Hasil pengujian menunjukkan bahwa penggunaan CoAP mampu menekan konsumsi daya hingga 265,94 mWh dibandingkan HTTP, dengan konsumsi daya masing-masing sebesar 645,08 mWh untuk CoAP dan 911,02 mWh untuk HTTP. Selain itu, CoAP juga menunjukkan performa jaringan yang lebih baik dengan rata-rata delay 25,52 ms, jauh lebih cepat dibandingkan HTTP yang mencapai 1510,13 ms. Dari sisi throughput, CoAP menghasilkan 117,23 bps, jauh lebih tinggi dibandingkan HTTP yang hanya 1,18 bps. Hal ini menunjukkan bahwa protokol CoAP tidak hanya hemat daya, tetapi juga unggul dalam kecepatan dan kapasitas transfer data. Oleh karena itu, protokol CoAP dapat menjadi pilihan pada sistem IoT yang membutuhkan penggunaan daya rendah serta kinerja jaringan yang andal, khususnya pada perangkat dengan keterbatasan sumber daya. Kata kunci— Konsumsi Daya, Kinerja jaringan, CoAP, HTTP, Sistem Pemantauan Tanaman.",
+    "authors": [
+      "Agamita Sasya Cahyani Arista",
+      "Uray Ristian",
+      "Hirzen Hasfani"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v13i3.97703",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/97703",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/97703/75676608828",
+    "storage_pdf_path": "public/storage/pdfs/97703.pdf",
+    "storage_pdf_url": "/storage/pdfs/97703.pdf",
+    "student": "Agamita Sasya Cahyani Arista",
+    "supervisors": [
+      {
+        "name": "Uray Ristian, S.Kom., M.Kom.",
+        "cleanName": "Uray Ristian",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hirzen Hasfani, S.Kom., M.Cs.",
+        "cleanName": "Hirzen Hasfani",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-97703",
+    "updated_at": "2026-09-09T11:06:33.677Z",
+    "created_at": "2026-09-09T11:06:33.677Z"
+  },
+  {
+    "ojs_id": "98053",
+    "title": "Sistem Kendali Dan Pemantauan Gas Amoniak Pada Rumah Walet Berbasis Internet Of Things",
+    "abstract": "Tantangan yang dihadapi dalam budidaya burung walet terletak pada pemantauan kondisi lingkungan di dalam rumah walet. Kondisi yang ideal bagi burung walet dapat mempengaruhi kualitas sarang burung walet tersebut. Pemantauan diperlukan terutama pada kelembaban dan kadar gas amoniak yang berada di dalam rumah walet. Para pembudidaya biasanya melakukan pemantauan secara manual untuk mengetahui nilai kelembaban dan kadar zat amoniak di dalam rumah walet serta tidak memungkinkan dilakukan sepanjang waktu. Maka dari itu, permasalahan tersebut dapat diatasi dengan memadukan konsep Internet of Things yang dapat memantau dan melakukan kontrol agar kelembaban dan kadar zat amoniak berada dalam kondisi ideal bagi burung walet. Pemantauan tersebut dapat diketahui melalui aplikasi mobile berbasis android. Aplikasi ini membantu untuk mengetahui nilai suhu, kelembaban, dan gas amonik yang dikirim oleh setiap sensor secara realtime. Adapun pengontrolan terhadap kelembaban dan gas amoniak dilakukan dengan mengaktifkan exhaust fan dan mist maker. Adanya sistem ini memiliki pengaruh terhadap tercapainya kondisi ideal yang diperlukan rumah walet dengan rata-rata nilai kelembaban sebesar 80,03% sedangkan rata-rata kadar gas amoniak sebesar 15,36 ppm. Adapun pengujian pada pembacaan nilai pada masing-masing sensor memiliki akurasi sebesar 98,767% untuk suhu udara, 96,97% untuk akurasi pembacaan kelembaban udara, dan 82,91% untuk akurasi pembacaan gas amoniak. Kata kunci : Internet of Things, Walet, Android, Gas Amoniak.",
+    "authors": [
+      "Bima Putra",
+      "Rahmi Hidayati",
+      "Irma Nirmala"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v13i3.98053",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98053",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98053/75676608830",
+    "storage_pdf_path": "public/storage/pdfs/98053.pdf",
+    "storage_pdf_url": "/storage/pdfs/98053.pdf",
+    "student": "Bima Putra",
+    "supervisors": [
+      {
+        "name": "Rahmi Hidayati, S.Kom., M.Cs.",
+        "cleanName": "Rahmi Hidayati",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      },
+      {
+        "name": "Irma Nirmala, S.T., M.T.",
+        "cleanName": "Irma Nirmala",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Automation & Embeded System (AES)"
+    ],
+    "id": "local-98053",
+    "updated_at": "2026-09-09T11:06:36.818Z",
+    "created_at": "2026-09-09T11:06:36.818Z"
+  },
+  {
+    "ojs_id": "98283",
+    "title": "Penggunaan Protokol Komunikasi MQTT Dan Bot Telegram Dalam Sistem Pemilah Buah Jeruk Berdasarkan Ukuran",
+    "abstract": "Jeruk siam merupakan buah unggulan dengan produksi tinggi di Kalimantan Barat, sehingga menyebabkan permasalahan dalam pemilahan buah yang kurang efektif karena masih dilakukan secara manual. Solusi yang dapat diterapkan adalah penggunaan sistem pemilah otomatis berbasis Internet of Things, dengan protokol komunikasi MQTT (Message Queuing Telemetry Transport) yang memiliki tingkat kehilangan data yang minimal. Sistem ini dibangun menggunakan NodeMCU ESP32 sebagai publisher yang mengirim data jumlah buah dan status wadah melalui MQTT ke broker Mosquitto, kemudian diteruskan ke Node-RED sebagai subscriber dan data tersebut akan dikirim untuk ditampilkan pada bot Telegram. Pengujian dalam penelitian ini dilakukan untuk menganalisis tingkat packet loss dan waktu pengiriman data. Hasil pengujian yang dilakukan dengan 38 dan 124 paket data menunjukkan, bahwa semua data berhasil terkirim dan diterima tanpa ada paket data yang hilang dengan tingkat packet loss sebesar 0%. Selain itu rata-rata pengujian waktu pengiriman data dengan menggunakan protokol MQTT adalah sebesar 1 detik. Hasil ini menunjukkan bahwa sistem bekerja dengan stabil dan akurat dalam menghitung jumlah buah, mendeteksi status wadah, serta mengirimkan data ke telegram. Kata kunci — Jeruk Siam, Pemilahan Buah, MQTT, Packet Loss",
+    "authors": [
+      "Elytia Elytia",
+      "Uray Ristian",
+      "Hafiz Muhardi"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.98283",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98283",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98283/75676608833",
+    "storage_pdf_path": "public/storage/pdfs/98283.pdf",
+    "storage_pdf_url": "/storage/pdfs/98283.pdf",
+    "student": "Elytia Elytia",
+    "supervisors": [
+      {
+        "name": "Uray Ristian, S.Kom., M.Kom.",
+        "cleanName": "Uray Ristian",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hafiz Muhardi, S.T., M.Kom.",
+        "cleanName": "Hafiz Muhardi",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-98283",
+    "updated_at": "2026-09-09T11:06:40.687Z",
+    "created_at": "2026-09-09T11:06:40.687Z"
+  },
+  {
+    "ojs_id": "98355",
+    "title": "Pengaruh Redaman Sinyal Terhadap Kualitas Transmisi Data Lorawan Pada Sistem Pemantauan Kelembaban Tanah Di Kawasan Sawit",
+    "abstract": "Pemantauan kelembaban tanah krusial untuk produktivitas kelapa sawit, sementara metode manual terbatas dan LoRaWAN menawarkan solusi efisien meski terkendala redaman sinyal di perkebunan. Penelitian ini menganalisis pengaruh free-space path loss pada skenario LOS dan obstruction loss akibat pohon kelapa sawit pada skenario NLOS terhadap kualitas transmisi data LoRaWAN, diukur melalui RSSI, SNR, dan packet loss pada sistem pemantauan kelembaban tanah. Sistem menggunakan modul LoRa RA-02 433MHz, mikrokontroler ESP32, dan sensor FC-28. Pengujian dilakukan di perkebunan kelapa sawit dengan dua skenario: LOS (tanpa halangan) dan NLOS (terhalang pohon kelapa sawit). Pada masing-masing skenario, pengukuran dilakukan pada jarak 16, 32, 48, dan 64 meter dengan 60 sampel per skenario, sehingga total delapan titik uji. Hasil menunjukkan packet loss 0% pada seluruh skenario. Pada LOS, RSSI menurun dari −80,57 dBm (16 m) menjadi −101,25 dBm (64 m) dan SNR dari 10,83 dB (16 m) menjadi 3,97 dB (64 m), selaras teori FSPL. Berdasarkan TIPHON, kualitas sinyal menurun dari sangat baik menjadi buruk (RSSI) dan dari bagus menjadi buruk (SNR). Pada NLOS, degradasi terbesar terjadi di 32 m dengan penurunan RSSI 13,51 dB; meski SNR mencapai −0,23 dB di 64 m, komunikasi tetap stabil. Kata kunci— LoRaWAN, Redaman Sinyal, RSSI, SNR, Packet Loss",
+    "authors": [
+      "Akmal Hidayat",
+      "Syamsul Bahri",
+      "Hafiz Muhardi"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v13i3.98355",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98355",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98355/75676608835",
+    "storage_pdf_path": "public/storage/pdfs/98355.pdf",
+    "storage_pdf_url": "/storage/pdfs/98355.pdf",
+    "student": "Akmal Hidayat",
+    "supervisors": [
+      {
+        "name": "Syamsul Bahri, S.Kom., M.Cs.",
+        "cleanName": "Syamsul Bahri",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hafiz Muhardi, S.T., M.Kom.",
+        "cleanName": "Hafiz Muhardi",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-98355",
+    "updated_at": "2026-09-09T11:06:42.777Z",
+    "created_at": "2026-09-09T11:06:42.777Z"
+  },
+  {
+    "ojs_id": "98657",
+    "title": "Sistem Cerdas Kendali Titik Lampu Pertanian Buah Naga Menggunakan Protokol MQTT",
+    "abstract": "Tanaman buah naga memerlukan sinar matahari yang panjang untuk tumbuh dengan baik. Ketika cahaya alami terbatas, penggunaan lampu tambahan menjadi solusi. Namun, pengaturan lampu secara manual kurang efisien. Selain itu, penerapan sistem otomatis berbasis Internet of Things sering menghadapi kendala, terutama karena tingginya lalu lintas data yang membebani jaringan, sehingga menyebabkan koneksi menjadi tidak stabil. Sistem ini menggunakan protokol MQTT (Message Queuing Telemetry Transport) dalam pengiriman dikondisi jaringan terbatas. Komunikasi antara Master Node dan Slave Node di kedua kebun menggunakan protokol ESP-NOW. Master Node bertindak sebagai publisher yang mengirimkan nilai intensitas cahaya dan status lampu melalui MQTT ke broker HiveMQ, kemudian diteruskan ke website sebagai subscriber. Pengujian dilakukan selama dua hari menunjukkan bahwa pada hari pertama, 6276 data berhasil diterima oleh subscriber dengan rata-rata delay sebesar 593,901 ms. Pada hari kedua, jumlah data yang diterima meningkat menjadi 9146 data dengan rata-rata delay 903,217 ms. Pengujian packet loss di kedua hari yang menunjukkan bahwa seluruh data berhasil diterima dengan utuh oleh subscriber. Menurut standar TIPHON, yang menunjukkan bahwa pengujian delay termasuk dalam kategori jelek, serta tingkat packet loss dalam kategori sangat bagus. Kata kunci— dragon fruit, MQTT, delay, packet loss, ESP-NOW",
+    "authors": [
+      "Siaudila Anisa Dewi Septiana",
+      "Dwi Marisa Midyanti",
+      "Hirzen Hasfani"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.98657",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98657",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98657/75676608837",
+    "storage_pdf_path": "public/storage/pdfs/98657.pdf",
+    "storage_pdf_url": "/storage/pdfs/98657.pdf",
+    "student": "Siaudila Anisa Dewi Septiana",
+    "supervisors": [
+      {
+        "name": "Dwi Marisa Midyanti, S.T., M.Cs.",
+        "cleanName": "Dwi Marisa Midyanti",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hirzen Hasfani, S.Kom., M.Cs.",
+        "cleanName": "Hirzen Hasfani",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-98657",
+    "updated_at": "2026-09-09T11:06:45.903Z",
+    "created_at": "2026-09-09T11:06:45.903Z"
+  },
+  {
+    "ojs_id": "98663",
+    "title": "Pemanfaatan Protokol Komunikasi MQTT Dalam Sistem Sortir Buah Jeruk Berdasarkan Warna Kulit Buah",
+    "abstract": "Bisnis Jeruk dalam proses penyortiran buah jeruk masih dilakukan secara manual oleh petani. Cara ini menghasilkan data yang harus segera diproses, namun keterlambatan komunikasi data yang menyebabkan response time yang tinggi. Hal ini berdampak pada lambatnya respons sistem otomatisasi dam penyortiran. Penelitian dalam pemanfaatan protokol MQTT dalam sistem sortir buah jeruk berdasarkan warna kulit buah untuk meningkatkan efisiensi dalam pengiriman data dan ringan secara real-time dengan response time yang rendah. Sistem dirancang menggunakan sensor TCS3200 untuk mendeteksi tingkat kematangan buah dengan kategori: mentah, setengah matang, matang, dan tidak sesuai. Sensor inframerah untuk menghitung jumlah buah yang telah disortir. Data dikirim melalui NodeMCU ESP32 sebagai publisher ke broker HiveMQ, lalu diproses dan ditampilkan pada antarmuka website sebagai subscriber. Hasil menunjukkan nilai response time rata – rata 491,81 ms. Nilai ini menunjukkan waktu yang layak dalam melakukan penyortiran antara pengiriman dan penerimaan data pada sistem sortir buah jeruk. Sensor TCS3200 mencapai akurasi keberhasilan sensor sebesar 76,7% dan error relatif sebesar 23,3% untuk tingkat kematangan buah. Sistem sortir buah jeruk dengan protokol MQTT berpotensi mendukung otomatisasi melalui komunikasi data real-time yang lebih efektif. Kata kunci: Sistem Sortir Buah, Warna Jeruk, MQTT, Waktu Respon.",
+    "authors": [
+      "Vitus Sandy Syahputra Dewa",
+      "Ikhwan Ruslianto",
+      "Dwi Marisa Midyanti"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.98663",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98663",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98663/75676608842",
+    "storage_pdf_path": "public/storage/pdfs/98663.pdf",
+    "storage_pdf_url": "/storage/pdfs/98663.pdf",
+    "student": "Vitus Sandy Syahputra Dewa",
+    "supervisors": [
+      {
+        "name": "Ikhwan Ruslianto, S.Kom., M.Cs.",
+        "cleanName": "Ikhwan Ruslianto",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Dwi Marisa Midyanti, S.T., M.Cs.",
+        "cleanName": "Dwi Marisa Midyanti",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-98663",
+    "updated_at": "2026-09-09T11:06:48.851Z",
+    "created_at": "2026-09-09T11:06:48.851Z"
+  },
+  {
+    "ojs_id": "98771",
+    "title": "Penerapan Topologi Mesh Pada Master-Slave Untuk Pengiriman Paket Data Sensor Soil Moisture",
+    "abstract": "Sektor pertanian memerlukan sistem pemantauan kelembaban tanah yang andal untuk menunjang pertumbuhan tanaman secara optimal. Penelitian ini merancang serta mengimplementasikan sistem pemantauan kelembaban tanah berbasis arsitektur master-slave menggunakan empat NodeMCU ESP32 dengan penerapan topologi mesh. Topologi mesh tidak dimanfaatkan sepenuhnya untuk pertukaran data, melainkan difokuskan pada mekanisme failover, yaitu ketika node master utama mengalami kegagalan, peran master dialihkan secara statis kepada slave sesuai urutan prioritas. Sistem terdiri atas satu master dan tiga slave, di mana setiap slave terhubung dengan empat sensor soil moisture. Data hasil pembacaan sensor dikumpulkan terlebih dahulu pada masing-masing slave menggunakan metode batch processing, kemudian dikirimkan ke master untuk diteruskan ke cloud server. Mekanisme failover ditetapkan secara statis, sehingga Slave 1 berfungsi sebagai backup master pertama, dilanjutkan oleh Slave 2, dan seterusnya. Pengujian dilakukan melalui sembilan skenario berbeda untuk mengevaluasi kinerja sistem. Hasil menunjukkan pada skenario 1, 2, 3, 4, 7, dan 8 sistem mencapai packet loss 0%, yang termasuk kategori sangat bagus menurut standar TIPHON. Total packet loss keseluruhan sebesar 0,13% juga masih dalam kategori sangat bagus. Dengan demikian, sistem terbukti efektif menjaga keberlanjutan pengiriman data melalui penerapan topologi mesh berbasis failover pada pemantauan pertanian secara real-time. Kata kunci: IoT, topologi mesh, master-slave, failover, soil moisture monitoring",
+    "authors": [
+      "Awal Cahyo Bayu Aji",
+      "Ikhwan Ruslianto"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.98771",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98771",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98771/75676608845",
+    "storage_pdf_path": "public/storage/pdfs/98771.pdf",
+    "storage_pdf_url": "/storage/pdfs/98771.pdf",
+    "student": "Awal Cahyo Bayu Aji",
+    "supervisors": [
+      {
+        "name": "Ikhwan Ruslianto, S.Kom., M.Cs.",
+        "cleanName": "Ikhwan Ruslianto",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-98771",
+    "updated_at": "2026-09-09T11:06:52.276Z",
+    "created_at": "2026-09-09T11:06:52.276Z"
+  },
+  {
+    "ojs_id": "98866",
+    "title": "Penerapan Algoritma Long Short Term Memory (LSTM) Dalam Prediksi Pergerakan Harga Cryptocurrency Menggunakan Data Time Series",
+    "abstract": "Cryptocurrency merupakan teknologi blockchain yang diterapkan pada sistem desentralisasi, memiliki kebebasan, kecepatan dan keamanan dalam transaksi cryptocurrency, namun volatilitas yang tinggi merupakan bagian dari kelemahan yang dimiliki cryptocurrency. Kelemahan berupa volatilitas yang tinggi dimanfaatkan sebagai sarana investasi untuk mendapatkan keuntungan. Selain mendapatkan keuntungan, volatilitas yang tinggi dapat memberikan kerugian akibat kesalahan dalam menentukan pergerakan harga cryptocurrency. Hal ini membuat Prediksi diperlukan untuk dapat memprediksi pergerakan harga cryptocurrency. Long Short Term Memory (LSTM) merupakan salah satu algoritma yang dapat digunakan untuk memprediksi harga berdasarkan data time series harga cryptocurrency dimasa lalu. Oleh karena itu, pada penelitian ini dibangun sebuah sistem prediksi yang dapat memprediksi pergerakan harga cryptocurrency. Data yang digunakan yaitu data pergerakan harian BTC, ETH, dan ADA pada tanggal 1 Januari 2019-31 Maret 2024 (1917 data) dengan rasio data latih dan data uji adalah 70%:30%. Penelitian ini dilakukan untuk mengamati variasi arsitektur LSTM yang memiliki akurasi tertinggi. Hasil pengujian menunjukan bahwa akurasi terbaik didapat dengan menggunakan variasi parameter 500 max epoch, 50 neuron, 128 batch size dan 0,001 learning rate pada BTC dengan hasil akurasi 98,42961%. Pada ETH menggunakan parameter 250 max epoch, 50 neuron, 64 batch size dan 0,001 learning rate mendapatkan akurasi sebesar 98,25673%. Sementara ADA menggunakan parameter 2000 max epoch, 50 neuron, 64 batch size dan 0,001 learning rate mendapatkan akurasi sebesar 97,50375%. Pengujian mendapatkan hasil terbaik pada setiap cryptocurrency dengan menggunakan dataset pada tanggal 1 Januari 2021 – 31 Maret 2024 (1186 data). Kata kunci— Cryptocurrency, Prediksi, Time series, Long Short Term Memory (LSTM).",
+    "authors": [
+      "Satrio Wahyutama",
+      "Tedy Rismawan",
+      "Syamsul Bahri"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.98866",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98866",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98866/75676608848",
+    "storage_pdf_path": "public/storage/pdfs/98866.pdf",
+    "storage_pdf_url": "/storage/pdfs/98866.pdf",
+    "student": "Satrio Wahyutama",
+    "supervisors": [
+      {
+        "name": "Tedy Rismawan, S.Kom., M.Cs.",
+        "cleanName": "Tedy Rismawan",
+        "keahlian": [
+          "Automation & Embeded System (AES)"
+        ]
+      },
+      {
+        "name": "Syamsul Bahri, S.Kom., M.Cs.",
+        "cleanName": "Syamsul Bahri",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Automation & Embeded System (AES)",
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-98866",
+    "updated_at": "2026-09-09T11:06:55.917Z",
+    "created_at": "2026-09-09T11:06:55.917Z"
+  },
+  {
+    "ojs_id": "98923",
+    "title": "Implementasi Algoritma Dijkstra Untuk Pemilihan Rute Terpendek Pengambilan Sampah Pada Sistem Pemantauan Edge Computing Smart Trash Bin",
+    "abstract": "Dalam sistem pengambilan sampah berbasis IoT memerlukan perencanaan rute yang efisien untuk meminimalkan jarak tempuh dan waktu perjalanan. Permasalahan yang terjadi adalah rute ditentukan berdasarkan volume sampah tanpa mempertimbangkan jarak sehingga memungkinkan pengambilan sampah dengan rute yang panjang. Oleh karena itu, sistem perlu mengintegrasikan optimasi rute berdasarkan jarak sebagai prioritas utama, selain volume sampah. Penelitian ini mengimplementasikan algoritma Dijkstra untuk menentukan rute terpendek pengambilan sampah pada sistem pementauan edge computing. Sistem terdiri dari 12 simpul, meliputi 5 lokasi edge tempat sampah, 6 simpul persimpangan, dan 1 titik awal petugas. Data jarak antar simpul direpresentasikan dalam bentuk graf sesuai kondisi lapangan, sedangkan volume sampah diperoleh secara real-time melalui sensor ultrasonik pada setiap lokasi edge. Data dikirim dari node ke server edge dan diteruskan ke cloud untuk penyimpanan serta pemrosesan lebih lanjut. Hasil pengujian menunjukkan waktu eksekusi rata-rata algoritma sebesar 0,021 ms untuk satu lokasi penuh, 0,00705 ms untuk dua lokasi penuh, 0,0121 ms untuk tiga lokasi penuh, 0,00695 ms untuk empat lokasi penuh, dan 0,00625 ms untuk lima lokasi penuh. Pengujian akurasi membuktikan algoritma mampu menentukan rute terpendek. Pengujian delay pengiriman data menunjukkan hasil yang baik, dengan rata-rata delay 172,6 ms dari node ke edge dan 148,8 ms dari edge ke cloud, memenuhi standar TIPHON. Kata kunci— Pengambilan Sampah, Algoritma Dijkstra, Rute Terpendek, Edge Computing.",
+    "authors": [
+      "Linda Linda",
+      "Syamsul Bahri",
+      "Kasliono Kasliono"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.98923",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/98923",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/98923/75676608854",
+    "storage_pdf_path": "public/storage/pdfs/98923.pdf",
+    "storage_pdf_url": "/storage/pdfs/98923.pdf",
+    "student": "Linda Linda",
+    "supervisors": [
+      {
+        "name": "Syamsul Bahri, S.Kom., M.Cs.",
+        "cleanName": "Syamsul Bahri",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Kasliono, S.Mat., M.Cs.",
+        "cleanName": "Kasliono",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-98923",
+    "updated_at": "2026-09-09T11:06:58.547Z",
+    "created_at": "2026-09-09T11:06:58.547Z"
+  },
+  {
+    "ojs_id": "99008",
+    "title": "Implementasi Metode Hybrid Scan Untuk Information Gathering Dan Pengujian Sistem Menggunakan SQL Injection Berbasis Website",
+    "abstract": "Kemajuan pesat dalam teknologi informasi dan komunikasi menuntut adanya sistem keamanan yang semakin kuat, khususnya dalam menghadapi ancaman seperti serangan SQL Injection. Untuk meminimalkan risiko tersebut, langkah awal yang krusial adalah melakukan information gathering secara menyeluruh guna mengidentifikasi potensi kerentanan pada suatu situs web sejak dini. Penelitian ini menggunakan metode hybrid scan, yang menggabungkan pemindaian aktif dan pasif, untuk melakukan information gathering dan pengujian kerentanan SQL Injection pada lima situs web. Metode aktif melibatkan tools yang terinstall, sedangkan metode pasif memanfaatkan API. Hasil pengujian menunjukkan bahwa semua situs web yang diuji berhasil mendeteksi subdomain, alamat IP, URL, host yang aktif, sistem operasi, teknologi, serta status load balancing dan port yang terbuka. Kerentanan SQL Injection bervariasi: situs web pertama menunjukkan kerentanan tingkat sedang, sedangkan situs web kedua dan ketiga memiliki kerentanan tinggi. Situs web keempat dan kelima tidak rentan. Waktu yang dibutuhkan untuk proses ini berkisar antara 4 hingga 33 menit. Alat bantu berbasis web yang dikembangkan dalam penelitian ini mempermudah proses information gathering dan deteksi kerentanan dengan 10 proses utama. Kata kunci: SQL Injection, Hybrid Scan, Information Gathering",
+    "authors": [
+      "Randi Rai",
+      "Ikhwan Ruslianto",
+      "Kasliono Kasliono"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.99008",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/99008",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/99008/75676608855",
+    "storage_pdf_path": "public/storage/pdfs/99008.pdf",
+    "storage_pdf_url": "/storage/pdfs/99008.pdf",
+    "student": "Randi Rai",
+    "supervisors": [
+      {
+        "name": "Ikhwan Ruslianto, S.Kom., M.Cs.",
+        "cleanName": "Ikhwan Ruslianto",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Kasliono, S.Mat., M.Cs.",
+        "cleanName": "Kasliono",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-99008",
+    "updated_at": "2026-09-09T11:07:01.194Z",
+    "created_at": "2026-09-09T11:07:01.194Z"
+  },
+  {
+    "ojs_id": "99257",
+    "title": "Penerapan Edge Computing Pada Sistem Cerdas Kendali Titik Lampu Pertanian Buah Naga Menggunakan Protokol HTTP",
+    "abstract": "Buah naga merupakan salah satu buah yang baik untuk dikonsumsi manusia. Namun buah naga memerlukan intensitas cahaya yang cukup agar dapat tumbuh. Untuk mengatasi masalah ini, dikembangkan sistem berbasis website yang dapat mengatur intensitas cahaya pada buah naga dengan teknologi edge computing menggunakan protokol HTTP. Dari penelitian yang sudah dilakukan, sistem mampu melakukan pemantauan selama 11 jam 3 menit tanpa henti. Penerapan edge computing pada penelitian menghasilkan pengiriman delay dengan kecepatan yang cukup bervariasi. Pada pengujian yang telah dilakukan menggunakan provider pribadi rumah didapatkan rata-rata delay sebesar 975.01 ms dikategorikan jelek dan packet loss sebesar 0 % dikategorikan sangat bagus menurut standar TIPHON. Hasil pengujian menunjukan bahwa sistem dapat berfungsi dengan baik dan memenuhi kebutuhan pengguna dalam menjaga intensitas cahaya pada tanaman buah naga. dengan adanya sistem ini diharapkan dapat membantu pembudidaya buah naga dalam menjaga intensitas cahaya yang ada disekitar tanaman serta mempercepat pertumbuhan buah naga. Kata kunci— Buah Naga, Delay, Edge Computing, packet loss, Protokol HTTP",
+    "authors": [
+      "Uray Rafli Andika",
+      "Ikhwan Ruslianto",
+      "Hafiz Muhardi"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.99257",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/99257",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/99257/75676608857",
+    "storage_pdf_path": "public/storage/pdfs/99257.pdf",
+    "storage_pdf_url": "/storage/pdfs/99257.pdf",
+    "student": "Uray Rafli Andika",
+    "supervisors": [
+      {
+        "name": "Ikhwan Ruslianto, S.Kom., M.Cs.",
+        "cleanName": "Ikhwan Ruslianto",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hafiz Muhardi, S.T., M.Kom.",
+        "cleanName": "Hafiz Muhardi",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-99257",
+    "updated_at": "2026-09-09T11:07:03.570Z",
+    "created_at": "2026-09-09T11:07:03.570Z"
+  },
+  {
+    "ojs_id": "99324",
+    "title": "Impementasi LoRa Pada Sistem Bantuan Darurat dan Keselamatan Dalam Pendakian",
+    "abstract": "Pendakian gunung merupakan aktivitas berisiko tinggi, terutama di wilayah terpencil yang minim akses komunikasi. Dalam kondisi darurat seperti kehilangan jalur atau cuaca buruk, dibutuhkan sistem komunikasi yang andal untuk meminta bantuan. Penelitian ini bertujuan membangun sistem bantuan darurat menggunakan jaringan LoRa (Long Range) secara point-to-point yang terintegrasi dengan GPS dan aplikasi android. Sistem terdiri dari perangkat LoRa transmitter berbasis ESP32 yang mengirimkan data koordinat lokasi pendaki ke LoRa receiver, lalu diteruskan ke server dan ditampilkan melalui aplikasi. Pengujian dilakukan pada jarak 10 hingga 60 meter dengan rentang jarak 10 meter, untuk mengevaluasi performa berdasarkan parameter delay, throughput, packet loss dan path loss. Hasil pengujian menunjukkan bahwa sistem mampu mengirimkan data dengan baik hingga jarak 50 meter, dengan nilai delay rata-rata terendah sebesar 4477,1 ms pada jarak 20 meter dan throughput tertinggi sebesar 0,075 kbps. Packet loss mulai terjadi pada jarak 40 meter sebesar 10% dan mencapai 100% pada jarak 60 meter. Sistem ini terbukti efektif digunakan sebagai alat bantu komunikasi darurat dalam pendakian dengan jangkauan optimal di bawah 50 meter. Kata kunci : LoRa, komunikasi darurat, pengiriman data",
+    "authors": [
+      "Balo Yuberlian Marsisto",
+      "Syamsul Bahri",
+      "Hirzen Hasfani"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.99324",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/99324",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/99324/75676608860",
+    "storage_pdf_path": "public/storage/pdfs/99324.pdf",
+    "storage_pdf_url": "/storage/pdfs/99324.pdf",
+    "student": "Balo Yuberlian Marsisto",
+    "supervisors": [
+      {
+        "name": "Syamsul Bahri, S.Kom., M.Cs.",
+        "cleanName": "Syamsul Bahri",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hirzen Hasfani, S.Kom., M.Cs.",
+        "cleanName": "Hirzen Hasfani",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-99324",
+    "updated_at": "2026-09-09T11:07:06.028Z",
+    "created_at": "2026-09-09T11:07:06.028Z"
+  },
+  {
+    "ojs_id": "99335",
+    "title": "Implementasi Protokol MQTT Dalam Transmisi Data Kualitas Air PDAM Menggunakan Aplikasi Website",
+    "abstract": "PDAM sebagai penyedia utama air bersih memiliki tanggung jawab dalam menjamin kualitas air yang disalurkan kepada masyarakat. Permasalahan yang sering terjadi adalah keterlambatan dalam mendeteksi perubahan kualitas air akibat keterbatasan sistem pemantauan secara manual. Penelitian ini bertujuan untuk mengembangkan purwarupa sistem monitoring kualitas air PDAM berbasis Internet of Things (IoT) dengan implementasi protokol MQTT sebagai media transmisi data secara real-time ke dalam aplikasi website. Sistem ini dirancang untuk membaca parameter kualitas air menggunakan sensor pH, Turbidity, dan TDS yang terhubung dengan NodeMCU ESP32. Parameter kualitas air diuji berdasarkan standar baku mutu air bersih, di mana pH air berada pada rentang 6,5 sampai 9,0, turbidity tidak melebihi 5 NTU, dan salinitas berada dibawah 0,5 ppt. Hasil pengujian menunjukkan bahwa sistem mampu mengirimkan data air PDAM dengan rata-rata delay untuk sensor pH air sebesar 0,003 ms, sensor turbidity sebesar 3,976 ms dan sensor TDS sebesar 0,01ms serta menampilkan status air secara langsung pada antarmuka web. Kata Kunci: PDAM, MQTT, Kualitas Air, Sensor, Delay.",
+    "authors": [
+      "Dinda Damayanti",
+      "Ikhwan Ruslianto",
+      "Hafiz Muhardi"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.99335",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/99335",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/99335/75676608863",
+    "storage_pdf_path": "public/storage/pdfs/99335.pdf",
+    "storage_pdf_url": "/storage/pdfs/99335.pdf",
+    "student": "Dinda Damayanti",
+    "supervisors": [
+      {
+        "name": "Ikhwan Ruslianto, S.Kom., M.Cs.",
+        "cleanName": "Ikhwan Ruslianto",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hafiz Muhardi, S.T., M.Kom.",
+        "cleanName": "Hafiz Muhardi",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-99335",
+    "updated_at": "2026-09-09T11:07:09.279Z",
+    "created_at": "2026-09-09T11:07:09.279Z"
+  },
+  {
+    "ojs_id": "99406",
+    "title": "Analisis Proses Serangan DoS dan ARP Spoofing antar Perangkat ESP32 pada WSN Bertopologi Star",
+    "abstract": "Perangkat Internet of Things (IoT) seperti ESP32, meskipun populer karena murah dan fitur Wi-Fi, memiliki keterbatasan sumber daya yang membuatnya rentan terhadap serangan siber. Penelitian ini menganalisis bagaimana serangan dapat dimplementasikan menggunakan 1 perangkat ESP32 dan dampak terhadap 1 perangkat ESP32 dari dua jenis serangan umum, yaitu Denial of Service (DoS) melalui ICMP Flood dan Address Resolution Protocol (ARP) Spoofing, dalam lingkungan Wireless Sensor Network (WSN) bertopologi star. Dalam penelitian ini, satu perangkat ESP32 diprogram sebagai penyerang untuk menyerang salah satu dari tiga perangkat ESP32 client lain yang terhubung ke sebuah server lokal melalui protokol WebSocket. Tujuan penelitian ini adalah untuk menganalisis pengimplementasian serangan, dampak performa perangkat target, dan dampak terhadap metrik Quality of Service (QoS) seperti latency, jitter, throughput, dan packet loss, serta kinerja perangkat (CPU load dan memori). Hasil penelitian menunjukkan bahwa serangan ARP Spoofing yang dilancarkan oleh satu perangkat ESP32 efektif dan dapat digunakan sebagai serangan DoS karena mampu memutus koneksi client target dari server dengan tingkat packet loss mencapai hampir 100%. Sebaliknya, serangan ICMP Flood dari satu perangkat ESP32 penyerang tidak berhasil mematikan perangkat target tetapi secara konsisten meningkatkan beban CPU-nya mencapai 17,63%. Penelitian ini membuktikan bahwa perangkat berdaya rendah seperti ESP32 dapat digunakan sebagai platform serangan yang efektif dalam jaringan lokal, menyoroti pentingnya keamanan pada lapisan jaringan bahkan di antara perangkat sejenis. Kata kunci: ESP32, Denial of Service, ARP Spoofing, Keamanan IoT, WSN.",
+    "authors": [
+      "Dede Kurniawan",
+      "Uray Ristian",
+      "Hafiz Muhardi"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.99406",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/99406",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/99406/75676608867",
+    "storage_pdf_path": "public/storage/pdfs/99406.pdf",
+    "storage_pdf_url": "/storage/pdfs/99406.pdf",
+    "student": "Dede Kurniawan",
+    "supervisors": [
+      {
+        "name": "Uray Ristian, S.Kom., M.Kom.",
+        "cleanName": "Uray Ristian",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Hafiz Muhardi, S.T., M.Kom.",
+        "cleanName": "Hafiz Muhardi",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-99406",
+    "updated_at": "2026-09-09T11:07:12.675Z",
+    "created_at": "2026-09-09T11:07:12.675Z"
+  },
+  {
+    "ojs_id": "100038",
+    "title": "Implementasi Edge Computing pada Mekanisme Antrian Pemesanan Mocktail Menggunakan Protokol HTTP",
+    "abstract": "Proses pemesanan dan pembuatan mocktail secara manual seringkali tidak efisien, terutama pada kawasan dengan banyak pengunjung, yang dapat menyebabkan penumpukan antrian dan mengakibatkan waktu tunggu proses pesanan yang lama. Penerapan teknologi pembuat mocktail dapat diterapkan, namun apabila menggunakan komputasi tradisional seperti cloud yang umumnya memiliki masalah latensi tinggi, dapat mengakibatkan layanan pemesanan mocktail kepada konsumen semakin tidak efisien. Untuk mengatasi masalah ini, diterapkan inovasi berupa sistem pemesanan dengan konsep reservasi dan self-service pada perangkat mocktail maker berbasis IoT, serta pemanfaatan konsep edge computing sebagai komputasi utama pada layanan sistem. Konsep ini memungkinkan pelanggan melakukan pemesanan dan pengambilan pesanan secara mandiri dari mocktail maker berbasis IoT dengan response time yang singkat. Penelitian yang dibangun berhasil menerapkan pemesanan secara reservasi dan pengambilan pesanan secara self-service dengan model antrian FIFO, serta menunjukkan rata-rata response time pengambilan data pesanan untuk edge computing dengan waktu sekitar 1414 milliseconds, sedangkan cloud computing memiliki response time sekitar 3300 milliseconds. Waktu response time yang didapatkan juga konsisten pada setiap komputasi yang digunakan dan tidak terpengaruh oleh jumlah antrian atau pesanan yang terdapat pada sistem, karena jumlah antrian difokuskan pada bagian server, sementara pesanan difokuskan pada bagian kendali alat. Kata kunci—Edge Computing, Sistem Pemesanan, Reservasi, Mocktail, Internet of Things",
+    "authors": [
+      "Muhammad Arifaldi Nur Ath Thariq",
+      "Hafiz Muhardi",
+      "Dwi Marisa Midyanti"
+    ],
+    "institutions": [
+      "Universitas Tanjungpura"
+    ],
+    "publication_date": "2026/04/06",
+    "doi": "10.26418/coding.v14i1.100038",
+    "issue_name": "Vol. 14 No. 1 (2026): Edisi April 2026",
+    "original_article_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/view/100038",
+    "original_pdf_url": "https://jurnal.untan.ac.id/index.php/jcskommipa/article/download/100038/75676608872",
+    "storage_pdf_path": "public/storage/pdfs/100038.pdf",
+    "storage_pdf_url": "/storage/pdfs/100038.pdf",
+    "student": "Muhammad Arifaldi Nur Ath Thariq",
+    "supervisors": [
+      {
+        "name": "Hafiz Muhardi, S.T., M.Kom.",
+        "cleanName": "Hafiz Muhardi",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      },
+      {
+        "name": "Dwi Marisa Midyanti, S.T., M.Cs.",
+        "cleanName": "Dwi Marisa Midyanti",
+        "keahlian": [
+          "Network Intelligent Control (NIC)"
+        ]
+      }
+    ],
+    "keahlian": [
+      "Network Intelligent Control (NIC)"
+    ],
+    "id": "local-100038",
+    "updated_at": "2026-09-09T11:07:16.516Z",
+    "created_at": "2026-09-09T11:07:16.516Z"
+  }
+]
