@@ -194,38 +194,38 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         {/* Authors Section: Student & Lecturers breakdown in Neo-brutalist box */}
         <div className="space-y-2.5 mb-4 p-3.5 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] text-xs">
           {/* Mahasiswa (Icon-only badge, no text) */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2.5">
             <span
               title="Mahasiswa (Penulis Utama)"
-              className="inline-flex items-center justify-center p-1 bg-[#60A5FA] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0"
+              className="inline-flex items-center justify-center p-1 bg-[#60A5FA] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0 mt-0.5"
             >
               <GraduationCap className="w-3.5 h-3.5 stroke-[2.5]" />
             </span>
-            <span className="font-extrabold text-black dark:text-white truncate">
+            <span className="font-extrabold text-black dark:text-white break-words flex-1 min-w-0 leading-tight">
               {studentName}
             </span>
           </div>
 
           {/* Dosen Pembimbing (Icon-only badge, no text, no numbers before names) */}
           {supervisors.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700">
+            <div className="flex items-start gap-2.5 pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700">
               <span
                 title="Dosen Pembimbing"
-                className="inline-flex items-center justify-center p-1 bg-[#FBBF24] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0"
+                className="inline-flex items-center justify-center p-1 bg-[#FBBF24] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0 mt-0.5"
               >
                 <Briefcase className="w-3.5 h-3.5 stroke-[2.5]" />
               </span>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex-1 min-w-0 flex flex-wrap items-center gap-1.5">
                 {supervisors.map((s, idx) => (
                   <button
                     key={idx}
                     onClick={() => onFilterDosen && onFilterDosen(s.cleanName)}
-                    className="inline-flex items-center px-2 py-0.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white font-bold text-xs shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black transition-colors"
+                    className="inline-flex items-center px-2 py-0.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white font-bold text-xs shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black transition-colors max-w-full text-left"
                     title={`Lihat riset bimbingan ${s.cleanName}`}
                   >
-                    <span>{s.cleanName}</span>
+                    <span className="break-words">{s.cleanName}</span>
                     {s.keahlian && s.keahlian[0] && (
-                      <span className="ml-1 text-[10px] font-mono opacity-80">
+                      <span className="ml-1 text-[10px] font-mono opacity-80 shrink-0">
                         [{s.keahlian[0].replace(/.*\(|\).*/g, '')}]
                       </span>
                     )}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Article } from '@/lib/types';
 import { DosenItem } from '@/lib/dosen';
 import { Navbar } from '@/components/Navbar';
@@ -14,7 +14,37 @@ import {
   X,
   SlidersHorizontal,
   Lock,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
 } from 'lucide-react';
+
+const PAGE_SIZE = 10;
+
+interface CachedPageData {
+  articles: Article[];
+  issues: string[];
+  years: string[];
+  dosenList: DosenItem[];
+  keahlianList: string[];
+  total: number;
+  filteredCount: number;
+  totalPages: number;
+  supabaseConnected: boolean;
+}
+
+function getPaginationItems(current: number, total: number): (number | string)[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total];
+  }
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  }
+  return [1, '...', current - 1, current, current + 1, '...', total];
+}
 
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -23,11 +53,18 @@ export default function HomePage() {
   const [dosenList, setDosenList] = useState<DosenItem[]>([]);
   const [keahlianList, setKeahlianList] = useState<string[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [filteredCount, setFilteredCount] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [showAll, setShowAll] = useState<boolean>(false);
   const [supabaseConnected, setSupabaseConnected] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Filters State
+  // Search input state with debouncing
+  const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Filters State
   const [selectedProdi, setSelectedProdi] = useState<string>('all');
   const [selectedIssue, setSelectedIssue] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
@@ -38,64 +75,139 @@ export default function HomePage() {
   // Modal State
   const [activePdfArticle, setActivePdfArticle] = useState<Article | null>(null);
 
-  // Fetch articles from API
-  const fetchArticles = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (searchQuery.trim()) params.set('q', searchQuery.trim());
-      if (selectedProdi !== 'all') params.set('prodi', selectedProdi);
-      if (selectedIssue !== 'all') params.set('issue', selectedIssue);
-      if (selectedYear !== 'all') params.set('year', selectedYear);
-      if (selectedDosen !== 'all') params.set('dosen', selectedDosen);
-      if (selectedKeahlian !== 'all') params.set('keahlian', selectedKeahlian);
-      params.set('sortBy', sortBy);
+  // In-memory page cache to retain visited pages and avoid redundant network calls
+  const pageCacheRef = useRef<Map<string, CachedPageData>>(new Map());
 
-      const res = await fetch(`/api/articles?${params.toString()}`);
-      const data = await res.json();
-
-      if (data.success) {
-        setArticles(data.articles || []);
-        setIssues(data.issues || []);
-        setYears(data.years || []);
-        setDosenList(data.dosenList || []);
-        setKeahlianList(data.keahlianList || []);
-        setTotalCount(data.total || 0);
-        setSupabaseConnected(data.supabaseConnected || false);
-      }
-    } catch (err) {
-      console.error('Error loading articles:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]);
-
+  // Debounce search query
   useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  // Derived statistics
-  const stats = useMemo(() => {
-    const allAuthors = new Set<string>();
-    articles.forEach((a) => {
-      a.authors?.forEach((author) => allAuthors.add(author));
-    });
-    return {
-      totalFound: articles.length,
-      totalAuthors: allAuthors.size,
-      totalIssues: issues.length || 1,
-    };
-  }, [articles, issues]);
+  // Generate cache key based on current filters and page/all mode
+  const getCacheKey = useCallback(
+    (page: number, allMode: boolean) => {
+      return [
+        searchQuery.trim().toLowerCase(),
+        selectedProdi,
+        selectedIssue,
+        selectedYear,
+        selectedDosen,
+        selectedKeahlian,
+        sortBy,
+        `p:${page}`,
+        `all:${allMode}`,
+      ].join('|');
+    },
+    [searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]
+  );
 
-  const hasActiveFilters =
-    searchQuery !== '' ||
-    selectedProdi !== 'all' ||
-    selectedIssue !== 'all' ||
-    selectedYear !== 'all' ||
-    selectedDosen !== 'all' ||
-    selectedKeahlian !== 'all';
+  // Fetch or retrieve from cache
+  const loadData = useCallback(
+    async (pageToLoad: number, allMode: boolean) => {
+      const cacheKey = getCacheKey(pageToLoad, allMode);
+
+      // Check client-side memory cache first
+      if (pageCacheRef.current.has(cacheKey)) {
+        const cached = pageCacheRef.current.get(cacheKey)!;
+        setArticles(cached.articles);
+        setIssues(cached.issues);
+        setYears(cached.years);
+        setDosenList(cached.dosenList);
+        setKeahlianList(cached.keahlianList);
+        setTotalCount(cached.total);
+        setFilteredCount(cached.filteredCount);
+        setTotalPages(cached.totalPages);
+        setSupabaseConnected(cached.supabaseConnected);
+        setCurrentPage(pageToLoad);
+        setShowAll(allMode);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (searchQuery.trim()) params.set('q', searchQuery.trim());
+        if (selectedProdi !== 'all') params.set('prodi', selectedProdi);
+        if (selectedIssue !== 'all') params.set('issue', selectedIssue);
+        if (selectedYear !== 'all') params.set('year', selectedYear);
+        if (selectedDosen !== 'all') params.set('dosen', selectedDosen);
+        if (selectedKeahlian !== 'all') params.set('keahlian', selectedKeahlian);
+        params.set('sortBy', sortBy);
+
+        if (allMode) {
+          params.set('all', 'true');
+        } else {
+          params.set('page', pageToLoad.toString());
+          params.set('limit', PAGE_SIZE.toString());
+        }
+
+        const res = await fetch(`/api/articles?${params.toString()}`);
+        const data = await res.json();
+
+        if (data.success) {
+          const cacheData: CachedPageData = {
+            articles: data.articles || [],
+            issues: data.issues || [],
+            years: data.years || [],
+            dosenList: data.dosenList || [],
+            keahlianList: data.keahlianList || [],
+            total: data.total || 0,
+            filteredCount: data.filteredCount || 0,
+            totalPages: data.totalPages || 1,
+            supabaseConnected: data.supabaseConnected || false,
+          };
+
+          // Save to in-memory cache
+          pageCacheRef.current.set(cacheKey, cacheData);
+
+          setArticles(cacheData.articles);
+          setIssues(cacheData.issues);
+          setYears(cacheData.years);
+          setDosenList(cacheData.dosenList);
+          setKeahlianList(cacheData.keahlianList);
+          setTotalCount(cacheData.total);
+          setFilteredCount(cacheData.filteredCount);
+          setTotalPages(cacheData.totalPages);
+          setSupabaseConnected(cacheData.supabaseConnected);
+          setCurrentPage(pageToLoad);
+          setShowAll(allMode);
+        }
+      } catch (err) {
+        console.error('Error loading articles:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [getCacheKey, searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]
+  );
+
+  // Trigger data load when filters change (resets to page 1 in paginated mode)
+  useEffect(() => {
+    loadData(1, false);
+  }, [searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy, loadData]);
+
+  // Page navigation handlers
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
+    loadData(newPage, false);
+    document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleToggleShowAll = () => {
+    if (showAll) {
+      loadData(1, false);
+    } else {
+      loadData(1, true);
+    }
+    document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleResetFilters = () => {
+    setSearchInput('');
     setSearchQuery('');
     setSelectedProdi('all');
     setSelectedIssue('all');
@@ -104,6 +216,21 @@ export default function HomePage() {
     setSelectedKeahlian('all');
     setSortBy('newest');
   };
+
+  // Scroll to catalog top on badge clicks
+  const scrollToCatalog = () => {
+    setTimeout(() => {
+      document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  };
+
+  const hasActiveFilters =
+    searchQuery !== '' ||
+    selectedProdi !== 'all' ||
+    selectedIssue !== 'all' ||
+    selectedYear !== 'all' ||
+    selectedDosen !== 'all' ||
+    selectedKeahlian !== 'all';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFDF5] dark:bg-[#0D0F12] text-black dark:text-white transition-colors">
@@ -133,7 +260,7 @@ export default function HomePage() {
           <p className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400">
             Mengindeks <strong className="font-black text-black dark:text-white">{totalCount}</strong> artikel riset •{' '}
             <strong className="font-black text-black dark:text-white">{dosenList.length}</strong> dosen pembimbing •{' '}
-            <strong className="font-black text-black dark:text-white">{stats.totalAuthors}</strong> penulis •{' '}
+            <strong className="font-black text-black dark:text-white">{keahlianList.length}</strong> bidang keahlian •{' '}
             <strong className="font-black text-black dark:text-white">{issues.length || 1}</strong> edisi publikasi
           </p>
         </div>
@@ -141,6 +268,8 @@ export default function HomePage() {
 
       {/* Main Content & Articles Catalog */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="catalog-top" className="scroll-mt-6" />
+
         {/* Unified Search & Filters Control Panel - Neo-Brutalist Box */}
         <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] space-y-4">
           {/* Search Bar */}
@@ -150,14 +279,17 @@ export default function HomePage() {
             </div>
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Cari judul riset, nama mahasiswa, dosen pembimbing, atau topik..."
               className="w-full pl-12 pr-10 py-3.5 text-sm sm:text-base font-bold bg-transparent text-black dark:text-white placeholder-slate-400 focus:outline-none"
             />
-            {searchQuery && (
+            {searchInput && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => {
+                  setSearchInput('');
+                  setSearchQuery('');
+                }}
                 className="absolute inset-y-0 right-0 pr-4 flex items-center text-black dark:text-white hover:opacity-70"
                 title="Hapus pencarian"
               >
@@ -270,7 +402,7 @@ export default function HomePage() {
             {/* Results Count Badge */}
             <div className="flex items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
               <span className="px-3 py-1.5 bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] font-black uppercase tracking-wide">
-                HASIL: {articles.length} / {totalCount} RISET
+                HASIL: {filteredCount} / {totalCount} RISET
               </span>
             </div>
           </div>
@@ -306,19 +438,131 @@ export default function HomePage() {
             )}
           </div>
         ) : (
-          /* Articles Grid */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {articles.map((article) => (
-              <ArticleCard
-                key={article.ojs_id}
-                article={article}
-                onReadPdf={(art) => setActivePdfArticle(art)}
-                onFilterDosen={(dosenName) => setSelectedDosen(dosenName)}
-                onFilterKeahlian={(keahlianName) => setSelectedKeahlian(keahlianName)}
-                onFilterProdi={(prodiName) => setSelectedProdi(prodiName)}
-              />
-            ))}
-          </div>
+          <>
+            {/* Articles Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {articles.map((article) => (
+                <ArticleCard
+                  key={article.ojs_id}
+                  article={article}
+                  onReadPdf={(art) => setActivePdfArticle(art)}
+                  onFilterDosen={(dosenName) => {
+                    setSelectedDosen(dosenName);
+                    scrollToCatalog();
+                  }}
+                  onFilterKeahlian={(keahlianName) => {
+                    setSelectedKeahlian(keahlianName);
+                    scrollToCatalog();
+                  }}
+                  onFilterProdi={(prodiName) => {
+                    setSelectedProdi(prodiName);
+                    scrollToCatalog();
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Neo-Brutalist Pagination & View Bar */}
+            <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Pagination Info Readout */}
+              <div className="text-xs font-mono font-bold text-black dark:text-white text-center md:text-left">
+                {showAll ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#A3E635] border border-black inline-block" />
+                    Menampilkan seluruh <strong className="font-black text-black dark:text-white">{filteredCount}</strong> riset (Satu Halaman)
+                  </span>
+                ) : (
+                  <span>
+                    Menampilkan riset <strong className="font-black">{(currentPage - 1) * PAGE_SIZE + 1}</strong> -{' '}
+                    <strong className="font-black">{Math.min(currentPage * PAGE_SIZE, filteredCount)}</strong> dari{' '}
+                    <strong className="font-black">{filteredCount}</strong> artikel
+                    {totalPages > 1 && (
+                      <span className="opacity-70 ml-1.5 font-normal">
+                        (Halaman {currentPage} dari {totalPages})
+                      </span>
+                    )}
+                  </span>
+                )}
+              </div>
+
+              {/* Numbered Page Controls (Active in Paginated Mode) */}
+              {!showAll && totalPages > 1 && (
+                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                  {/* Prev Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage <= 1}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
+                      currentPage <= 1
+                        ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                    }`}
+                    title="Halaman Sebelumnya"
+                  >
+                    <ChevronLeft className="w-4 h-4 stroke-[3]" />
+                    <span className="hidden sm:inline">Prev</span>
+                  </button>
+
+                  {/* Smart Windowed Page Numbers */}
+                  {getPaginationItems(currentPage, totalPages).map((item, idx) => {
+                    if (item === '...') {
+                      return (
+                        <span
+                          key={`ellipsis-${idx}`}
+                          className="px-2 py-1 text-xs font-mono font-bold opacity-60"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+                    const pageNum = Number(item);
+                    const isActive = pageNum === currentPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`min-w-[34px] px-2 py-1.5 text-xs font-black border-2 border-black dark:border-white transition-all ${
+                          isActive
+                            ? 'bg-[#FACC15] text-black shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] scale-105'
+                            : 'bg-white dark:bg-black text-black dark:text-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage >= totalPages}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
+                      currentPage >= totalPages
+                        ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                    }`}
+                    title="Halaman Selanjutnya"
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <ChevronRight className="w-4 h-4 stroke-[3]" />
+                  </button>
+                </div>
+              )}
+
+              {/* Show All Toggle Button */}
+              <button
+                onClick={handleToggleShowAll}
+                className={`inline-flex items-center gap-2 px-3.5 py-2 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all ${
+                  showAll
+                    ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
+                    : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
+                }`}
+              >
+                <Layers className="w-4 h-4 stroke-[2.5]" />
+                <span>{showAll ? 'Tampilkan Per Halaman (10 Riset)' : 'Tampilkan Semua Riset (1 Halaman)'}</span>
+              </button>
+            </div>
+          </>
         )}
       </main>
 
