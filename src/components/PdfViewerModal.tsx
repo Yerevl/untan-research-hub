@@ -60,10 +60,9 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
                   <ExternalLink className="w-4 h-4 stroke-[2.5]" />
                 </a>
                 <a
-                  href={pdfUrl}
-                  download
+                  href={`/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`}
                   className="inline-flex items-center space-x-1 px-3 py-1.5 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-xs font-black uppercase transition-all"
-                  title="Unduh file PDF"
+                  title={`Unduh: ${article.title}`}
                 >
                   <Download className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span className="hidden sm:inline">UNDUH PDF</span>

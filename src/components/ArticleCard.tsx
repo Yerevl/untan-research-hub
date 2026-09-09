@@ -282,10 +282,9 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               </button>
 
               <a
-                href={pdfUrl}
-                download
+                href={`/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`}
                 className="inline-flex items-center space-x-1 px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-bold text-xs uppercase transition-all"
-                title="Download file PDF"
+                title={`Unduh: ${article.title}`}
               >
                 <Download className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>UNDUH</span>
