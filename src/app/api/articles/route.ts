@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getArticles, isSupabaseConfigured } from '@/lib/supabase';
-import { getDosenList, getKeahlianList } from '@/lib/dosen';
+import { getDosenList, getKeahlianList, enrichArticleWithDosen } from '@/lib/dosen';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,9 +10,11 @@ export async function GET(request: NextRequest) {
     const year = searchParams.get('year') || undefined;
     const dosen = searchParams.get('dosen') || undefined;
     const keahlian = searchParams.get('keahlian') || undefined;
+    const prodi = searchParams.get('prodi') || undefined;
     const sortBy = searchParams.get('sortBy') || 'newest';
 
-    const allArticles = await getArticles();
+    const rawAllArticles = await getArticles();
+    const allArticles = rawAllArticles.map((a) => enrichArticleWithDosen(a));
 
     // Extract unique issues and years for filter dropdowns
     const uniqueIssues = Array.from(new Set(allArticles.map((a) => a.issue_name).filter(Boolean))) as string[];
@@ -28,7 +30,12 @@ export async function GET(request: NextRequest) {
     const dosenList = getDosenList();
     const keahlianList = getKeahlianList();
 
-    let filtered = await getArticles({ query, issue, year, dosen, keahlian });
+    const rawFiltered = await getArticles({ query, issue, year, dosen, keahlian });
+    let filtered = rawFiltered.map((a) => enrichArticleWithDosen(a));
+
+    if (prodi && prodi !== 'all') {
+      filtered = filtered.filter((a) => a.prodi?.toUpperCase() === prodi.toUpperCase());
+    }
 
     if (sortBy === 'title') {
       filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));

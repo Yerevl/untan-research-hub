@@ -2,6 +2,7 @@ export interface Supervisor {
   name: string;
   cleanName: string;
   keahlian: string[];
+  prodi?: 'SISKOM' | 'SISFO' | string;
 }
 
 export interface Article {
@@ -14,6 +15,7 @@ export interface Article {
   supervisors?: Supervisor[];
   keahlian?: string[];
   institutions: string[];
+  prodi?: 'SISKOM' | 'SISFO' | string;
   publication_date?: string;
   doi?: string;
   issue_name?: string;
@@ -41,6 +43,7 @@ export interface FilterOptions {
   author?: string;
   dosen?: string;
   keahlian?: string;
+  prodi?: string;
   sortBy?: "newest" | "oldest" | "title";
 }
 

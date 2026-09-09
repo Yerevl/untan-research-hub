@@ -28,6 +28,7 @@ export default function HomePage() {
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedProdi, setSelectedProdi] = useState<string>('all');
   const [selectedIssue, setSelectedIssue] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedDosen, setSelectedDosen] = useState<string>('all');
@@ -43,6 +44,7 @@ export default function HomePage() {
     try {
       const params = new URLSearchParams();
       if (searchQuery.trim()) params.set('q', searchQuery.trim());
+      if (selectedProdi !== 'all') params.set('prodi', selectedProdi);
       if (selectedIssue !== 'all') params.set('issue', selectedIssue);
       if (selectedYear !== 'all') params.set('year', selectedYear);
       if (selectedDosen !== 'all') params.set('dosen', selectedDosen);
@@ -66,7 +68,7 @@ export default function HomePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]);
+  }, [searchQuery, selectedProdi, selectedIssue, selectedYear, selectedDosen, selectedKeahlian, sortBy]);
 
   useEffect(() => {
     fetchArticles();
@@ -87,6 +89,7 @@ export default function HomePage() {
 
   const hasActiveFilters =
     searchQuery !== '' ||
+    selectedProdi !== 'all' ||
     selectedIssue !== 'all' ||
     selectedYear !== 'all' ||
     selectedDosen !== 'all' ||
@@ -94,6 +97,7 @@ export default function HomePage() {
 
   const handleResetFilters = () => {
     setSearchQuery('');
+    setSelectedProdi('all');
     setSelectedIssue('all');
     setSelectedYear('all');
     setSelectedDosen('all');
@@ -112,7 +116,7 @@ export default function HomePage() {
           {/* Sticker Tag */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] uppercase tracking-widest transform -rotate-1">
             <GraduationCap className="w-4 h-4 stroke-[2.5]" />
-            <span>★ REKAYASA SISTEM KOMPUTER • UNTAN ★</span>
+            <span>★ SISKOM &amp; SISFO • FMIPA UNTAN ★</span>
           </div>
 
           {/* Punchy Title */}
@@ -121,7 +125,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-sm sm:text-base font-medium text-slate-800 dark:text-slate-200 max-w-2xl mx-auto leading-relaxed">
-            Koleksi riset Tugas Akhir & Skripsi mahasiswa Siskom Untan bersama dosen pembimbing.
+            Koleksi riset Tugas Akhir &amp; Skripsi mahasiswa Rekayasa Sistem Komputer &amp; Sistem Informasi Untan bersama dosen pembimbing.
             Cari topik, saring bidang keahlian laboratorium, dan baca naskah PDF secara instan.
           </p>
 
@@ -171,16 +175,27 @@ export default function HomePage() {
                 <span>Filter:</span>
               </div>
 
+              {/* Prodi Filter */}
+              <select
+                value={selectedProdi}
+                onChange={(e) => setSelectedProdi(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+              >
+                <option value="all">Semua Prodi</option>
+                <option value="SISKOM">Siskom</option>
+                <option value="SISFO">Sisfo</option>
+              </select>
+
               {/* Dosen Pembimbing Filter */}
               <select
                 value={selectedDosen}
                 onChange={(e) => setSelectedDosen(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[200px] truncate"
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[210px] truncate"
               >
                 <option value="all">Semua Dosen Pembimbing</option>
                 {dosenList.map((d) => (
                   <option key={d.cleanName} value={d.cleanName}>
-                    {d.name}
+                    {d.name} [{d.prodi}]
                   </option>
                 ))}
               </select>
@@ -300,6 +315,7 @@ export default function HomePage() {
                 onReadPdf={(art) => setActivePdfArticle(art)}
                 onFilterDosen={(dosenName) => setSelectedDosen(dosenName)}
                 onFilterKeahlian={(keahlianName) => setSelectedKeahlian(keahlianName)}
+                onFilterProdi={(prodiName) => setSelectedProdi(prodiName)}
               />
             ))}
           </div>
@@ -314,7 +330,7 @@ export default function HomePage() {
               UNTAN RESEARCH HUB • JCSKOMMIPA
             </p>
             <p className="mt-1 text-slate-600 dark:text-slate-400 font-medium">
-              Program Studi Rekayasa Sistem Komputer, Fakultas MIPA, Universitas Tanjungpura.
+              Program Studi Rekayasa Sistem Komputer &amp; Sistem Informasi, Fakultas MIPA, Universitas Tanjungpura.
             </p>
           </div>
           <div className="flex items-center gap-3 font-black">
@@ -325,6 +341,15 @@ export default function HomePage() {
               className="hover:underline"
             >
               DOSEN SISKOM
+            </a>
+            <span>•</span>
+            <a
+              href="https://sisfo.untan.ac.id/dosen-staff"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              DOSEN SISFO
             </a>
             <span>•</span>
             <a

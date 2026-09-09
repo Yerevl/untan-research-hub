@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Article } from '@/lib/types';
+import { Article, Supervisor } from '@/lib/types';
 import {
   FileText,
   Download,
@@ -24,6 +24,7 @@ interface ArticleCardProps {
   onReadPdf: (article: Article) => void;
   onFilterDosen?: (dosenName: string) => void;
   onFilterKeahlian?: (keahlianName: string) => void;
+  onFilterProdi?: (prodiName: string) => void;
 }
 
 export const ArticleCard: React.FC<ArticleCardProps> = ({
@@ -31,6 +32,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   onReadPdf,
   onFilterDosen,
   onFilterKeahlian,
+  onFilterProdi,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -50,10 +52,28 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   const studentName = article.student || article.authors[0] || 'Mahasiswa';
 
   // Supervisors (authors 1 and 2)
-  const supervisors =
+  const supervisors: Supervisor[] =
     article.supervisors && article.supervisors.length > 0
       ? article.supervisors
       : article.authors.slice(1).map((a) => ({ name: a, cleanName: a, keahlian: [] }));
+
+  // Determine prodi: SISKOM or SISFO
+  const prodi =
+    article.prodi ||
+    (supervisors.some(
+      (s) =>
+        s.prodi === 'SISFO' ||
+        s.cleanName.toLowerCase().includes('ilhamsyah') ||
+        s.cleanName.toLowerCase().includes('ibnur') ||
+        s.cleanName.toLowerCase().includes('mutiah') ||
+        s.cleanName.toLowerCase().includes('renny') ||
+        s.cleanName.toLowerCase().includes('prawira') ||
+        s.cleanName.toLowerCase().includes('ferdy') ||
+        s.cleanName.toLowerCase().includes('syahru') ||
+        s.cleanName.toLowerCase().includes('gusmita')
+    )
+      ? 'SISFO'
+      : 'SISKOM');
 
   // Color code keahlian badge with neo-brutalist punchy pastels
   const getKeahlianStyle = (k: string) => {
@@ -78,8 +98,29 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         icon: <Server className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />,
       };
     }
+    if (k.includes('Tata Kelola') || k.includes('TKTI')) {
+      return {
+        bg: 'bg-[#FBBF24]',
+        text: 'text-black',
+        icon: <Briefcase className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />,
+      };
+    }
+    if (k.includes('Intelejensi') || k.includes('Analisis Data')) {
+      return {
+        bg: 'bg-[#34D399]',
+        text: 'text-black',
+        icon: <Layers className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />,
+      };
+    }
+    if (k.includes('Perangkat Lunak') || k.includes('RPL')) {
+      return {
+        bg: 'bg-[#FB7185]',
+        text: 'text-black',
+        icon: <Layers className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />,
+      };
+    }
     return {
-      bg: 'bg-[#FBBF24]',
+      bg: 'bg-[#E2E8F0]',
       text: 'text-black',
       icon: <Layers className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />,
     };
@@ -88,13 +129,28 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   return (
     <article className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] p-6 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[9px_9px_0px_0px_#000] dark:hover:shadow-[9px_9px_0px_0px_#fff] transition-all flex flex-col justify-between">
       <div>
-        {/* Badges Row: Issue, Keahlian, Date */}
+        {/* Badges Row: Issue, Prodi, Keahlian, Date */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {article.issue_name && (
             <span className="inline-flex items-center px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] uppercase tracking-wider">
               <Bookmark className="w-3 h-3 mr-1 stroke-[2.5]" />
               {article.issue_name.replace(/:.*/, '')}
             </span>
+          )}
+
+          {/* Prodi Badge: SISKOM or SISFO */}
+          {prodi && (
+            <button
+              onClick={() => onFilterProdi && onFilterProdi(prodi)}
+              className={`inline-flex items-center px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#000] uppercase tracking-wider active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                prodi === 'SISFO'
+                  ? 'bg-[#F472B6] text-black hover:bg-[#F472B6]/85'
+                  : 'bg-[#38BDF8] text-black hover:bg-[#38BDF8]/85'
+              }`}
+              title={`Filter berdasarkan Program Studi ${prodi === 'SISFO' ? 'Sistem Informasi' : 'Rekayasa Sistem Komputer'}`}
+            >
+              {prodi}
+            </button>
           )}
 
           {/* Keahlian Badges */}
@@ -137,23 +193,27 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
         {/* Authors Section: Student & Lecturers breakdown in Neo-brutalist box */}
         <div className="space-y-2.5 mb-4 p-3.5 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] text-xs">
-          {/* Mahasiswa */}
+          {/* Mahasiswa (Icon-only badge, no text) */}
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center px-2 py-0.5 bg-[#60A5FA] text-black font-black uppercase text-[10px] tracking-wider border border-black shrink-0">
-              <GraduationCap className="w-3 h-3 mr-1 stroke-[2.5]" />
-              Mahasiswa
+            <span
+              title="Mahasiswa (Penulis Utama)"
+              className="inline-flex items-center justify-center p-1 bg-[#60A5FA] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0"
+            >
+              <GraduationCap className="w-3.5 h-3.5 stroke-[2.5]" />
             </span>
             <span className="font-extrabold text-black dark:text-white truncate">
               {studentName}
             </span>
           </div>
 
-          {/* Dosen Pembimbing */}
+          {/* Dosen Pembimbing (Icon-only badge, no text, no numbers before names) */}
           {supervisors.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700">
-              <span className="inline-flex items-center px-2 py-0.5 bg-[#FBBF24] text-black font-black uppercase text-[10px] tracking-wider border border-black shrink-0">
-                <Briefcase className="w-3 h-3 mr-1 stroke-[2.5]" />
-                Pembimbing
+              <span
+                title="Dosen Pembimbing"
+                className="inline-flex items-center justify-center p-1 bg-[#FBBF24] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0"
+              >
+                <Briefcase className="w-3.5 h-3.5 stroke-[2.5]" />
               </span>
               <div className="flex flex-wrap items-center gap-1.5">
                 {supervisors.map((s, idx) => (
@@ -163,9 +223,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                     className="inline-flex items-center px-2 py-0.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white font-bold text-xs shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black transition-colors"
                     title={`Lihat riset bimbingan ${s.cleanName}`}
                   >
-                    <span>
-                      {idx + 1}. {s.cleanName}
-                    </span>
+                    <span>{s.cleanName}</span>
                     {s.keahlian && s.keahlian[0] && (
                       <span className="ml-1 text-[10px] font-mono opacity-80">
                         [{s.keahlian[0].replace(/.*\(|\).*/g, '')}]
