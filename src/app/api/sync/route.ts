@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { scrapeIssue, scrapeArchive } from '@/lib/scraper';
 
+// Extend Vercel function timeout to maximum allowed on hobby plan (60 seconds)
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

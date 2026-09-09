@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runAutoSync } from '../../../../scripts/auto-sync';
 
+// Extend Vercel function timeout to maximum allowed on hobby plan (60 seconds)
+export const maxDuration = 60;
+
 export async function GET(request: NextRequest) {
   try {
     // Optional: Protect cron route with Vercel Cron Secret if set
