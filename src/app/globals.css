@@ -74,3 +74,12 @@ body {
   animation: flyoutSlideLeft 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Universal Held Button State (applied dynamically on press & hold) */
+.btn-held-active {
+  filter: blur(1.5px) !important;
+  opacity: 0.7 !important;
+  transform: scale(0.98) !important;
+  transition: filter 0.15s ease, opacity 0.15s ease, transform 0.15s ease !important;
+}
+
+

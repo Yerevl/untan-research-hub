@@ -198,7 +198,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className="relative inline-block select-none touch-none">
+    <div ref={containerRef} data-citation-container className="relative inline-block select-none touch-none">
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="absolute -top-9 left-0 whitespace-nowrap z-50 px-2.5 py-1 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] text-[11px] font-black uppercase tracking-wider animate-in fade-in zoom-in-95 duration-150">

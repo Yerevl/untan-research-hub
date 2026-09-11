@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 
@@ -96,6 +96,7 @@ export const HoldableButton: React.FC<HoldableButtonProps> = ({
     <button
       ref={buttonRef}
       type="button"
+      data-no-hold="true"
       onPointerDown={handlePointerDown}
       className={`inline-flex items-center space-x-1.5 px-3 py-2 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wide transition-all duration-150 select-none touch-none ${
         isHolding
