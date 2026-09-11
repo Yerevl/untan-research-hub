@@ -14,6 +14,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
   const [activeFormat, setActiveFormat] = useState<'APA' | 'IEEE' | null>(null);
   const [copiedFormat, setCopiedFormat] = useState<'APA' | 'IEEE' | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isHolding, setIsHolding] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
@@ -44,6 +45,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
       setToastMessage(`Sitasi ${format} disalin!`);
       setIsOpen(false);
       setActiveFormat(null);
+      setIsHolding(false);
 
       if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
         window.navigator.vibrate([20, 30, 20]);
@@ -90,6 +92,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
     // Start hold detection timer (150ms)
     pressTimerRef.current = setTimeout(() => {
       isDraggingRef.current = true;
+      setIsHolding(true);
       setIsOpen(true);
       if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
         window.navigator.vibrate(15);
@@ -104,6 +107,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
         if (dist > 7 && pressTimerRef.current) {
           clearTimeout(pressTimerRef.current);
           isDraggingRef.current = true;
+          setIsHolding(true);
           setIsOpen(true);
         }
       }
@@ -126,14 +130,26 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
         clearTimeout(pressTimerRef.current);
         pressTimerRef.current = null;
       }
+      setIsHolding(false);
 
       if (isDraggingRef.current) {
         const selected = checkHoveredOption(e.clientX, e.clientY);
         if (selected) {
           copyCitation(selected);
         } else {
-          setIsOpen(false);
-          setActiveFormat(null);
+          // If released over the main container button, keep it open for normal click
+          const containerRect = containerRef.current?.getBoundingClientRect();
+          const inContainer =
+            containerRect &&
+            e.clientX >= containerRect.left &&
+            e.clientX <= containerRect.right &&
+            e.clientY >= containerRect.top &&
+            e.clientY <= containerRect.bottom;
+
+          if (!inContainer) {
+            setIsOpen(false);
+            setActiveFormat(null);
+          }
         }
         isDraggingRef.current = false;
       }
@@ -145,6 +161,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
         pressTimerRef.current = null;
       }
       isDraggingRef.current = false;
+      setIsHolding(false);
       setActiveFormat(null);
     };
 
@@ -232,7 +249,9 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
         type="button"
         onPointerDown={handlePointerDown}
         onClick={handleClick}
-        className={`inline-flex items-center space-x-1.5 px-3 py-2 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wide transition-all active:translate-x-0.5 active:translate-y-0.5 ${
+        className={`inline-flex items-center space-x-1.5 px-3 py-2 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wide transition-all duration-150 active:translate-x-0.5 active:translate-y-0.5 active:opacity-80 ${
+          isHolding ? 'opacity-60 scale-[0.98]' : 'opacity-100'
+        } ${
           copiedFormat
             ? 'bg-[#A3E635] text-black shadow-[3px_3px_0px_0px_#000]'
             : isOpen
