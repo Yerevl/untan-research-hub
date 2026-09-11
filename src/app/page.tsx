@@ -400,14 +400,14 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Results Count Badge & Quick View Mode Toggle */}
+            {/* Results Count Badge (Flat metadata stamp) & Quick View Mode Toggle (Elevated Button) */}
             <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
-              <span className="px-3 py-1.5 bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] font-black uppercase tracking-wide">
+              <span className="px-3 py-1.5 bg-slate-100 dark:bg-[#1E232B] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 font-bold uppercase tracking-wider select-none cursor-default shadow-none rounded-sm">
                 HASIL: {filteredCount} / {totalCount} RISET
               </span>
               <button
                 onClick={handleToggleShowAll}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
                   showAll
                     ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
                     : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
