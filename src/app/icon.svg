@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Dark Container with High-Contrast Border -->
+  <rect x="1" y="1" width="30" height="30" rx="6" fill="#0D0D0D" stroke="#FFFFFF" stroke-width="2"/>
+  
+  <!-- Accent Badge (UNTAN Yellow) -->
+  <rect x="5" y="5" width="22" height="22" rx="4" fill="#FFCC00"/>
+  
+  <!-- Simplified Open Book / Research Icon -->
+  <path d="M9 11C9 11 12 10 16 12V22C12 20 9 21 9 21V11Z" fill="#0D0D0D"/>
+  <path d="M23 11C23 11 20 10 16 12V22C20 20 23 21 23 21V11Z" fill="#0D0D0D"/>
+  <line x1="16" y1="12" x2="16" y2="22" stroke="#FFCC00" stroke-width="1.5"/>
+</svg>
