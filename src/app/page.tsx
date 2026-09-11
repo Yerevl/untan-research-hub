@@ -234,7 +234,7 @@ export default function HomePage() {
     selectedKeahlian !== 'all';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFDF5] dark:bg-[#0D0F12] text-black dark:text-white transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#FAF8F3] dark:bg-[#101216] text-black dark:text-white transition-colors">
       {/* Top Navigation */}
       <Navbar supabaseConnected={supabaseConnected} totalArticles={totalCount} />
 
@@ -242,7 +242,7 @@ export default function HomePage() {
       <section className="relative pt-10 pb-8 px-4 sm:px-6 lg:px-8 border-b-[3px] border-black dark:border-white">
         <div className="max-w-4xl mx-auto text-center space-y-4">
           {/* Sticker Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] uppercase tracking-widest transform -rotate-1">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] uppercase tracking-widest transform -rotate-1">
             <GraduationCap className="w-4 h-4 stroke-[2.5]" />
             <span>★ SISKOM &amp; SISFO • FMIPA UNTAN ★</span>
           </div>
@@ -272,9 +272,9 @@ export default function HomePage() {
         <div id="catalog-top" className="scroll-mt-6" />
 
         {/* Unified Search & Filters Control Panel - Neo-Brutalist Box */}
-        <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] space-y-4">
+        <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] space-y-4">
           {/* Search Bar */}
-          <div className="relative flex items-center bg-[#FFFDF5] dark:bg-[#0D0F12] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
+          <div className="relative flex items-center bg-[#FAF8F3] dark:bg-[#101216] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8]">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black dark:text-white">
               <Search className="w-5 h-5 stroke-[2.5]" />
             </div>
@@ -312,7 +312,7 @@ export default function HomePage() {
               <select
                 value={selectedProdi}
                 onChange={(e) => setSelectedProdi(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
               >
                 <option value="all">Semua Prodi</option>
                 <option value="SISKOM">Siskom</option>
@@ -323,7 +323,7 @@ export default function HomePage() {
               <select
                 value={selectedDosen}
                 onChange={(e) => setSelectedDosen(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[210px] truncate"
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none max-w-[210px] truncate"
               >
                 <option value="all">Semua Dosen Pembimbing</option>
                 {dosenList.map((d) => (
@@ -337,7 +337,7 @@ export default function HomePage() {
               <select
                 value={selectedKeahlian}
                 onChange={(e) => setSelectedKeahlian(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[220px] truncate"
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none max-w-[220px] truncate"
               >
                 <option value="all">Semua Bidang Keahlian</option>
                 {keahlianList.map((k) => (
@@ -351,7 +351,7 @@ export default function HomePage() {
               <select
                 value={selectedIssue}
                 onChange={(e) => setSelectedIssue(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[180px] truncate"
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none max-w-[180px] truncate"
               >
                 <option value="all">Semua Edisi ({issues.length})</option>
                 {issues.map((iss) => (
@@ -366,7 +366,7 @@ export default function HomePage() {
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
-                  className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+                  className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
                 >
                   <option value="all">Semua Tahun</option>
                   {years.map((y) => (
@@ -381,7 +381,7 @@ export default function HomePage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
               >
                 <option value="newest">Terbaru</option>
                 <option value="oldest">Terlama</option>
@@ -392,7 +392,7 @@ export default function HomePage() {
               {hasActiveFilters && (
                 <button
                   onClick={handleResetFilters}
-                  className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
+                  className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
                 >
                   <X className="w-3.5 h-3.5 stroke-[3]" />
                   <span>Reset</span>
@@ -407,7 +407,7 @@ export default function HomePage() {
               </span>
               <button
                 onClick={handleToggleShowAll}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
                   showAll
                     ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
                     : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
@@ -429,8 +429,8 @@ export default function HomePage() {
           </div>
         ) : articles.length === 0 ? (
           /* Empty State */
-          <div className="py-16 px-6 text-center border-[3px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] max-w-lg mx-auto space-y-3">
-            <div className="w-14 h-14 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center mx-auto">
+          <div className="py-16 px-6 text-center border-[3px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] max-w-lg mx-auto space-y-3">
+            <div className="w-14 h-14 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] flex items-center justify-center mx-auto">
               <BookOpen className="w-7 h-7 stroke-[2.5]" />
             </div>
             <h3 className="text-lg font-black uppercase text-black dark:text-white">
@@ -444,7 +444,7 @@ export default function HomePage() {
             {hasActiveFilters && (
               <button
                 onClick={handleResetFilters}
-                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
+                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5"
               >
                 Reset Filter Pencarian
               </button>
@@ -476,7 +476,7 @@ export default function HomePage() {
             </div>
 
             {/* Neo-Brutalist Pagination & View Bar */}
-            <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] flex flex-col md:flex-row items-center justify-between gap-4">
               {/* Pagination Info Readout */}
               <div className="text-xs font-mono font-bold text-black dark:text-white text-center md:text-left">
                 {showAll ? (
@@ -508,7 +508,7 @@ export default function HomePage() {
                     className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
                       currentPage <= 1
                         ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
-                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
                     }`}
                     title="Halaman Sebelumnya"
                   >
@@ -536,8 +536,8 @@ export default function HomePage() {
                         onClick={() => handlePageChange(pageNum)}
                         className={`min-w-[34px] px-2 py-1.5 text-xs font-black border-2 border-black dark:border-white transition-all ${
                           isActive
-                            ? 'bg-[#FACC15] text-black shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] scale-105'
-                            : 'bg-white dark:bg-black text-black dark:text-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                            ? 'bg-[#FACC15] text-black shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] scale-105'
+                            : 'bg-white dark:bg-black text-black dark:text-white shadow-[1.5px_1.5px_0px_0px_#16181D] dark:shadow-[1.5px_1.5px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
                         }`}
                       >
                         {pageNum}
@@ -552,7 +552,7 @@ export default function HomePage() {
                     className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
                       currentPage >= totalPages
                         ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
-                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
                     }`}
                     title="Halaman Selanjutnya"
                   >
@@ -565,13 +565,13 @@ export default function HomePage() {
               {/* Show All Toggle Button */}
               <button
                 onClick={handleToggleShowAll}
-                className={`inline-flex items-center gap-2 px-3.5 py-2 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all ${
+                className={`inline-flex items-center gap-2 px-3.5 py-2 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all ${
                   showAll
                     ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
                     : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
                 }`}
               >
-                <Layers className="w-4 h-4 stroke-[2.5]" />
+                <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>{showAll ? 'Tampilkan Per Halaman (10 Riset)' : 'Tampilkan Semua Riset (1 Halaman)'}</span>
               </button>
             </div>
@@ -580,7 +580,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer - Neo-Brutalist */}
-      <footer className="mt-20 border-t-[3px] border-black dark:border-white bg-white dark:bg-[#0D0F12] py-8 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white">
+      <footer className="mt-20 border-t-[3px] border-black dark:border-white bg-white dark:bg-[#101216] py-8 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
             <p className="font-black text-sm uppercase tracking-wide">
@@ -620,7 +620,7 @@ export default function HomePage() {
             <span>•</span>
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none transition-all"
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none transition-all"
               title="Panel Pengelola Database"
             >
               <Lock className="w-3 h-3 stroke-[2.5]" />
@@ -638,10 +638,10 @@ export default function HomePage() {
 
       {/* Floating Quick Action Pill for Show All Mode */}
       {showAll && (
-        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
+        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8]">
           <button
             onClick={handleToggleShowAll}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-black uppercase bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#EAB308] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-black uppercase bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#EAB308] active:translate-x-0.5 active:translate-y-0.5 transition-all"
             title="Kembali ke tampilan 10 artikel per halaman"
           >
             <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -649,7 +649,7 @@ export default function HomePage() {
           </button>
           <button
             onClick={() => document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' })}
-            className="p-2 text-xs font-black bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            className="p-2 text-xs font-black bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
             title="Kembali ke Atas"
           >
             <ArrowUp className="w-4 h-4 stroke-[3]" />

@@ -102,7 +102,7 @@ export const HoldableButton: React.FC<HoldableButtonProps> = ({
         isHolding
           ? 'blur-[1.5px] opacity-70 scale-[0.98]'
           : 'blur-none opacity-100 scale-100 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5'
-      } bg-white dark:bg-black text-black dark:text-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black ${className}`}
+      } bg-white dark:bg-black text-black dark:text-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black ${className}`}
       title={title}
     >
       {icon}

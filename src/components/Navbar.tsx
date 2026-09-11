@@ -13,11 +13,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   totalArticles,
 }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b-[3px] border-black dark:border-white bg-[#FFFDF5] dark:bg-[#0D0F12] transition-colors">
+    <header className="sticky top-0 z-40 w-full border-b-[3px] border-black dark:border-white bg-[#FAF8F3] dark:bg-[#101216] transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         {/* Brand & Logo */}
         <div className="flex items-center space-x-3.5">
-          <div className="w-11 h-11 rounded-none bg-[#FACC15] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] flex items-center justify-center text-black font-extrabold transform -rotate-1 hover:rotate-0 transition-transform">
+          <div className="w-11 h-11 rounded-none bg-[#FACC15] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] flex items-center justify-center text-black font-extrabold transform -rotate-1 hover:rotate-0 transition-transform">
             <BookOpen className="w-6 h-6 stroke-[2.5]" />
           </div>
           <div>
@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Action Controls & Badges */}
         <div className="flex items-center space-x-3">
           {/* Supabase Status Indicator */}
-          <div className="flex items-center space-x-2 px-3 py-1 text-xs font-bold border-2 border-black dark:border-white bg-white dark:bg-black text-black dark:text-white shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff]">
+          <div className="flex items-center space-x-2 px-3 py-1 text-xs font-bold border-2 border-black dark:border-white bg-white dark:bg-black text-black dark:text-white shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8]">
             <span
               className={`w-2.5 h-2.5 rounded-full border border-black ${
                 supabaseConnected ? 'bg-[#4ADE80] animate-pulse' : 'bg-[#FBBF24]'
