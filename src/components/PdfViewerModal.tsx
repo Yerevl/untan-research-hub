@@ -30,11 +30,11 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/70 backdrop-blur-[2px] animate-in fade-in duration-150">
-      <div className="relative w-full max-w-5xl h-[92vh] bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[10px_10px_0px_0px_#000] dark:shadow-[10px_10px_0px_0px_#fff] flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-5xl h-[92vh] bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[10px_10px_0px_0px_#16181D] dark:shadow-[10px_10px_0px_0px_#D4D4D8] flex flex-col overflow-hidden">
         {/* Retro Window Titlebar */}
         <div className="flex items-center justify-between px-5 py-3 border-b-[3px] border-black dark:border-white bg-[#FACC15] text-black">
           <div className="flex items-center space-x-3 overflow-hidden mr-3">
-            <div className="p-1 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000] shrink-0">
+            <div className="p-1 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#16181D] shrink-0">
               <FileText className="w-4 h-4 stroke-[2.5]" />
             </div>
             <div className="overflow-hidden">
@@ -54,14 +54,14 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
                   href={pdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-1.5 bg-white text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                  className="p-1.5 bg-white text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
                   title="Buka tab baru"
                 >
                   <ExternalLink className="w-4 h-4 stroke-[2.5]" />
                 </a>
                 <a
                   href={`/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`}
-                  className="inline-flex items-center space-x-1 px-3 py-1.5 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-xs font-black uppercase transition-all"
+                  className="inline-flex items-center space-x-1 px-3 py-1.5 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-xs font-black uppercase transition-all"
                   title={`Unduh: ${article.title}`}
                 >
                   <Download className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -71,7 +71,7 @@ export const PdfViewerModal: React.FC<PdfViewerModalProps> = ({ article, onClose
             )}
             <button
               onClick={onClose}
-              className="p-1.5 bg-[#FB7185] hover:bg-[#F43F5E] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+              className="p-1.5 bg-[#FB7185] hover:bg-[#F43F5E] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
               title="Tutup (ESC)"
             >
               <X className="w-4 h-4 stroke-[3]" />

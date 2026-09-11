@@ -1,21 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FFFDF5;
-  --foreground: #0F0F0F;
+  --background: #FAF8F3;
+  --foreground: #16181D;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-black: #16181D;
+  --color-white: #FCFAF6;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0D0F12;
-    --foreground: #F8FAFC;
+    --background: #101216;
+    --foreground: #EDEDED;
   }
 }
 
@@ -23,38 +25,38 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(22, 24, 29, 0.06) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(237, 237, 237, 0.07) 1px, transparent 1px);
   }
 }
 
-/* Neo-brutalist solid shadow utility helpers */
+/* Neo-brutalist solid shadow utility helpers (Softened tones) */
 .brutal-shadow {
-  box-shadow: 4px 4px 0px 0px #000000;
+  box-shadow: 4px 4px 0px 0px #16181D;
 }
 
 .brutal-shadow-lg {
-  box-shadow: 6px 6px 0px 0px #000000;
+  box-shadow: 6px 6px 0px 0px #16181D;
 }
 
 .brutal-shadow-sm {
-  box-shadow: 2.5px 2.5px 0px 0px #000000;
+  box-shadow: 2.5px 2.5px 0px 0px #16181D;
 }
 
 @media (prefers-color-scheme: dark) {
   .brutal-shadow {
-    box-shadow: 4px 4px 0px 0px #ffffff;
+    box-shadow: 4px 4px 0px 0px #D4D4D8;
   }
   .brutal-shadow-lg {
-    box-shadow: 6px 6px 0px 0px #ffffff;
+    box-shadow: 6px 6px 0px 0px #D4D4D8;
   }
   .brutal-shadow-sm {
-    box-shadow: 2.5px 2.5px 0px 0px #ffffff;
+    box-shadow: 2.5px 2.5px 0px 0px #D4D4D8;
   }
 }
 
@@ -73,4 +75,13 @@ body {
 .animate-flyout-slide-left {
   animation: flyoutSlideLeft 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Universal Held Button State (applied dynamically on press & hold) */
+.btn-held-active {
+  filter: blur(1.5px) !important;
+  opacity: 0.7 !important;
+  transform: scale(0.98) !important;
+  transition: filter 0.15s ease, opacity 0.15s ease, transform 0.15s ease !important;
+}
+
 

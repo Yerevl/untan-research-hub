@@ -198,10 +198,10 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className="relative inline-block select-none touch-none">
+    <div ref={containerRef} data-citation-container className="relative inline-block select-none touch-none">
       {/* Toast Feedback */}
       {toastMessage && (
-        <div className="absolute -top-9 left-0 whitespace-nowrap z-50 px-2.5 py-1 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] text-[11px] font-black uppercase tracking-wider animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute -top-9 left-0 whitespace-nowrap z-50 px-2.5 py-1 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] text-[11px] font-black uppercase tracking-wider animate-in fade-in zoom-in-95 duration-150">
           ✓ {toastMessage}
         </div>
       )}
@@ -210,7 +210,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
       {isOpen && (
         <div
           ref={flyoutRef}
-          className="absolute left-full -ml-2.5 top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] origin-left animate-flyout-slide-left overflow-hidden"
+          className="absolute left-full -ml-2.5 top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8] origin-left animate-flyout-slide-left overflow-hidden"
         >
           {/* APA Option (Top) */}
           <button
@@ -253,10 +253,10 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
           isHolding ? 'blur-[1.5px] opacity-70 scale-[0.98]' : 'blur-none opacity-100'
         } ${
           copiedFormat
-            ? 'bg-[#A3E635] text-black shadow-[3px_3px_0px_0px_#000]'
+            ? 'bg-[#A3E635] text-black shadow-[3px_3px_0px_0px_#16181D]'
             : isOpen
-            ? 'bg-[#FEF08A] text-black shadow-[3px_3px_0px_0px_#000]'
-            : 'bg-white dark:bg-black text-black dark:text-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black'
+            ? 'bg-[#FEF08A] text-black shadow-[3px_3px_0px_0px_#16181D]'
+            : 'bg-white dark:bg-black text-black dark:text-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black'
         }`}
         title="Klik atau Tahan & Geser (Hold & Drag) ke kanan untuk memilih format APA atau IEEE"
       >

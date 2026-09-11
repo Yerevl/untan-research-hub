@@ -18,6 +18,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { CitationButton } from './CitationButton';
+import { HoldableButton } from './HoldableButton';
 
 interface ArticleCardProps {
   article: Article;
@@ -127,33 +128,33 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   };
 
   return (
-    <article className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] p-6 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[9px_9px_0px_0px_#000] dark:hover:shadow-[9px_9px_0px_0px_#fff] transition-all flex flex-col justify-between">
+    <article className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-all flex flex-col justify-between">
       <div>
-        {/* Badges Row: Issue, Prodi, Keahlian, Date */}
+        {/* Badges Row: Issue (flat stamp), Prodi (elevated button), Keahlian (elevated button), Date (flat stamp) */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {article.issue_name && (
-            <span className="inline-flex items-center px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] uppercase tracking-wider">
-              <Bookmark className="w-3 h-3 mr-1 stroke-[2.5]" />
-              {article.issue_name.replace(/:.*/, '')}
+            <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-bold bg-[#FEF08A]/70 dark:bg-[#FEF08A]/15 text-black dark:text-yellow-200 border border-black/30 dark:border-yellow-400/30 uppercase tracking-wider rounded-sm select-none cursor-default shadow-none">
+              <Bookmark className="w-3 h-3 mr-1 stroke-[2.5] opacity-70" />
+              <span>{article.issue_name.replace(/:.*/, '')}</span>
             </span>
           )}
 
-          {/* Prodi Badge: SISKOM or SISFO */}
+          {/* Prodi Button: Interactive Filter (Elevated with Hard Shadow) */}
           {prodi && (
             <button
               onClick={() => onFilterProdi && onFilterProdi(prodi)}
-              className={`inline-flex items-center px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#000] uppercase tracking-wider active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+              className={`inline-flex items-center px-2.5 py-1 text-xs font-black border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] uppercase tracking-wider active:translate-x-0.5 active:translate-y-0.5 transition-all ${
                 prodi === 'SISFO'
                   ? 'bg-[#F472B6] text-black hover:bg-[#F472B6]/85'
                   : 'bg-[#38BDF8] text-black hover:bg-[#38BDF8]/85'
               }`}
               title={`Filter berdasarkan Program Studi ${prodi === 'SISFO' ? 'Sistem Informasi' : 'Rekayasa Sistem Komputer'}`}
             >
-              {prodi}
+              <span>{prodi}</span>
             </button>
           )}
 
-          {/* Keahlian Badges */}
+          {/* Keahlian Buttons: Interactive Filters (Elevated with Hard Shadow) */}
           {article.keahlian &&
             article.keahlian.map((k) => {
               const style = getKeahlianStyle(k);
@@ -161,7 +162,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                 <button
                   key={k}
                   onClick={() => onFilterKeahlian && onFilterKeahlian(k)}
-                  className={`inline-flex items-center px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all ${style.bg} ${style.text}`}
+                  className={`inline-flex items-center px-2.5 py-1 text-xs font-black border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${style.bg} ${style.text}`}
                   title={`Filter riset bidang: ${k}`}
                 >
                   {style.icon}
@@ -170,10 +171,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               );
             })}
 
+          {/* Date Stamp: Static Metadata (Flat, No Shadow) */}
           {formattedDate && (
-            <span className="inline-flex items-center px-2.5 py-1 text-xs font-mono font-bold bg-white dark:bg-[#23272F] text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] ml-auto shrink-0">
-              <Calendar className="w-3.5 h-3.5 mr-1 stroke-[2.5]" />
-              {formattedDate}
+            <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#20242C] border border-slate-300 dark:border-slate-700 ml-auto shrink-0 select-none cursor-default shadow-none rounded-sm">
+              <Calendar className="w-3 h-3 mr-1 stroke-[2] opacity-70" />
+              <span>{formattedDate}</span>
             </span>
           )}
         </div>
@@ -184,35 +186,38 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </h3>
 
         {/* Authors Section: Student & Lecturers breakdown in Neo-brutalist box */}
-        <div className="space-y-2.5 mb-4 p-3.5 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] text-xs">
+        <div className="space-y-2 mb-4 p-3 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] text-xs">
           {/* Mahasiswa (Icon-only badge, no text) */}
-          <div className="flex items-start gap-2.5">
+          <div className="flex items-center gap-2.5 min-h-[26px]">
             <span
               title="Mahasiswa (Penulis Utama)"
-              className="inline-flex items-center justify-center p-1 bg-[#60A5FA] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0 mt-0.5"
+              className="w-6 h-6 inline-flex items-center justify-center bg-[#60A5FA] text-black border border-black rounded-sm shrink-0 shadow-none"
             >
               <GraduationCap className="w-3.5 h-3.5 stroke-[2.5]" />
             </span>
-            <span className="font-extrabold text-black dark:text-white break-words flex-1 min-w-0 leading-tight">
+            <span className="font-extrabold text-black dark:text-white break-words flex-1 min-w-0 text-xs">
               {studentName}
             </span>
           </div>
 
           {/* Dosen Pembimbing (Icon-only badge, no text, no numbers before names) */}
           {supervisors.length > 0 && (
-            <div className="flex items-start gap-2.5 pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700">
-              <span
-                title="Dosen Pembimbing"
-                className="inline-flex items-center justify-center p-1 bg-[#FBBF24] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0 mt-0.5"
-              >
-                <Briefcase className="w-3.5 h-3.5 stroke-[2.5]" />
-              </span>
-              <div className="flex-1 min-w-0 flex flex-wrap items-center gap-1.5">
-                {supervisors.map((s, idx) => (
+            <div className="pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700 space-y-1.5">
+              {supervisors.map((s, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 min-h-[26px]">
+                  {idx === 0 ? (
+                    <span
+                      title="Dosen Pembimbing"
+                      className="w-6 h-6 inline-flex items-center justify-center bg-[#FBBF24] text-black border border-black rounded-sm shrink-0 shadow-none"
+                    >
+                      <Briefcase className="w-3.5 h-3.5 stroke-[2.5]" />
+                    </span>
+                  ) : (
+                    <span className="w-6 shrink-0" />
+                  )}
                   <button
-                    key={idx}
                     onClick={() => onFilterDosen && onFilterDosen(s.cleanName)}
-                    className="inline-flex items-center px-2 py-0.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white font-bold text-xs shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black transition-colors max-w-full text-left"
+                    className="inline-flex items-center px-2 py-0.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white font-bold text-xs shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black transition-colors max-w-full text-left"
                     title={`Lihat riset bimbingan ${s.cleanName}`}
                   >
                     <span className="break-words">{s.cleanName}</span>
@@ -222,8 +227,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                       </span>
                     )}
                   </button>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -265,22 +270,27 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           {pdfUrl ? (
             <>
-              <button
-                onClick={() => onReadPdf(article)}
-                className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#FACC15] hover:bg-[#EAB308] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase tracking-wide transition-all"
-              >
-                <FileText className="w-4 h-4 stroke-[2.5]" />
-                <span>BACA PDF</span>
-              </button>
+              <HoldableButton
+                onTrigger={() => onReadPdf(article)}
+                icon={<FileText className="w-3.5 h-3.5 stroke-[2.5]" />}
+                label="BACA PDF"
+                title={`Baca PDF: ${article.title}`}
+              />
 
-              <a
-                href={`/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`}
-                className="inline-flex items-center space-x-1 px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-bold text-xs uppercase transition-all"
+              <HoldableButton
+                onTrigger={() => {
+                  const downloadUrl = `/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`;
+                  const a = document.createElement('a');
+                  a.href = downloadUrl;
+                  a.download = `${article.title}.pdf`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                }}
+                icon={<Download className="w-3.5 h-3.5 stroke-[2.5]" />}
+                label="UNDUH"
                 title={`Unduh: ${article.title}`}
-              >
-                <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>UNDUH</span>
-              </a>
+              />
 
               <CitationButton article={article} />
             </>
@@ -298,7 +308,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] px-2.5 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center"
+              className="text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] px-2.5 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center"
               title={`DOI: ${article.doi}`}
             >
               DOI

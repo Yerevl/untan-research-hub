@@ -16,6 +16,8 @@ import {
   Lock,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ArrowUpDown,
   Layers,
   ArrowUp,
 } from 'lucide-react';
@@ -218,6 +220,75 @@ export default function HomePage() {
     setSortBy('newest');
   };
 
+  // Two-way synchronization handlers between Prodi, Dosen, and Keahlian
+  const handleDosenChange = (val: string) => {
+    if (val === '__clear_keahlian__') {
+      setSelectedKeahlian('all');
+      setSelectedDosen('all');
+      return;
+    }
+    setSelectedDosen(val);
+    if (val !== 'all') {
+      const matched = dosenList.find((d) => d.cleanName === val);
+      if (matched && matched.keahlian && matched.keahlian.length > 0) {
+        setSelectedKeahlian(matched.keahlian[0]);
+        if (matched.prodi && selectedProdi !== 'all' && selectedProdi !== matched.prodi) {
+          setSelectedProdi(matched.prodi);
+        }
+      }
+    }
+  };
+
+  const handleKeahlianChange = (val: string) => {
+    setSelectedKeahlian(val);
+    if (val !== 'all') {
+      // If currently selected dosen doesn't belong to this keahlian, reset dosen
+      if (selectedDosen !== 'all') {
+        const currentDosen = dosenList.find((d) => d.cleanName === selectedDosen);
+        if (!currentDosen || !currentDosen.keahlian.includes(val)) {
+          setSelectedDosen('all');
+        }
+      }
+    }
+  };
+
+  const handleProdiChange = (newProdi: 'all' | 'SISKOM' | 'SISFO') => {
+    setSelectedProdi(newProdi);
+    if (newProdi !== 'all') {
+      if (selectedDosen !== 'all') {
+        const currentDosen = dosenList.find((d) => d.cleanName === selectedDosen);
+        if (currentDosen && currentDosen.prodi !== newProdi) {
+          setSelectedDosen('all');
+        }
+      }
+      if (selectedKeahlian !== 'all') {
+        const prodiDosen = dosenList.filter((d) => d.prodi === newProdi);
+        const hasKeahlian = prodiDosen.some((d) => d.keahlian.includes(selectedKeahlian));
+        if (!hasKeahlian) {
+          setSelectedKeahlian('all');
+        }
+      }
+    }
+  };
+
+  // Filtered dosen options based on active keahlian and prodi filters
+  const displayedDosenList = useMemo(() => {
+    return dosenList.filter((d) => {
+      if (selectedProdi !== 'all' && d.prodi !== selectedProdi) return false;
+      if (selectedKeahlian !== 'all' && !d.keahlian.includes(selectedKeahlian)) return false;
+      return true;
+    });
+  }, [dosenList, selectedProdi, selectedKeahlian]);
+
+  // Filtered keahlian options based on active prodi filter
+  const displayedKeahlianList = useMemo(() => {
+    if (selectedProdi === 'all') return keahlianList;
+    const prodiDosen = dosenList.filter((d) => d.prodi === selectedProdi);
+    const prodiKeahlian = new Set<string>();
+    prodiDosen.forEach((d) => d.keahlian.forEach((k) => prodiKeahlian.add(k)));
+    return keahlianList.filter((k) => prodiKeahlian.has(k));
+  }, [keahlianList, dosenList, selectedProdi]);
+
   // Scroll to catalog top on badge clicks
   const scrollToCatalog = () => {
     setTimeout(() => {
@@ -234,7 +305,7 @@ export default function HomePage() {
     selectedKeahlian !== 'all';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFDF5] dark:bg-[#0D0F12] text-black dark:text-white transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#FAF8F3] dark:bg-[#101216] text-black dark:text-white transition-colors">
       {/* Top Navigation */}
       <Navbar supabaseConnected={supabaseConnected} totalArticles={totalCount} />
 
@@ -242,7 +313,7 @@ export default function HomePage() {
       <section className="relative pt-10 pb-8 px-4 sm:px-6 lg:px-8 border-b-[3px] border-black dark:border-white">
         <div className="max-w-4xl mx-auto text-center space-y-4">
           {/* Sticker Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] uppercase tracking-widest transform -rotate-1">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] uppercase tracking-widest transform -rotate-1">
             <GraduationCap className="w-4 h-4 stroke-[2.5]" />
             <span>★ SISKOM &amp; SISFO • FMIPA UNTAN ★</span>
           </div>
@@ -272,9 +343,9 @@ export default function HomePage() {
         <div id="catalog-top" className="scroll-mt-6" />
 
         {/* Unified Search & Filters Control Panel - Neo-Brutalist Box */}
-        <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] space-y-4">
+        <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] space-y-4">
           {/* Search Bar */}
-          <div className="relative flex items-center bg-[#FFFDF5] dark:bg-[#0D0F12] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff]">
+          <div className="relative flex items-center bg-[#FAF8F3] dark:bg-[#101216] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8]">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black dark:text-white">
               <Search className="w-5 h-5 stroke-[2.5]" />
             </div>
@@ -299,115 +370,191 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Filters & Results Counter Row */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
-            {/* Filter Dropdowns */}
+          {/* Filters & Results Controls Row */}
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
+            {/* Filter Dropdowns & Segmented Prodi Control */}
             <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
               <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
                 <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
                 <span>Filter:</span>
               </div>
 
-              {/* Prodi Filter */}
-              <select
-                value={selectedProdi}
-                onChange={(e) => setSelectedProdi(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
-              >
-                <option value="all">Semua Prodi</option>
-                <option value="SISKOM">Siskom</option>
-                <option value="SISFO">Sisfo</option>
-              </select>
-
-              {/* Dosen Pembimbing Filter */}
-              <select
-                value={selectedDosen}
-                onChange={(e) => setSelectedDosen(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[210px] truncate"
-              >
-                <option value="all">Semua Dosen Pembimbing</option>
-                {dosenList.map((d) => (
-                  <option key={d.cleanName} value={d.cleanName}>
-                    {d.name} [{d.prodi}]
-                  </option>
-                ))}
-              </select>
-
-              {/* Keahlian Filter */}
-              <select
-                value={selectedKeahlian}
-                onChange={(e) => setSelectedKeahlian(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[220px] truncate"
-              >
-                <option value="all">Semua Bidang Keahlian</option>
-                {keahlianList.map((k) => (
-                  <option key={k} value={k}>
-                    {k}
-                  </option>
-                ))}
-              </select>
-
-              {/* Issue Selector */}
-              <select
-                value={selectedIssue}
-                onChange={(e) => setSelectedIssue(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none max-w-[180px] truncate"
-              >
-                <option value="all">Semua Edisi ({issues.length})</option>
-                {issues.map((iss) => (
-                  <option key={iss} value={iss}>
-                    {iss}
-                  </option>
-                ))}
-              </select>
-
-              {/* Year Selector */}
-              {years.length > 0 && (
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
+              {/* Segmented Prodi Control (Replaces clumsy dropdown) */}
+              <div className="inline-flex border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] overflow-hidden text-xs font-black uppercase">
+                <button
+                  type="button"
+                  onClick={() => handleProdiChange('all')}
+                  className={`px-3 py-1.5 transition-all ${
+                    selectedProdi === 'all'
+                      ? 'bg-black text-white dark:bg-white dark:text-black font-black'
+                      : 'bg-white dark:bg-[#181B20] text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                  title="Tampilkan riset dari semua program studi"
                 >
-                  <option value="all">Semua Tahun</option>
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      Tahun {y}
+                  Semua
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleProdiChange('SISKOM')}
+                  className={`px-3 py-1.5 border-l-2 border-black dark:border-white transition-all ${
+                    selectedProdi === 'SISKOM'
+                      ? 'bg-[#38BDF8] text-black font-black'
+                      : 'bg-white dark:bg-[#181B20] text-black dark:text-white hover:bg-[#38BDF8]/20'
+                  }`}
+                  title="Saring riset Prodi Rekayasa Sistem Komputer"
+                >
+                  Siskom
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleProdiChange('SISFO')}
+                  className={`px-3 py-1.5 border-l-2 border-black dark:border-white transition-all ${
+                    selectedProdi === 'SISFO'
+                      ? 'bg-[#F472B6] text-black font-black'
+                      : 'bg-white dark:bg-[#181B20] text-black dark:text-white hover:bg-[#F472B6]/20'
+                  }`}
+                  title="Saring riset Prodi Sistem Informasi"
+                >
+                  Sisfo
+                </button>
+              </div>
+
+              {/* Dosen Pembimbing Filter (Yellow active pop with auto-sync & clear keahlian option) */}
+              <div className="relative inline-flex items-center">
+                <select
+                  value={selectedDosen}
+                  onChange={(e) => handleDosenChange(e.target.value)}
+                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[210px] truncate ${
+                    selectedDosen !== 'all'
+                      ? 'bg-[#FEF08A] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                      : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                  }`}
+                  title={selectedDosen !== 'all' ? `Filter dosen: ${selectedDosen}` : 'Pilih Dosen Pembimbing'}
+                >
+                  {selectedKeahlian !== 'all' ? (
+                    <>
+                      <option value="all" className="text-black bg-white font-bold">
+                        Semua Dosen [{selectedKeahlian.replace(/\s*\(.*/, '')}] ({displayedDosenList.length})
+                      </option>
+                      <option value="__clear_keahlian__" className="text-blue-700 bg-amber-50 font-black">
+                        🌐 Tampilkan Semua Dosen (Hapus Filter Keahlian)
+                      </option>
+                      <option disabled className="text-slate-400 bg-slate-100">
+                        ── Dosen {selectedKeahlian.replace(/\s*\(.*/, '')} ──
+                      </option>
+                    </>
+                  ) : (
+                    <option value="all" className="text-black bg-white">
+                      Semua Dosen Pembimbing ({displayedDosenList.length})
+                    </option>
+                  )}
+                  {displayedDosenList.map((d) => (
+                    <option key={d.cleanName} value={d.cleanName} className="text-black bg-white">
+                      {d.name} [{d.prodi}]
                     </option>
                   ))}
                 </select>
-              )}
+                <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedDosen !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+              </div>
 
-              {/* Sort Selector */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] font-bold text-xs focus:outline-none"
-              >
-                <option value="newest">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="title">Judul (A-Z)</option>
-              </select>
-
-              {/* Reset Button */}
-              {hasActiveFilters && (
-                <button
-                  onClick={handleResetFilters}
-                  className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
+              {/* Keahlian Filter (Mint active pop) */}
+              <div className="relative inline-flex items-center">
+                <select
+                  value={selectedKeahlian}
+                  onChange={(e) => handleKeahlianChange(e.target.value)}
+                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[210px] truncate ${
+                    selectedKeahlian !== 'all'
+                      ? 'bg-[#A7F3D0] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                      : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                  }`}
+                  title={selectedKeahlian !== 'all' ? `Filter keahlian: ${selectedKeahlian}` : 'Pilih Bidang Keahlian'}
                 >
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>Reset</span>
-                </button>
+                  <option value="all" className="text-black bg-white">Semua Bidang Keahlian</option>
+                  {displayedKeahlianList.map((k) => (
+                    <option key={k} value={k} className="text-black bg-white">
+                      {k}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedKeahlian !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+              </div>
+
+              {/* Issue Selector (Peach active pop) */}
+              <div className="relative inline-flex items-center">
+                <select
+                  value={selectedIssue}
+                  onChange={(e) => setSelectedIssue(e.target.value)}
+                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[175px] truncate ${
+                    selectedIssue !== 'all'
+                      ? 'bg-[#FED7AA] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                      : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                  }`}
+                  title={selectedIssue !== 'all' ? `Filter edisi: ${selectedIssue}` : 'Pilih Edisi Publikasi'}
+                >
+                  <option value="all" className="text-black bg-white">Semua Edisi ({issues.length})</option>
+                  {issues.map((iss) => (
+                    <option key={iss} value={iss} className="text-black bg-white">
+                      {iss}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedIssue !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+              </div>
+
+              {/* Year Selector (Lavender active pop) */}
+              {years.length > 0 && (
+                <div className="relative inline-flex items-center">
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none ${
+                      selectedYear !== 'all'
+                        ? 'bg-[#DDD6FE] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                    }`}
+                    title={selectedYear !== 'all' ? `Filter tahun: ${selectedYear}` : 'Pilih Tahun'}
+                  >
+                    <option value="all" className="text-black bg-white">Semua Tahun</option>
+                    {years.map((y) => (
+                      <option key={y} value={y} className="text-black bg-white">
+                        Tahun {y}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedYear !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+                </div>
               )}
             </div>
 
-            {/* Results Count Badge & Quick View Mode Toggle */}
-            <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
-              <span className="px-3 py-1.5 bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] font-black uppercase tracking-wide">
+            {/* Right Side: Sort Controls, Results Count, & View Mode */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold shrink-0 self-start xl:self-center">
+              {/* Sort Selector */}
+              <div className="relative inline-flex items-center">
+                <div className="absolute left-2.5 pointer-events-none text-black dark:text-white">
+                  <ArrowUpDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
+                  className="appearance-none pl-8 pr-7 py-1.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
+                  title="Urutkan daftar riset"
+                >
+                  <option value="newest" className="text-black bg-white">Terbaru</option>
+                  <option value="oldest" className="text-black bg-white">Terlama</option>
+                  <option value="title" className="text-black bg-white">Judul (A-Z)</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] text-black dark:text-white" />
+              </div>
+
+              {/* Results Count Badge (Flat metadata stamp) */}
+              <span className="px-3 py-1.5 bg-slate-100 dark:bg-[#1E232B] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 font-mono font-bold uppercase tracking-wider select-none cursor-default shadow-none rounded-sm">
                 HASIL: {filteredCount} / {totalCount} RISET
               </span>
+
+              {/* Quick View Mode Toggle */}
               <button
                 onClick={handleToggleShowAll}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
                   showAll
                     ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
                     : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
@@ -419,6 +566,109 @@ export default function HomePage() {
               </button>
             </div>
           </div>
+
+          {/* Active Filter Chips Bar (Only shown when any filter is active) */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap items-center gap-2 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20 text-xs animate-in fade-in duration-150">
+              <span className="font-mono font-bold text-slate-500 dark:text-slate-400 uppercase text-[11px] mr-1 select-none">
+                Filter Aktif:
+              </span>
+
+              {/* Active Prodi Chip */}
+              {selectedProdi !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedProdi('all')}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 ${
+                    selectedProdi === 'SISFO' ? 'bg-[#F472B6] text-black' : 'bg-[#38BDF8] text-black'
+                  }`}
+                  title="Hapus filter prodi"
+                >
+                  <span>Prodi: {selectedProdi}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Keahlian Chip */}
+              {selectedKeahlian !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedKeahlian('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#A7F3D0] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter bidang keahlian"
+                >
+                  <span>Keahlian: {selectedKeahlian}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Dosen Chip */}
+              {selectedDosen !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDosen('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter dosen"
+                >
+                  <span>Dosen: {selectedDosen}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Issue Chip */}
+              {selectedIssue !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedIssue('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FED7AA] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter edisi"
+                >
+                  <span>Edisi: {selectedIssue}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Year Chip */}
+              {selectedYear !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedYear('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#DDD6FE] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter tahun"
+                >
+                  <span>Tahun: {selectedYear}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Search Query Chip */}
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchInput('');
+                    setSearchQuery('');
+                  }}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-slate-200 dark:bg-slate-700 text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus kata kunci pencarian"
+                >
+                  <span>Cari: &quot;{searchQuery}&quot;</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Reset All Button */}
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all ml-auto uppercase"
+                title="Reset semua filter ke default"
+              >
+                <X className="w-3.5 h-3.5 stroke-[3]" />
+                <span>Reset Semua</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Loading State */}
@@ -429,8 +679,8 @@ export default function HomePage() {
           </div>
         ) : articles.length === 0 ? (
           /* Empty State */
-          <div className="py-16 px-6 text-center border-[3px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] max-w-lg mx-auto space-y-3">
-            <div className="w-14 h-14 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] flex items-center justify-center mx-auto">
+          <div className="py-16 px-6 text-center border-[3px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] max-w-lg mx-auto space-y-3">
+            <div className="w-14 h-14 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] flex items-center justify-center mx-auto">
               <BookOpen className="w-7 h-7 stroke-[2.5]" />
             </div>
             <h3 className="text-lg font-black uppercase text-black dark:text-white">
@@ -444,7 +694,7 @@ export default function HomePage() {
             {hasActiveFilters && (
               <button
                 onClick={handleResetFilters}
-                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
+                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5"
               >
                 Reset Filter Pencarian
               </button>
@@ -460,15 +710,15 @@ export default function HomePage() {
                   article={article}
                   onReadPdf={(art) => setActivePdfArticle(art)}
                   onFilterDosen={(dosenName) => {
-                    setSelectedDosen(dosenName);
+                    handleDosenChange(dosenName);
                     scrollToCatalog();
                   }}
                   onFilterKeahlian={(keahlianName) => {
-                    setSelectedKeahlian(keahlianName);
+                    handleKeahlianChange(keahlianName);
                     scrollToCatalog();
                   }}
                   onFilterProdi={(prodiName) => {
-                    setSelectedProdi(prodiName);
+                    handleProdiChange(prodiName as 'SISKOM' | 'SISFO');
                     scrollToCatalog();
                   }}
                 />
@@ -476,7 +726,7 @@ export default function HomePage() {
             </div>
 
             {/* Neo-Brutalist Pagination & View Bar */}
-            <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#000] dark:shadow-[6px_6px_0px_0px_#fff] flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] flex flex-col md:flex-row items-center justify-between gap-4">
               {/* Pagination Info Readout */}
               <div className="text-xs font-mono font-bold text-black dark:text-white text-center md:text-left">
                 {showAll ? (
@@ -508,7 +758,7 @@ export default function HomePage() {
                     className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
                       currentPage <= 1
                         ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
-                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
                     }`}
                     title="Halaman Sebelumnya"
                   >
@@ -536,8 +786,8 @@ export default function HomePage() {
                         onClick={() => handlePageChange(pageNum)}
                         className={`min-w-[34px] px-2 py-1.5 text-xs font-black border-2 border-black dark:border-white transition-all ${
                           isActive
-                            ? 'bg-[#FACC15] text-black shadow-[2.5px_2.5px_0px_0px_#000] dark:shadow-[2.5px_2.5px_0px_0px_#fff] scale-105'
-                            : 'bg-white dark:bg-black text-black dark:text-white shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                            ? 'bg-[#FACC15] text-black shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] scale-105'
+                            : 'bg-white dark:bg-black text-black dark:text-white shadow-[1.5px_1.5px_0px_0px_#16181D] dark:shadow-[1.5px_1.5px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
                         }`}
                       >
                         {pageNum}
@@ -552,7 +802,7 @@ export default function HomePage() {
                     className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white transition-all ${
                       currentPage >= totalPages
                         ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 text-slate-400'
-                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5'
                     }`}
                     title="Halaman Selanjutnya"
                   >
@@ -565,13 +815,13 @@ export default function HomePage() {
               {/* Show All Toggle Button */}
               <button
                 onClick={handleToggleShowAll}
-                className={`inline-flex items-center gap-2 px-3.5 py-2 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all ${
+                className={`inline-flex items-center gap-2 px-3.5 py-2 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all ${
                   showAll
                     ? 'bg-[#FEF08A] text-black hover:bg-[#FACC15]'
                     : 'bg-[#38BDF8] text-black hover:bg-[#0EA5E9]'
                 }`}
               >
-                <Layers className="w-4 h-4 stroke-[2.5]" />
+                <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>{showAll ? 'Tampilkan Per Halaman (10 Riset)' : 'Tampilkan Semua Riset (1 Halaman)'}</span>
               </button>
             </div>
@@ -580,7 +830,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer - Neo-Brutalist */}
-      <footer className="mt-20 border-t-[3px] border-black dark:border-white bg-white dark:bg-[#0D0F12] py-8 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white">
+      <footer className="mt-20 border-t-[3px] border-black dark:border-white bg-white dark:bg-[#101216] py-8 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
             <p className="font-black text-sm uppercase tracking-wide">
@@ -620,7 +870,7 @@ export default function HomePage() {
             <span>•</span>
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none transition-all"
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none transition-all"
               title="Panel Pengelola Database"
             >
               <Lock className="w-3 h-3 stroke-[2.5]" />
@@ -638,10 +888,10 @@ export default function HomePage() {
 
       {/* Floating Quick Action Pill for Show All Mode */}
       {showAll && (
-        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff]">
+        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8]">
           <button
             onClick={handleToggleShowAll}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-black uppercase bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#EAB308] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-black uppercase bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#EAB308] active:translate-x-0.5 active:translate-y-0.5 transition-all"
             title="Kembali ke tampilan 10 artikel per halaman"
           >
             <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -649,7 +899,7 @@ export default function HomePage() {
           </button>
           <button
             onClick={() => document.getElementById('catalog-top')?.scrollIntoView({ behavior: 'smooth' })}
-            className="p-2 text-xs font-black bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#000] dark:shadow-[2px_2px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            className="p-2 text-xs font-black bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
             title="Kembali ke Atas"
           >
             <ArrowUp className="w-4 h-4 stroke-[3]" />
