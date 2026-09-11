@@ -146,7 +146,7 @@ export const SISFO_DOSEN: DosenItem[] = [
   {
     name: "Renny Puspita Sari, S.T., M.T.",
     cleanName: "Renny Puspita Sari",
-    keahlian: ["Tata Kelola TI", "Rekayasa Perangkat Lunak"],
+    keahlian: ["Tata Kelola TI"],
     prodi: "SISFO",
     jabatan: "Ketua Jurusan Sistem Informasi",
   },

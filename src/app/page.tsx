@@ -220,6 +220,75 @@ export default function HomePage() {
     setSortBy('newest');
   };
 
+  // Two-way synchronization handlers between Prodi, Dosen, and Keahlian
+  const handleDosenChange = (val: string) => {
+    if (val === '__clear_keahlian__') {
+      setSelectedKeahlian('all');
+      setSelectedDosen('all');
+      return;
+    }
+    setSelectedDosen(val);
+    if (val !== 'all') {
+      const matched = dosenList.find((d) => d.cleanName === val);
+      if (matched && matched.keahlian && matched.keahlian.length > 0) {
+        setSelectedKeahlian(matched.keahlian[0]);
+        if (matched.prodi && selectedProdi !== 'all' && selectedProdi !== matched.prodi) {
+          setSelectedProdi(matched.prodi);
+        }
+      }
+    }
+  };
+
+  const handleKeahlianChange = (val: string) => {
+    setSelectedKeahlian(val);
+    if (val !== 'all') {
+      // If currently selected dosen doesn't belong to this keahlian, reset dosen
+      if (selectedDosen !== 'all') {
+        const currentDosen = dosenList.find((d) => d.cleanName === selectedDosen);
+        if (!currentDosen || !currentDosen.keahlian.includes(val)) {
+          setSelectedDosen('all');
+        }
+      }
+    }
+  };
+
+  const handleProdiChange = (newProdi: 'all' | 'SISKOM' | 'SISFO') => {
+    setSelectedProdi(newProdi);
+    if (newProdi !== 'all') {
+      if (selectedDosen !== 'all') {
+        const currentDosen = dosenList.find((d) => d.cleanName === selectedDosen);
+        if (currentDosen && currentDosen.prodi !== newProdi) {
+          setSelectedDosen('all');
+        }
+      }
+      if (selectedKeahlian !== 'all') {
+        const prodiDosen = dosenList.filter((d) => d.prodi === newProdi);
+        const hasKeahlian = prodiDosen.some((d) => d.keahlian.includes(selectedKeahlian));
+        if (!hasKeahlian) {
+          setSelectedKeahlian('all');
+        }
+      }
+    }
+  };
+
+  // Filtered dosen options based on active keahlian and prodi filters
+  const displayedDosenList = useMemo(() => {
+    return dosenList.filter((d) => {
+      if (selectedProdi !== 'all' && d.prodi !== selectedProdi) return false;
+      if (selectedKeahlian !== 'all' && !d.keahlian.includes(selectedKeahlian)) return false;
+      return true;
+    });
+  }, [dosenList, selectedProdi, selectedKeahlian]);
+
+  // Filtered keahlian options based on active prodi filter
+  const displayedKeahlianList = useMemo(() => {
+    if (selectedProdi === 'all') return keahlianList;
+    const prodiDosen = dosenList.filter((d) => d.prodi === selectedProdi);
+    const prodiKeahlian = new Set<string>();
+    prodiDosen.forEach((d) => d.keahlian.forEach((k) => prodiKeahlian.add(k)));
+    return keahlianList.filter((k) => prodiKeahlian.has(k));
+  }, [keahlianList, dosenList, selectedProdi]);
+
   // Scroll to catalog top on badge clicks
   const scrollToCatalog = () => {
     setTimeout(() => {
@@ -314,7 +383,7 @@ export default function HomePage() {
               <div className="inline-flex border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] overflow-hidden text-xs font-black uppercase">
                 <button
                   type="button"
-                  onClick={() => setSelectedProdi('all')}
+                  onClick={() => handleProdiChange('all')}
                   className={`px-3 py-1.5 transition-all ${
                     selectedProdi === 'all'
                       ? 'bg-black text-white dark:bg-white dark:text-black font-black'
@@ -326,7 +395,7 @@ export default function HomePage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSelectedProdi('SISKOM')}
+                  onClick={() => handleProdiChange('SISKOM')}
                   className={`px-3 py-1.5 border-l-2 border-black dark:border-white transition-all ${
                     selectedProdi === 'SISKOM'
                       ? 'bg-[#38BDF8] text-black font-black'
@@ -338,7 +407,7 @@ export default function HomePage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSelectedProdi('SISFO')}
+                  onClick={() => handleProdiChange('SISFO')}
                   className={`px-3 py-1.5 border-l-2 border-black dark:border-white transition-all ${
                     selectedProdi === 'SISFO'
                       ? 'bg-[#F472B6] text-black font-black'
@@ -350,20 +419,36 @@ export default function HomePage() {
                 </button>
               </div>
 
-              {/* Dosen Pembimbing Filter (Yellow active pop) */}
+              {/* Dosen Pembimbing Filter (Yellow active pop with auto-sync & clear keahlian option) */}
               <div className="relative inline-flex items-center">
                 <select
                   value={selectedDosen}
-                  onChange={(e) => setSelectedDosen(e.target.value)}
-                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[200px] truncate ${
+                  onChange={(e) => handleDosenChange(e.target.value)}
+                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[210px] truncate ${
                     selectedDosen !== 'all'
                       ? 'bg-[#FEF08A] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
                       : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
                   }`}
                   title={selectedDosen !== 'all' ? `Filter dosen: ${selectedDosen}` : 'Pilih Dosen Pembimbing'}
                 >
-                  <option value="all" className="text-black bg-white">Semua Dosen Pembimbing</option>
-                  {dosenList.map((d) => (
+                  {selectedKeahlian !== 'all' ? (
+                    <>
+                      <option value="all" className="text-black bg-white font-bold">
+                        Semua Dosen [{selectedKeahlian.replace(/\s*\(.*/, '')}] ({displayedDosenList.length})
+                      </option>
+                      <option value="__clear_keahlian__" className="text-blue-700 bg-amber-50 font-black">
+                        🌐 Tampilkan Semua Dosen (Hapus Filter Keahlian)
+                      </option>
+                      <option disabled className="text-slate-400 bg-slate-100">
+                        ── Dosen {selectedKeahlian.replace(/\s*\(.*/, '')} ──
+                      </option>
+                    </>
+                  ) : (
+                    <option value="all" className="text-black bg-white">
+                      Semua Dosen Pembimbing ({displayedDosenList.length})
+                    </option>
+                  )}
+                  {displayedDosenList.map((d) => (
                     <option key={d.cleanName} value={d.cleanName} className="text-black bg-white">
                       {d.name} [{d.prodi}]
                     </option>
@@ -376,7 +461,7 @@ export default function HomePage() {
               <div className="relative inline-flex items-center">
                 <select
                   value={selectedKeahlian}
-                  onChange={(e) => setSelectedKeahlian(e.target.value)}
+                  onChange={(e) => handleKeahlianChange(e.target.value)}
                   className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[210px] truncate ${
                     selectedKeahlian !== 'all'
                       ? 'bg-[#A7F3D0] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
@@ -385,7 +470,7 @@ export default function HomePage() {
                   title={selectedKeahlian !== 'all' ? `Filter keahlian: ${selectedKeahlian}` : 'Pilih Bidang Keahlian'}
                 >
                   <option value="all" className="text-black bg-white">Semua Bidang Keahlian</option>
-                  {keahlianList.map((k) => (
+                  {displayedKeahlianList.map((k) => (
                     <option key={k} value={k} className="text-black bg-white">
                       {k}
                     </option>
@@ -625,15 +710,15 @@ export default function HomePage() {
                   article={article}
                   onReadPdf={(art) => setActivePdfArticle(art)}
                   onFilterDosen={(dosenName) => {
-                    setSelectedDosen(dosenName);
+                    handleDosenChange(dosenName);
                     scrollToCatalog();
                   }}
                   onFilterKeahlian={(keahlianName) => {
-                    setSelectedKeahlian(keahlianName);
+                    handleKeahlianChange(keahlianName);
                     scrollToCatalog();
                   }}
                   onFilterProdi={(prodiName) => {
-                    setSelectedProdi(prodiName);
+                    handleProdiChange(prodiName as 'SISKOM' | 'SISFO');
                     scrollToCatalog();
                   }}
                 />
