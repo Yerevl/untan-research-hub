@@ -18,6 +18,7 @@ import {
   Server,
   Layers,
 } from 'lucide-react';
+import { CitationButton } from './CitationButton';
 
 interface ArticleCardProps {
   article: Article;
@@ -270,12 +271,12 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
       {/* Card Footer Actions */}
       <div className="pt-4 border-t-2 border-black dark:border-white flex items-center justify-between gap-3 mt-auto">
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           {pdfUrl ? (
             <>
               <button
                 onClick={() => onReadPdf(article)}
-                className="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#FACC15] hover:bg-[#EAB308] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase tracking-wide transition-all"
+                className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#FACC15] hover:bg-[#EAB308] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase tracking-wide transition-all"
               >
                 <FileText className="w-4 h-4 stroke-[2.5]" />
                 <span>BACA PDF</span>
@@ -289,9 +290,14 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                 <Download className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>UNDUH</span>
               </a>
+
+              <CitationButton article={article} />
             </>
           ) : (
-            <span className="text-xs text-slate-500 font-mono italic">PDF belum tersedia</span>
+            <>
+              <span className="text-xs text-slate-500 font-mono italic">PDF belum tersedia</span>
+              <CitationButton article={article} />
+            </>
           )}
         </div>
 
