@@ -6,7 +6,6 @@ import {
   FileText,
   Download,
   Calendar,
-  ExternalLink,
   ChevronDown,
   ChevronUp,
   Bookmark,
@@ -180,16 +179,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-black text-black dark:text-white leading-snug mb-4 group-hover:text-indigo-600 dark:group-hover:text-yellow-300 transition-colors">
-          <a
-            href={article.original_article_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline flex items-baseline gap-1.5"
-          >
-            <span>{article.title}</span>
-            <ExternalLink className="w-4 h-4 text-black dark:text-white shrink-0 inline-block opacity-0 group-hover:opacity-100 transition-opacity stroke-[2.5]" />
-          </a>
+        <h3 className="text-xl font-black text-black dark:text-white leading-snug mb-4">
+          {article.title}
         </h3>
 
         {/* Authors Section: Student & Lecturers breakdown in Neo-brutalist box */}
