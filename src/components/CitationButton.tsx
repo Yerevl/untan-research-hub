@@ -210,7 +210,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
       {isOpen && (
         <div
           ref={flyoutRef}
-          className="absolute left-full ml-1.5 top-1/2 -translate-y-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] -skew-y-6 origin-left animate-in fade-in slide-in-from-left-2 duration-150 overflow-hidden"
+          className="absolute left-full -ml-2.5 top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#000] dark:shadow-[4px_4px_0px_0px_#fff] origin-left animate-flyout-slide-left overflow-hidden"
         >
           {/* APA Option (Top) */}
           <button
