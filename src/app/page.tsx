@@ -16,6 +16,8 @@ import {
   Lock,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ArrowUpDown,
   Layers,
   ArrowUp,
 } from 'lucide-react';
@@ -299,112 +301,172 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Filters & Results Counter Row */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
-            {/* Filter Dropdowns */}
+          {/* Filters & Results Controls Row */}
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
+            {/* Filter Dropdowns & Segmented Prodi Control */}
             <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
               <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
                 <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
                 <span>Filter:</span>
               </div>
 
-              {/* Prodi Filter */}
-              <select
-                value={selectedProdi}
-                onChange={(e) => setSelectedProdi(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
-              >
-                <option value="all">Semua Prodi</option>
-                <option value="SISKOM">Siskom</option>
-                <option value="SISFO">Sisfo</option>
-              </select>
-
-              {/* Dosen Pembimbing Filter */}
-              <select
-                value={selectedDosen}
-                onChange={(e) => setSelectedDosen(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none max-w-[210px] truncate"
-              >
-                <option value="all">Semua Dosen Pembimbing</option>
-                {dosenList.map((d) => (
-                  <option key={d.cleanName} value={d.cleanName}>
-                    {d.name} [{d.prodi}]
-                  </option>
-                ))}
-              </select>
-
-              {/* Keahlian Filter */}
-              <select
-                value={selectedKeahlian}
-                onChange={(e) => setSelectedKeahlian(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none max-w-[220px] truncate"
-              >
-                <option value="all">Semua Bidang Keahlian</option>
-                {keahlianList.map((k) => (
-                  <option key={k} value={k}>
-                    {k}
-                  </option>
-                ))}
-              </select>
-
-              {/* Issue Selector */}
-              <select
-                value={selectedIssue}
-                onChange={(e) => setSelectedIssue(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none max-w-[180px] truncate"
-              >
-                <option value="all">Semua Edisi ({issues.length})</option>
-                {issues.map((iss) => (
-                  <option key={iss} value={iss}>
-                    {iss}
-                  </option>
-                ))}
-              </select>
-
-              {/* Year Selector */}
-              {years.length > 0 && (
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
+              {/* Segmented Prodi Control (Replaces clumsy dropdown) */}
+              <div className="inline-flex border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] overflow-hidden text-xs font-black uppercase">
+                <button
+                  type="button"
+                  onClick={() => setSelectedProdi('all')}
+                  className={`px-3 py-1.5 transition-all ${
+                    selectedProdi === 'all'
+                      ? 'bg-black text-white dark:bg-white dark:text-black font-black'
+                      : 'bg-white dark:bg-[#181B20] text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                  title="Tampilkan riset dari semua program studi"
                 >
-                  <option value="all">Semua Tahun</option>
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      Tahun {y}
+                  Semua
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedProdi('SISKOM')}
+                  className={`px-3 py-1.5 border-l-2 border-black dark:border-white transition-all ${
+                    selectedProdi === 'SISKOM'
+                      ? 'bg-[#38BDF8] text-black font-black'
+                      : 'bg-white dark:bg-[#181B20] text-black dark:text-white hover:bg-[#38BDF8]/20'
+                  }`}
+                  title="Saring riset Prodi Rekayasa Sistem Komputer"
+                >
+                  Siskom
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedProdi('SISFO')}
+                  className={`px-3 py-1.5 border-l-2 border-black dark:border-white transition-all ${
+                    selectedProdi === 'SISFO'
+                      ? 'bg-[#F472B6] text-black font-black'
+                      : 'bg-white dark:bg-[#181B20] text-black dark:text-white hover:bg-[#F472B6]/20'
+                  }`}
+                  title="Saring riset Prodi Sistem Informasi"
+                >
+                  Sisfo
+                </button>
+              </div>
+
+              {/* Dosen Pembimbing Filter (Yellow active pop) */}
+              <div className="relative inline-flex items-center">
+                <select
+                  value={selectedDosen}
+                  onChange={(e) => setSelectedDosen(e.target.value)}
+                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[200px] truncate ${
+                    selectedDosen !== 'all'
+                      ? 'bg-[#FEF08A] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                      : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                  }`}
+                  title={selectedDosen !== 'all' ? `Filter dosen: ${selectedDosen}` : 'Pilih Dosen Pembimbing'}
+                >
+                  <option value="all" className="text-black bg-white">Semua Dosen Pembimbing</option>
+                  {dosenList.map((d) => (
+                    <option key={d.cleanName} value={d.cleanName} className="text-black bg-white">
+                      {d.name} [{d.prodi}]
                     </option>
                   ))}
                 </select>
-              )}
+                <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedDosen !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+              </div>
 
-              {/* Sort Selector */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
-                className="px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
-              >
-                <option value="newest">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="title">Judul (A-Z)</option>
-              </select>
-
-              {/* Reset Button */}
-              {hasActiveFilters && (
-                <button
-                  onClick={handleResetFilters}
-                  className="px-3 py-1.5 bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 font-black uppercase text-xs"
+              {/* Keahlian Filter (Mint active pop) */}
+              <div className="relative inline-flex items-center">
+                <select
+                  value={selectedKeahlian}
+                  onChange={(e) => setSelectedKeahlian(e.target.value)}
+                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[210px] truncate ${
+                    selectedKeahlian !== 'all'
+                      ? 'bg-[#A7F3D0] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                      : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                  }`}
+                  title={selectedKeahlian !== 'all' ? `Filter keahlian: ${selectedKeahlian}` : 'Pilih Bidang Keahlian'}
                 >
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>Reset</span>
-                </button>
+                  <option value="all" className="text-black bg-white">Semua Bidang Keahlian</option>
+                  {keahlianList.map((k) => (
+                    <option key={k} value={k} className="text-black bg-white">
+                      {k}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedKeahlian !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+              </div>
+
+              {/* Issue Selector (Peach active pop) */}
+              <div className="relative inline-flex items-center">
+                <select
+                  value={selectedIssue}
+                  onChange={(e) => setSelectedIssue(e.target.value)}
+                  className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none max-w-[175px] truncate ${
+                    selectedIssue !== 'all'
+                      ? 'bg-[#FED7AA] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                      : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                  }`}
+                  title={selectedIssue !== 'all' ? `Filter edisi: ${selectedIssue}` : 'Pilih Edisi Publikasi'}
+                >
+                  <option value="all" className="text-black bg-white">Semua Edisi ({issues.length})</option>
+                  {issues.map((iss) => (
+                    <option key={iss} value={iss} className="text-black bg-white">
+                      {iss}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedIssue !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+              </div>
+
+              {/* Year Selector (Lavender active pop) */}
+              {years.length > 0 && (
+                <div className="relative inline-flex items-center">
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className={`appearance-none pl-3 pr-7 py-1.5 border-2 border-black dark:border-white text-xs font-bold transition-all focus:outline-none ${
+                      selectedYear !== 'all'
+                        ? 'bg-[#DDD6FE] text-black shadow-[2px_2px_0px_0px_#16181D] font-black'
+                        : 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8]'
+                    }`}
+                    title={selectedYear !== 'all' ? `Filter tahun: ${selectedYear}` : 'Pilih Tahun'}
+                  >
+                    <option value="all" className="text-black bg-white">Semua Tahun</option>
+                    {years.map((y) => (
+                      <option key={y} value={y} className="text-black bg-white">
+                        Tahun {y}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className={`w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] ${selectedYear !== 'all' ? 'text-black' : 'text-black dark:text-white'}`} />
+                </div>
               )}
             </div>
 
-            {/* Results Count Badge (Flat metadata stamp) & Quick View Mode Toggle (Elevated Button) */}
-            <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold shrink-0 self-start lg:self-center">
-              <span className="px-3 py-1.5 bg-slate-100 dark:bg-[#1E232B] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 font-bold uppercase tracking-wider select-none cursor-default shadow-none rounded-sm">
+            {/* Right Side: Sort Controls, Results Count, & View Mode */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold shrink-0 self-start xl:self-center">
+              {/* Sort Selector */}
+              <div className="relative inline-flex items-center">
+                <div className="absolute left-2.5 pointer-events-none text-black dark:text-white">
+                  <ArrowUpDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title')}
+                  className="appearance-none pl-8 pr-7 py-1.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] font-bold text-xs focus:outline-none"
+                  title="Urutkan daftar riset"
+                >
+                  <option value="newest" className="text-black bg-white">Terbaru</option>
+                  <option value="oldest" className="text-black bg-white">Terlama</option>
+                  <option value="title" className="text-black bg-white">Judul (A-Z)</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 absolute right-2 pointer-events-none stroke-[2.5] text-black dark:text-white" />
+              </div>
+
+              {/* Results Count Badge (Flat metadata stamp) */}
+              <span className="px-3 py-1.5 bg-slate-100 dark:bg-[#1E232B] text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 font-mono font-bold uppercase tracking-wider select-none cursor-default shadow-none rounded-sm">
                 HASIL: {filteredCount} / {totalCount} RISET
               </span>
+
+              {/* Quick View Mode Toggle */}
               <button
                 onClick={handleToggleShowAll}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase border-2 border-black dark:border-white shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
@@ -419,6 +481,109 @@ export default function HomePage() {
               </button>
             </div>
           </div>
+
+          {/* Active Filter Chips Bar (Only shown when any filter is active) */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap items-center gap-2 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20 text-xs animate-in fade-in duration-150">
+              <span className="font-mono font-bold text-slate-500 dark:text-slate-400 uppercase text-[11px] mr-1 select-none">
+                Filter Aktif:
+              </span>
+
+              {/* Active Prodi Chip */}
+              {selectedProdi !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedProdi('all')}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 ${
+                    selectedProdi === 'SISFO' ? 'bg-[#F472B6] text-black' : 'bg-[#38BDF8] text-black'
+                  }`}
+                  title="Hapus filter prodi"
+                >
+                  <span>Prodi: {selectedProdi}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Keahlian Chip */}
+              {selectedKeahlian !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedKeahlian('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#A7F3D0] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter bidang keahlian"
+                >
+                  <span>Keahlian: {selectedKeahlian}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Dosen Chip */}
+              {selectedDosen !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDosen('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter dosen"
+                >
+                  <span>Dosen: {selectedDosen}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Issue Chip */}
+              {selectedIssue !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedIssue('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FED7AA] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter edisi"
+                >
+                  <span>Edisi: {selectedIssue}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Year Chip */}
+              {selectedYear !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedYear('all')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#DDD6FE] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus filter tahun"
+                >
+                  <span>Tahun: {selectedYear}</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Active Search Query Chip */}
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchInput('');
+                    setSearchQuery('');
+                  }}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-slate-200 dark:bg-slate-700 text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                  title="Hapus kata kunci pencarian"
+                >
+                  <span>Cari: &quot;{searchQuery}&quot;</span>
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              )}
+
+              {/* Reset All Button */}
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all ml-auto uppercase"
+                title="Reset semua filter ke default"
+              >
+                <X className="w-3.5 h-3.5 stroke-[3]" />
+                <span>Reset Semua</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Loading State */}
