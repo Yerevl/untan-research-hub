@@ -18,6 +18,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { CitationButton } from './CitationButton';
+import { HoldableButton } from './HoldableButton';
 
 interface ArticleCardProps {
   article: Article;
@@ -184,33 +185,36 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </h3>
 
         {/* Authors Section: Student & Lecturers breakdown in Neo-brutalist box */}
-        <div className="space-y-2.5 mb-4 p-3.5 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] text-xs">
+        <div className="space-y-2 mb-4 p-3 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] text-xs">
           {/* Mahasiswa (Icon-only badge, no text) */}
-          <div className="flex items-start gap-2.5">
+          <div className="flex items-center gap-2.5 min-h-[26px]">
             <span
               title="Mahasiswa (Penulis Utama)"
-              className="inline-flex items-center justify-center p-1 bg-[#60A5FA] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0 mt-0.5"
+              className="w-6 h-6 inline-flex items-center justify-center bg-[#60A5FA] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0"
             >
               <GraduationCap className="w-3.5 h-3.5 stroke-[2.5]" />
             </span>
-            <span className="font-extrabold text-black dark:text-white break-words flex-1 min-w-0 leading-tight">
+            <span className="font-extrabold text-black dark:text-white break-words flex-1 min-w-0 text-xs">
               {studentName}
             </span>
           </div>
 
           {/* Dosen Pembimbing (Icon-only badge, no text, no numbers before names) */}
           {supervisors.length > 0 && (
-            <div className="flex items-start gap-2.5 pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700">
-              <span
-                title="Dosen Pembimbing"
-                className="inline-flex items-center justify-center p-1 bg-[#FBBF24] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0 mt-0.5"
-              >
-                <Briefcase className="w-3.5 h-3.5 stroke-[2.5]" />
-              </span>
-              <div className="flex-1 min-w-0 flex flex-wrap items-center gap-1.5">
-                {supervisors.map((s, idx) => (
+            <div className="pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700 space-y-1.5">
+              {supervisors.map((s, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 min-h-[26px]">
+                  {idx === 0 ? (
+                    <span
+                      title="Dosen Pembimbing"
+                      className="w-6 h-6 inline-flex items-center justify-center bg-[#FBBF24] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] shrink-0"
+                    >
+                      <Briefcase className="w-3.5 h-3.5 stroke-[2.5]" />
+                    </span>
+                  ) : (
+                    <span className="w-6 shrink-0" />
+                  )}
                   <button
-                    key={idx}
                     onClick={() => onFilterDosen && onFilterDosen(s.cleanName)}
                     className="inline-flex items-center px-2 py-0.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white font-bold text-xs shadow-[1.5px_1.5px_0px_0px_#000] dark:shadow-[1.5px_1.5px_0px_0px_#fff] hover:bg-[#FEF08A] hover:text-black transition-colors max-w-full text-left"
                     title={`Lihat riset bimbingan ${s.cleanName}`}
@@ -222,8 +226,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                       </span>
                     )}
                   </button>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -265,22 +269,27 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           {pdfUrl ? (
             <>
-              <button
-                onClick={() => onReadPdf(article)}
-                className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#FACC15] hover:bg-[#EAB308] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase tracking-wide transition-all"
-              >
-                <FileText className="w-4 h-4 stroke-[2.5]" />
-                <span>BACA PDF</span>
-              </button>
+              <HoldableButton
+                onTrigger={() => onReadPdf(article)}
+                icon={<FileText className="w-3.5 h-3.5 stroke-[2.5]" />}
+                label="BACA PDF"
+                title={`Baca PDF: ${article.title}`}
+              />
 
-              <a
-                href={`/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`}
-                className="inline-flex items-center space-x-1 px-3 py-2 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#000] dark:shadow-[3px_3px_0px_0px_#fff] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-bold text-xs uppercase transition-all"
+              <HoldableButton
+                onTrigger={() => {
+                  const downloadUrl = `/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`;
+                  const a = document.createElement('a');
+                  a.href = downloadUrl;
+                  a.download = `${article.title}.pdf`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                }}
+                icon={<Download className="w-3.5 h-3.5 stroke-[2.5]" />}
+                label="UNDUH"
                 title={`Unduh: ${article.title}`}
-              >
-                <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>UNDUH</span>
-              </a>
+              />
 
               <CitationButton article={article} />
             </>
