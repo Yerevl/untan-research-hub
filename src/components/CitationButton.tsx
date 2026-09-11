@@ -249,8 +249,8 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
         type="button"
         onPointerDown={handlePointerDown}
         onClick={handleClick}
-        className={`inline-flex items-center space-x-1.5 px-3 py-2 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wide transition-all duration-150 active:translate-x-0.5 active:translate-y-0.5 active:opacity-80 ${
-          isHolding ? 'opacity-60 scale-[0.98]' : 'opacity-100'
+        className={`inline-flex items-center space-x-1.5 px-3 py-2 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wide transition-all duration-150 active:translate-x-0.5 active:translate-y-0.5 ${
+          isHolding ? 'blur-[1.5px] opacity-70 scale-[0.98]' : 'blur-none opacity-100'
         } ${
           copiedFormat
             ? 'bg-[#A3E635] text-black shadow-[3px_3px_0px_0px_#000]'
