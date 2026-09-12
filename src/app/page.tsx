@@ -157,8 +157,12 @@ export default function HomePage() {
     const res = toggleBookmarkLocal(article.ojs_id);
     setVault(res.vault);
 
-    if (res.isFirstEver && res.generatedKey) {
-      setNewSecretKeyAnnounce(res.generatedKey);
+    // Show celebration announcement modal on first bookmark or if user hasn't seen it yet
+    if ((res.isFirstEver && res.generatedKey) || (!res.vault.hasSeenWelcome && res.vault.secretKey)) {
+      setNewSecretKeyAnnounce(res.vault.secretKey);
+      const updatedVault: LocalVault = { ...res.vault, hasSeenWelcome: true };
+      saveLocalVault(updatedVault);
+      setVault(updatedVault);
     }
 
     if (res.vault.secretKey) {

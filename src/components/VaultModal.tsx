@@ -128,7 +128,13 @@ export const VaultModal: React.FC<VaultModalProps> = ({
           isPrimary: data.vault.isPrimary,
           lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
         });
-        setFeedback({ type: 'success', text: 'Daftar artikel berhasil diperbarui!' });
+        if (data.supabaseStatus?.saved) {
+          setFeedback({ type: 'success', text: `Tersinkronisasi ke Supabase (${data.supabaseStatus.table})!` });
+        } else if (data.supabaseStatus?.error) {
+          setFeedback({ type: 'error', text: data.supabaseStatus.error });
+        } else {
+          setFeedback({ type: 'success', text: 'Daftar artikel berhasil diperbarui!' });
+        }
       } else {
         setFeedback({ type: 'error', text: data.error || 'Gagal memperbarui.' });
       }
