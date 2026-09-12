@@ -124,7 +124,6 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
   const tableCandidates = ['user_vaults', 'user_vault'];
   for (const tableName of tableCandidates) {
     try {
-      // 1. Try standard upsert with native array / json
       const payload: Record<string, any> = {
         secret_key: record.secret_key,
         primary_device_id: record.primary_device_id,
@@ -134,46 +133,98 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
         created_at: record.created_at,
       };
 
-      const { data, error } = await client
+      // 1. Try standard upsert
+      const { error: upsertErr } = await client
         .from(tableName)
-        .upsert(payload, { onConflict: 'secret_key' })
-        .select();
+        .upsert(payload, { onConflict: 'secret_key' });
 
-      if (!error) {
+      if (!upsertErr) {
         result.savedToSupabase = true;
         result.tableUsed = tableName;
         result.supabaseError = null;
-        console.log(`[Vault] Successfully synced secret key "${record.secret_key}" to Supabase table "${tableName}"`);
+        console.log(`[Vault] Successfully synced to Supabase table "${tableName}"`);
         return result;
       }
 
-      console.warn(`[Vault] Upsert to "${tableName}" failed:`, error.message, error.details);
+      console.warn(`[Vault] Upsert to "${tableName}" returned code ${upsertErr.code}: ${upsertErr.message}`);
 
       // If relation does not exist, try next candidate table name
-      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+      if (upsertErr.code === '42P01' || upsertErr.message?.includes('does not exist')) {
         result.supabaseError = `Table "${tableName}" does not exist in Supabase.`;
         continue;
       }
 
-      // If type error, attempt stringified JSON fallback
-      if (error.message?.includes('type') || error.message?.includes('syntax') || error.code === '22P02') {
+      // 2. If upsert failed due to missing UNIQUE constraint on secret_key (code 42P10) or other constraints,
+      // try explicit check: select then update or insert
+      const { data: existingRow, error: checkErr } = await client
+        .from(tableName)
+        .select('secret_key')
+        .eq('secret_key', record.secret_key)
+        .maybeSingle();
+
+      if (!checkErr) {
+        let opErr: any = null;
+        if (existingRow) {
+          const { error } = await client
+            .from(tableName)
+            .update({
+              primary_device_id: record.primary_device_id,
+              secondary_device_ids: record.secondary_device_ids,
+              bookmarks: record.bookmarks,
+              updated_at: record.updated_at,
+            })
+            .eq('secret_key', record.secret_key);
+          opErr = error;
+        } else {
+          const { error } = await client
+            .from(tableName)
+            .insert({
+              secret_key: record.secret_key,
+              primary_device_id: record.primary_device_id,
+              secondary_device_ids: record.secondary_device_ids,
+              bookmarks: record.bookmarks,
+              created_at: record.created_at,
+              updated_at: record.updated_at,
+            });
+          opErr = error;
+        }
+
+        if (!opErr) {
+          result.savedToSupabase = true;
+          result.tableUsed = tableName;
+          result.supabaseError = null;
+          console.log(`[Vault] Successfully updated/inserted into Supabase table "${tableName}"`);
+          return result;
+        }
+
+        // Check if RLS is blocking
+        if (opErr.code === '42501' || opErr.message?.includes('row-level security') || opErr.message?.includes('policy')) {
+          result.supabaseError = `Supabase RLS is blocking writes on "${tableName}". Run in SQL Editor: alter table public.${tableName} disable row level security;`;
+          return result;
+        }
+
+        // Try stringified JSON payload fallback
         try {
-          const stringifiedPayload = {
+          const stringPayload = {
             ...payload,
             bookmarks: JSON.stringify(record.bookmarks),
             secondary_device_ids: JSON.stringify(record.secondary_device_ids),
           };
-          const retryRes = await client.from(tableName).upsert(stringifiedPayload, { onConflict: 'secret_key' }).select();
-          if (!retryRes.error) {
+          const { error: stringErr } = existingRow
+            ? await client.from(tableName).update(stringPayload).eq('secret_key', record.secret_key)
+            : await client.from(tableName).insert(stringPayload);
+          if (!stringErr) {
             result.savedToSupabase = true;
             result.tableUsed = tableName;
             result.supabaseError = null;
             return result;
           }
         } catch {}
-      }
 
-      result.supabaseError = error.message || 'Supabase upsert rejected';
+        result.supabaseError = `[${tableName}] ${opErr.message} (code: ${opErr.code})`;
+      } else {
+        result.supabaseError = `[${tableName}] ${checkErr.message}`;
+      }
     } catch (e: any) {
       console.error(`[Vault] Exception during save to "${tableName}":`, e);
       result.supabaseError = e?.message || 'Exception during upsert';
