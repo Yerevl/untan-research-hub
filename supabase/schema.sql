@@ -67,3 +67,35 @@ create policy "Allow upload to journal-pdfs"
   on storage.objects for insert
   with check (bucket_id = 'journal-pdfs');
 
+-- =========================================================
+-- 5. Buat Tabel `user_vaults` untuk Sinkronisasi Bookmark & Secret Key
+-- =========================================================
+create table if not exists public.user_vaults (
+  secret_key text primary key,
+  primary_device_id text not null,
+  secondary_device_ids jsonb default '[]'::jsonb,
+  bookmarks jsonb default '[]'::jsonb,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Index untuk pencarian instan berdasarkan secret_key
+create index if not exists idx_user_vaults_secret_key on public.user_vaults (secret_key);
+
+-- Row Level Security (RLS)
+alter table public.user_vaults enable row level security;
+
+-- Kebijakan RLS: Akses publik membaca vault berdasarkan secret key
+create policy "Allow public read access on user_vaults"
+  on public.user_vaults
+  for select
+  using (true);
+
+-- Kebijakan RLS: Akses publik insert dan update bookmark
+create policy "Allow public insert and update on user_vaults"
+  on public.user_vaults
+  for all
+  using (true)
+  with check (true);
+
+
