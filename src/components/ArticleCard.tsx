@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { CitationButton } from './CitationButton';
 import { HoldableButton } from './HoldableButton';
+import { motion } from 'motion/react';
 
 interface ArticleCardProps {
   article: Article;
@@ -128,7 +129,18 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   };
 
   return (
-    <article className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-all flex flex-col justify-between">
+    <motion.article
+      layout="position"
+      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{
+        layout: { type: 'spring', stiffness: 450, damping: 35 },
+        opacity: { duration: 0.15 },
+        scale: { duration: 0.15 },
+      }}
+      className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
+    >
       <div>
         {/* Badges Row: Issue (flat stamp), Prodi (elevated button), Keahlian (elevated button), Date (flat stamp) */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -316,6 +328,6 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           )}
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 };

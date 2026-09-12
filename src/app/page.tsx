@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { ArticleCard } from '@/components/ArticleCard';
 import { PdfViewerModal } from '@/components/PdfViewerModal';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
   BookOpen,
@@ -567,108 +568,150 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Active Filter Chips Bar (Only shown when any filter is active) */}
-          {hasActiveFilters && (
-            <div className="flex flex-wrap items-center gap-2 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20 text-xs animate-in fade-in duration-150">
-              <span className="font-mono font-bold text-slate-500 dark:text-slate-400 uppercase text-[11px] mr-1 select-none">
-                Filter Aktif:
-              </span>
-
-              {/* Active Prodi Chip */}
-              {selectedProdi !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedProdi('all')}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 ${
-                    selectedProdi === 'SISFO' ? 'bg-[#F472B6] text-black' : 'bg-[#38BDF8] text-black'
-                  }`}
-                  title="Hapus filter prodi"
-                >
-                  <span>Prodi: {selectedProdi}</span>
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                </button>
-              )}
-
-              {/* Active Keahlian Chip */}
-              {selectedKeahlian !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedKeahlian('all')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#A7F3D0] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
-                  title="Hapus filter bidang keahlian"
-                >
-                  <span>Keahlian: {selectedKeahlian}</span>
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                </button>
-              )}
-
-              {/* Active Dosen Chip */}
-              {selectedDosen !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedDosen('all')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
-                  title="Hapus filter dosen"
-                >
-                  <span>Dosen: {selectedDosen}</span>
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                </button>
-              )}
-
-              {/* Active Issue Chip */}
-              {selectedIssue !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedIssue('all')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FED7AA] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
-                  title="Hapus filter edisi"
-                >
-                  <span>Edisi: {selectedIssue}</span>
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                </button>
-              )}
-
-              {/* Active Year Chip */}
-              {selectedYear !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedYear('all')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#DDD6FE] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
-                  title="Hapus filter tahun"
-                >
-                  <span>Tahun: {selectedYear}</span>
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                </button>
-              )}
-
-              {/* Active Search Query Chip */}
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchInput('');
-                    setSearchQuery('');
-                  }}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-slate-200 dark:bg-slate-700 text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
-                  title="Hapus kata kunci pencarian"
-                >
-                  <span>Cari: &quot;{searchQuery}&quot;</span>
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
-                </button>
-              )}
-
-              {/* Reset All Button */}
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all ml-auto uppercase"
-                title="Reset semua filter ke default"
+          {/* Active Filter Chips Bar with Motion Spring Physics */}
+          <AnimatePresence>
+            {hasActiveFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-wrap items-center gap-2 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20 text-xs overflow-hidden"
               >
-                <X className="w-3.5 h-3.5 stroke-[3]" />
-                <span>Reset Semua</span>
-              </button>
-            </div>
-          )}
+                <span className="font-mono font-bold text-slate-500 dark:text-slate-400 uppercase text-[11px] mr-1 select-none">
+                  Filter Aktif:
+                </span>
+
+                <AnimatePresence>
+                  {/* Active Prodi Chip */}
+                  {selectedProdi !== 'all' && (
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      type="button"
+                      onClick={() => handleProdiChange('all')}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 ${
+                        selectedProdi === 'SISFO' ? 'bg-[#F472B6] text-black' : 'bg-[#38BDF8] text-black'
+                      }`}
+                      title="Hapus filter prodi"
+                    >
+                      <span>Prodi: {selectedProdi}</span>
+                      <X className="w-3.5 h-3.5 stroke-[3]" />
+                    </motion.button>
+                  )}
+
+                  {/* Active Keahlian Chip */}
+                  {selectedKeahlian !== 'all' && (
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      type="button"
+                      onClick={() => handleKeahlianChange('all')}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#A7F3D0] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      title="Hapus filter bidang keahlian"
+                    >
+                      <span>Keahlian: {selectedKeahlian}</span>
+                      <X className="w-3.5 h-3.5 stroke-[3]" />
+                    </motion.button>
+                  )}
+
+                  {/* Active Dosen Chip */}
+                  {selectedDosen !== 'all' && (
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      type="button"
+                      onClick={() => handleDosenChange('all')}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      title="Hapus filter dosen"
+                    >
+                      <span>Dosen: {selectedDosen}</span>
+                      <X className="w-3.5 h-3.5 stroke-[3]" />
+                    </motion.button>
+                  )}
+
+                  {/* Active Issue Chip */}
+                  {selectedIssue !== 'all' && (
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      type="button"
+                      onClick={() => setSelectedIssue('all')}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FED7AA] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      title="Hapus filter edisi"
+                    >
+                      <span>Edisi: {selectedIssue}</span>
+                      <X className="w-3.5 h-3.5 stroke-[3]" />
+                    </motion.button>
+                  )}
+
+                  {/* Active Year Chip */}
+                  {selectedYear !== 'all' && (
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      type="button"
+                      onClick={() => setSelectedYear('all')}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#DDD6FE] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      title="Hapus filter tahun"
+                    >
+                      <span>Tahun: {selectedYear}</span>
+                      <X className="w-3.5 h-3.5 stroke-[3]" />
+                    </motion.button>
+                  )}
+
+                  {/* Active Search Query Chip */}
+                  {searchQuery && (
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      type="button"
+                      onClick={() => {
+                        setSearchInput('');
+                        setSearchQuery('');
+                      }}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-slate-200 dark:bg-slate-700 text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      title="Hapus kata kunci pencarian"
+                    >
+                      <span>Cari: &quot;{searchQuery}&quot;</span>
+                      <X className="w-3.5 h-3.5 stroke-[3]" />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+
+                {/* Reset All Button */}
+                <motion.button
+                  layout
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all ml-auto uppercase"
+                  title="Reset semua filter ke default"
+                >
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                  <span>Reset Semua</span>
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Loading State */}
@@ -703,27 +746,29 @@ export default function HomePage() {
         ) : (
           <>
             {/* Articles Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {articles.map((article) => (
-                <ArticleCard
-                  key={article.ojs_id}
-                  article={article}
-                  onReadPdf={(art) => setActivePdfArticle(art)}
-                  onFilterDosen={(dosenName) => {
-                    handleDosenChange(dosenName);
-                    scrollToCatalog();
-                  }}
-                  onFilterKeahlian={(keahlianName) => {
-                    handleKeahlianChange(keahlianName);
-                    scrollToCatalog();
-                  }}
-                  onFilterProdi={(prodiName) => {
-                    handleProdiChange(prodiName as 'SISKOM' | 'SISFO');
-                    scrollToCatalog();
-                  }}
-                />
-              ))}
-            </div>
+            <motion.div layout className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AnimatePresence mode="popLayout">
+                {articles.map((article) => (
+                  <ArticleCard
+                    key={article.ojs_id}
+                    article={article}
+                    onReadPdf={(art) => setActivePdfArticle(art)}
+                    onFilterDosen={(dosenName) => {
+                      handleDosenChange(dosenName);
+                      scrollToCatalog();
+                    }}
+                    onFilterKeahlian={(keahlianName) => {
+                      handleKeahlianChange(keahlianName);
+                      scrollToCatalog();
+                    }}
+                    onFilterProdi={(prodiName) => {
+                      handleProdiChange(prodiName as 'SISKOM' | 'SISFO');
+                      scrollToCatalog();
+                    }}
+                  />
+                ))}
+              </AnimatePresence>
+            </motion.div>
 
             {/* Neo-Brutalist Pagination & View Bar */}
             <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] flex flex-col md:flex-row items-center justify-between gap-4">
