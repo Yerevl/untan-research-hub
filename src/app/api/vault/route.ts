@@ -31,29 +31,63 @@ function writeLocalVaults(data: Record<string, CloudVaultRecord>): void {
   }
 }
 
+interface SaveVaultResult {
+  savedToLocal: boolean;
+  savedToSupabase: boolean;
+  tableUsed?: string | null;
+  supabaseError?: string | null;
+}
+
 // Helper to get a vault record from Supabase or local fallback
 async function getCloudVault(secretKey: string): Promise<CloudVaultRecord | null> {
   const client = getSupabaseClient();
   if (client) {
-    try {
-      const { data, error } = await client
-        .from('user_vaults')
-        .select('*')
-        .eq('secret_key', secretKey)
-        .maybeSingle();
+    const tableCandidates = ['user_vaults', 'user_vault'];
+    for (const tableName of tableCandidates) {
+      try {
+        const { data, error } = await client
+          .from(tableName)
+          .select('*')
+          .eq('secret_key', secretKey)
+          .maybeSingle();
 
-      if (!error && data) {
-        return {
-          secret_key: data.secret_key,
-          primary_device_id: data.primary_device_id,
-          secondary_device_ids: Array.isArray(data.secondary_device_ids) ? data.secondary_device_ids : [],
-          bookmarks: Array.isArray(data.bookmarks) ? data.bookmarks : [],
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-        };
+        if (!error && data) {
+          let parsedBookmarks: string[] = [];
+          if (Array.isArray(data.bookmarks)) {
+            parsedBookmarks = data.bookmarks;
+          } else if (typeof data.bookmarks === 'string') {
+            try {
+              const p = JSON.parse(data.bookmarks);
+              if (Array.isArray(p)) parsedBookmarks = p;
+            } catch {
+              parsedBookmarks = [data.bookmarks];
+            }
+          }
+
+          let parsedSecondary: string[] = [];
+          if (Array.isArray(data.secondary_device_ids)) {
+            parsedSecondary = data.secondary_device_ids;
+          } else if (typeof data.secondary_device_ids === 'string') {
+            try {
+              const p = JSON.parse(data.secondary_device_ids);
+              if (Array.isArray(p)) parsedSecondary = p;
+            } catch {
+              parsedSecondary = [data.secondary_device_ids];
+            }
+          }
+
+          return {
+            secret_key: data.secret_key,
+            primary_device_id: data.primary_device_id,
+            secondary_device_ids: parsedSecondary,
+            bookmarks: parsedBookmarks,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+          };
+        }
+      } catch (e) {
+        console.warn(`[Vault] Error querying Supabase table "${tableName}":`, e);
       }
-    } catch (e) {
-      console.warn('Supabase user_vaults query error, falling back to local storage:', e);
     }
   }
 
@@ -62,37 +96,91 @@ async function getCloudVault(secretKey: string): Promise<CloudVaultRecord | null
 }
 
 // Helper to persist a vault record to Supabase and local fallback
-async function saveCloudVault(record: CloudVaultRecord): Promise<void> {
+async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult> {
+  const result: SaveVaultResult = {
+    savedToLocal: false,
+    savedToSupabase: false,
+    tableUsed: null,
+    supabaseError: null,
+  };
+
   // Always update local fallback for offline resilience
-  const localVaults = readLocalVaults();
-  localVaults[record.secret_key] = record;
-  writeLocalVaults(localVaults);
+  try {
+    const localVaults = readLocalVaults();
+    localVaults[record.secret_key] = record;
+    writeLocalVaults(localVaults);
+    result.savedToLocal = true;
+  } catch (e: any) {
+    console.warn('[Vault] Local JSON fallback deferred (read-only environment):', e?.message);
+  }
 
   // If Supabase is active, upsert
   const client = getSupabaseClient();
-  if (client) {
-    try {
-      const { error } = await client
-        .from('user_vaults')
-        .upsert(
-          {
-            secret_key: record.secret_key,
-            primary_device_id: record.primary_device_id,
-            secondary_device_ids: record.secondary_device_ids,
-            bookmarks: record.bookmarks,
-            updated_at: record.updated_at,
-            created_at: record.created_at,
-          },
-          { onConflict: 'secret_key' }
-        );
+  if (!client) {
+    result.supabaseError = 'Supabase client is not configured (missing URL or API keys)';
+    return result;
+  }
 
-      if (error) {
-        console.warn('Supabase user_vaults upsert warning (using local fallback):', error.message);
+  const tableCandidates = ['user_vaults', 'user_vault'];
+  for (const tableName of tableCandidates) {
+    try {
+      // 1. Try standard upsert with native array / json
+      const payload: Record<string, any> = {
+        secret_key: record.secret_key,
+        primary_device_id: record.primary_device_id,
+        secondary_device_ids: record.secondary_device_ids,
+        bookmarks: record.bookmarks,
+        updated_at: record.updated_at,
+        created_at: record.created_at,
+      };
+
+      const { data, error } = await client
+        .from(tableName)
+        .upsert(payload, { onConflict: 'secret_key' })
+        .select();
+
+      if (!error) {
+        result.savedToSupabase = true;
+        result.tableUsed = tableName;
+        result.supabaseError = null;
+        console.log(`[Vault] Successfully synced secret key "${record.secret_key}" to Supabase table "${tableName}"`);
+        return result;
       }
-    } catch (e) {
-      console.warn('Supabase user_vaults upsert exception:', e);
+
+      console.warn(`[Vault] Upsert to "${tableName}" failed:`, error.message, error.details);
+
+      // If relation does not exist, try next candidate table name
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        result.supabaseError = `Table "${tableName}" does not exist in Supabase.`;
+        continue;
+      }
+
+      // If type error, attempt stringified JSON fallback
+      if (error.message?.includes('type') || error.message?.includes('syntax') || error.code === '22P02') {
+        try {
+          const stringifiedPayload = {
+            ...payload,
+            bookmarks: JSON.stringify(record.bookmarks),
+            secondary_device_ids: JSON.stringify(record.secondary_device_ids),
+          };
+          const retryRes = await client.from(tableName).upsert(stringifiedPayload, { onConflict: 'secret_key' }).select();
+          if (!retryRes.error) {
+            result.savedToSupabase = true;
+            result.tableUsed = tableName;
+            result.supabaseError = null;
+            return result;
+          }
+        } catch {}
+      }
+
+      result.supabaseError = error.message || 'Supabase upsert rejected';
+    } catch (e: any) {
+      console.error(`[Vault] Exception during save to "${tableName}":`, e);
+      result.supabaseError = e?.message || 'Exception during upsert';
     }
   }
+
+  return result;
 }
 
 // GET: Retrieve vault info
@@ -171,7 +259,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      await saveCloudVault(vault);
+      const saveResult = await saveCloudVault(vault);
 
       const isPrimary = vault.primary_device_id === deviceId;
       return NextResponse.json({
@@ -183,6 +271,11 @@ export async function POST(request: NextRequest) {
           secondaryDevices: vault.secondary_device_ids,
           bookmarks: vault.bookmarks,
           updatedAt: vault.updated_at,
+        },
+        supabaseStatus: {
+          saved: saveResult.savedToSupabase,
+          table: saveResult.tableUsed || null,
+          error: saveResult.supabaseError || null,
         },
       });
     }
@@ -209,8 +302,9 @@ export async function POST(request: NextRequest) {
       if (vault.primary_device_id !== deviceId && !vault.secondary_device_ids.includes(deviceId)) {
         vault.secondary_device_ids.push(deviceId);
         vault.updated_at = new Date().toISOString();
-        await saveCloudVault(vault);
       }
+
+      const saveResult = await saveCloudVault(vault);
 
       const isPrimary = vault.primary_device_id === deviceId;
 
@@ -224,6 +318,11 @@ export async function POST(request: NextRequest) {
           secondaryDevices: vault.secondary_device_ids,
           bookmarks: vault.bookmarks,
           updatedAt: vault.updated_at,
+        },
+        supabaseStatus: {
+          saved: saveResult.savedToSupabase,
+          table: saveResult.tableUsed || null,
+          error: saveResult.supabaseError || null,
         },
       });
     }
@@ -260,7 +359,7 @@ export async function POST(request: NextRequest) {
       vault.secondary_device_ids = vault.secondary_device_ids.filter((id) => id !== targetDeviceId);
       vault.updated_at = new Date().toISOString();
 
-      await saveCloudVault(vault);
+      const saveResult = await saveCloudVault(vault);
 
       return NextResponse.json({
         success: true,
@@ -272,6 +371,11 @@ export async function POST(request: NextRequest) {
           secondaryDevices: vault.secondary_device_ids,
           bookmarks: vault.bookmarks,
           updatedAt: vault.updated_at,
+        },
+        supabaseStatus: {
+          saved: saveResult.savedToSupabase,
+          table: saveResult.tableUsed || null,
+          error: saveResult.supabaseError || null,
         },
       });
     }
