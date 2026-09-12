@@ -27,6 +27,8 @@ interface ArticleCardProps {
   onFilterDosen?: (dosenName: string) => void;
   onFilterKeahlian?: (keahlianName: string) => void;
   onFilterProdi?: (prodiName: string) => void;
+  isBookmarked?: boolean;
+  onToggleBookmark?: (article: Article) => void;
 }
 
 const comicCardVariants: Variants = {
@@ -49,6 +51,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   onFilterDosen,
   onFilterKeahlian,
   onFilterProdi,
+  isBookmarked = false,
+  onToggleBookmark,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -190,13 +194,34 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               );
             })}
 
-          {/* Date Stamp: Static Metadata (Flat, No Shadow) */}
-          {formattedDate && (
-            <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#20242C] border border-slate-300 dark:border-slate-700 ml-auto shrink-0 select-none cursor-default shadow-none rounded-sm">
-              <Calendar className="w-3 h-3 mr-1 stroke-[2] opacity-70" />
-              <span>{formattedDate}</span>
-            </span>
-          )}
+          {/* Date Stamp & Bookmark Button */}
+          <div className="ml-auto flex items-center gap-1.5 shrink-0">
+            {formattedDate && (
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#20242C] border border-slate-300 dark:border-slate-700 select-none cursor-default shadow-none rounded-sm">
+                <Calendar className="w-3 h-3 mr-1 stroke-[2] opacity-70" />
+                <span>{formattedDate}</span>
+              </span>
+            )}
+
+            {onToggleBookmark && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleBookmark(article);
+                }}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                  isBookmarked
+                    ? 'bg-[#FEF08A] text-black hover:bg-[#FDE047]'
+                    : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#FEF08A] hover:text-black'
+                }`}
+                title={isBookmarked ? 'Hapus dari brankas tersimpan' : 'Simpan artikel ke brankas rahasia'}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-black stroke-[2.5]' : 'stroke-[2.5]'}`} />
+                <span className="text-[11px] uppercase tracking-wider">{isBookmarked ? 'SIMPAN ★' : 'SIMPAN'}</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Title */}

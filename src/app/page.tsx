@@ -23,7 +23,17 @@ import {
   ArrowUp,
   Database,
   RotateCcw,
+  Bookmark,
 } from 'lucide-react';
+import {
+  LocalVault,
+  getLocalVault,
+  saveLocalVault,
+  toggleBookmarkLocal,
+} from '@/lib/vault';
+import { VaultTrigger } from '@/components/VaultTrigger';
+import { VaultModal } from '@/components/VaultModal';
+import { SecretKeyAnnouncementModal } from '@/components/SecretKeyAnnouncementModal';
 
 const PAGE_SIZE = 10;
 
@@ -80,6 +90,76 @@ export default function HomePage() {
 
   // Modal State
   const [activePdfArticle, setActivePdfArticle] = useState<Article | null>(null);
+
+  // Vault & Bookmark State
+  const [vault, setVault] = useState<LocalVault>({
+    secretKey: null,
+    isPrimary: false,
+    deviceId: 'client',
+    bookmarks: [],
+  });
+  const [isVaultOpen, setIsVaultOpen] = useState<boolean>(false);
+  const [newSecretKeyAnnounce, setNewSecretKeyAnnounce] = useState<string | null>(null);
+  const [isBookmarkFilterActive, setIsBookmarkFilterActive] = useState<boolean>(false);
+
+  // Sync vault on client mount and listen for storage/custom events
+  useEffect(() => {
+    const v = getLocalVault();
+    setVault(v);
+
+    const handleVaultUpdate = (e: any) => {
+      if (e.detail) {
+        setVault(e.detail);
+      } else {
+        setVault(getLocalVault());
+      }
+    };
+
+    window.addEventListener('untan_vault_updated', handleVaultUpdate);
+    window.addEventListener('storage', handleVaultUpdate);
+    return () => {
+      window.removeEventListener('untan_vault_updated', handleVaultUpdate);
+      window.removeEventListener('storage', handleVaultUpdate);
+    };
+  }, []);
+
+  // Toggle bookmark handler (instant local save, background cloud sync, first-time key popup)
+  const handleToggleBookmark = useCallback(async (article: Article) => {
+    const res = toggleBookmarkLocal(article.ojs_id);
+    setVault(res.vault);
+
+    if (res.isFirstEver && res.generatedKey) {
+      setNewSecretKeyAnnounce(res.generatedKey);
+    }
+
+    if (res.vault.secretKey) {
+      try {
+        const syncRes = await fetch('/api/vault', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'sync',
+            secretKey: res.vault.secretKey,
+            deviceId: res.vault.deviceId,
+            bookmarks: res.vault.bookmarks,
+          }),
+        });
+        const syncData = await syncRes.json();
+        if (syncData.success && syncData.vault) {
+          const updated: LocalVault = {
+            ...res.vault,
+            bookmarks: syncData.vault.bookmarks,
+            isPrimary: syncData.vault.isPrimary,
+            lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+          };
+          saveLocalVault(updated);
+          setVault(updated);
+        }
+      } catch (err) {
+        console.warn('Background sync deferred:', err);
+      }
+    }
+  }, []);
 
   // In-memory page cache to retain visited pages and avoid redundant network calls
   const pageCacheRef = useRef<Map<string, CachedPageData>>(new Map());
@@ -221,6 +301,7 @@ export default function HomePage() {
     setSelectedDosen('all');
     setSelectedKeahlian('all');
     setSortBy('newest');
+    setIsBookmarkFilterActive(false);
   };
 
   // Two-way synchronization handlers between Prodi, Dosen, and Keahlian
@@ -299,13 +380,20 @@ export default function HomePage() {
     }, 50);
   };
 
+  // Filtered articles when bookmark filter is active
+  const displayedArticles = useMemo(() => {
+    if (!isBookmarkFilterActive) return articles;
+    return articles.filter((a) => vault.bookmarks.includes(a.ojs_id));
+  }, [articles, isBookmarkFilterActive, vault.bookmarks]);
+
   const hasActiveFilters =
     searchQuery !== '' ||
     selectedProdi !== 'all' ||
     selectedIssue !== 'all' ||
     selectedYear !== 'all' ||
     selectedDosen !== 'all' ||
-    selectedKeahlian !== 'all';
+    selectedKeahlian !== 'all' ||
+    isBookmarkFilterActive;
 
   return (
     <div className="min-h-screen flex flex-col relative bg-[#FAF8F4] dark:bg-[#101216] text-black dark:text-white transition-colors overflow-x-hidden">
@@ -556,6 +644,25 @@ export default function HomePage() {
                 </span>
 
                 <AnimatePresence>
+                  {/* Active Bookmarks Filter Chip */}
+                  {isBookmarkFilterActive && (
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                      type="button"
+                      onClick={() => setIsBookmarkFilterActive(false)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      title="Hapus filter koleksi tersimpan"
+                    >
+                      <Bookmark className="w-3.5 h-3.5 fill-black stroke-[2.5]" />
+                      <span>Koleksi Tersimpan ({vault.bookmarks.length})</span>
+                      <X className="w-3.5 h-3.5 stroke-[3]" />
+                    </motion.button>
+                  )}
+
                   {/* Active Prodi Chip */}
                   {selectedProdi !== 'all' && (
                     <motion.button
@@ -693,17 +800,23 @@ export default function HomePage() {
             <div className="w-10 h-10 border-4 border-black border-t-[#FACC15] rounded-full animate-spin" />
             <p className="text-sm font-black uppercase tracking-wider">Memuat data riset...</p>
           </div>
-        ) : articles.length === 0 ? (
+        ) : displayedArticles.length === 0 ? (
           /* Empty State */
           <div className="py-16 px-6 text-center border-[3px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] max-w-lg mx-auto space-y-3">
             <div className="w-14 h-14 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] flex items-center justify-center mx-auto">
-              <BookOpen className="w-7 h-7 stroke-[2.5]" />
+              <Bookmark className="w-7 h-7 stroke-[2.5]" />
             </div>
             <h3 className="text-lg font-black uppercase text-black dark:text-white">
-              {hasActiveFilters ? 'Tidak ada artikel yang cocok' : 'Belum ada data artikel'}
+              {isBookmarkFilterActive
+                ? 'Belum Ada Koleksi Tersimpan'
+                : hasActiveFilters
+                ? 'Tidak ada artikel yang cocok'
+                : 'Belum ada data artikel'}
             </h3>
             <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300">
-              {hasActiveFilters
+              {isBookmarkFilterActive
+                ? 'Anda belum menyimpan artikel ke brankas rahasia, atau artikel tersimpan tidak cocok dengan filter lain yang aktif.'
+                : hasActiveFilters
                 ? 'Coba ganti kata kunci pencarian atau reset filter yang aktif.'
                 : 'Data riset belum tersedia di database.'}
             </p>
@@ -720,7 +833,7 @@ export default function HomePage() {
           <>
             {/* Articles Grid */}
             <motion.div
-              key={`${selectedDosen}-${selectedKeahlian}-${selectedProdi}-${selectedYear}-${selectedIssue}-${searchQuery}-${currentPage}-${sortBy}-${showAll}`}
+              key={`${selectedDosen}-${selectedKeahlian}-${selectedProdi}-${selectedYear}-${selectedIssue}-${searchQuery}-${currentPage}-${sortBy}-${showAll}-${isBookmarkFilterActive}`}
               initial="hidden"
               animate="show"
               variants={{
@@ -734,10 +847,12 @@ export default function HomePage() {
               }}
               className="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
-              {articles.map((article) => (
+              {displayedArticles.map((article) => (
                 <ArticleCard
                   key={article.ojs_id}
                   article={article}
+                  isBookmarked={vault.bookmarks.includes(article.ojs_id)}
+                  onToggleBookmark={handleToggleBookmark}
                   onReadPdf={(art) => setActivePdfArticle(art)}
                   onFilterDosen={(dosenName) => {
                     handleDosenChange(dosenName);
@@ -928,9 +1043,9 @@ export default function HomePage() {
         onClose={() => setActivePdfArticle(null)}
       />
 
-      {/* Floating Quick Action Pill for Show All Mode */}
+      {/* Floating Quick Action Pill for Show All Mode (Stacked above Vault Trigger on PC) */}
       {showAll && (
-        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8]">
+        <div className="fixed bottom-20 right-6 z-40 flex items-center gap-2 bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white p-1.5 shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8]">
           <button
             onClick={handleToggleShowAll}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-black uppercase bg-[#FACC15] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#EAB308] active:translate-x-0.5 active:translate-y-0.5 transition-all"
@@ -948,6 +1063,44 @@ export default function HomePage() {
           </button>
         </div>
       )}
+
+      {/* Floating Vault Trigger (Mobile: Top-Right, PC: Bottom-Right) */}
+      <VaultTrigger
+        vault={vault}
+        onClick={() => setIsVaultOpen(true)}
+        isFilterActive={isBookmarkFilterActive}
+      />
+
+      {/* Neo-Brutalist Vault Modal */}
+      <VaultModal
+        isOpen={isVaultOpen}
+        onClose={() => setIsVaultOpen(false)}
+        vault={vault}
+        allArticles={articles}
+        onToggleBookmark={(ojsId) => {
+          const art = articles.find((a) => a.ojs_id === ojsId);
+          if (art) {
+            handleToggleBookmark(art);
+          } else {
+            const res = toggleBookmarkLocal(ojsId);
+            setVault(res.vault);
+          }
+        }}
+        onVaultSynced={(updatedVault) => {
+          saveLocalVault(updatedVault);
+          setVault(updatedVault);
+        }}
+        onReadPdf={(art) => setActivePdfArticle(art)}
+        onFilterBookmarksOnly={() => setIsBookmarkFilterActive(!isBookmarkFilterActive)}
+        isFilterActive={isBookmarkFilterActive}
+      />
+
+      {/* First-Time Secret Key Celebration Modal */}
+      <SecretKeyAnnouncementModal
+        isOpen={Boolean(newSecretKeyAnnounce)}
+        secretKey={newSecretKeyAnnounce || ''}
+        onClose={() => setNewSecretKeyAnnounce(null)}
+      />
     </div>
   );
 }
