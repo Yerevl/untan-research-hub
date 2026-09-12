@@ -42,52 +42,50 @@ interface SaveVaultResult {
 async function getCloudVault(secretKey: string): Promise<CloudVaultRecord | null> {
   const client = getSupabaseClient();
   if (client) {
-    const tableCandidates = ['user_vaults', 'user_vault'];
-    for (const tableName of tableCandidates) {
-      try {
-        const { data, error } = await client
-          .from(tableName)
-          .select('*')
-          .eq('secret_key', secretKey)
-          .maybeSingle();
+    const tableName = 'user_vaults';
+    try {
+      const { data, error } = await client
+        .from(tableName)
+        .select('*')
+        .eq('secret_key', secretKey)
+        .maybeSingle();
 
-        if (!error && data) {
-          let parsedBookmarks: string[] = [];
-          if (Array.isArray(data.bookmarks)) {
-            parsedBookmarks = data.bookmarks;
-          } else if (typeof data.bookmarks === 'string') {
-            try {
-              const p = JSON.parse(data.bookmarks);
-              if (Array.isArray(p)) parsedBookmarks = p;
-            } catch {
-              parsedBookmarks = [data.bookmarks];
-            }
+      if (!error && data) {
+        let parsedBookmarks: string[] = [];
+        if (Array.isArray(data.bookmarks)) {
+          parsedBookmarks = data.bookmarks;
+        } else if (typeof data.bookmarks === 'string') {
+          try {
+            const p = JSON.parse(data.bookmarks);
+            if (Array.isArray(p)) parsedBookmarks = p;
+          } catch {
+            parsedBookmarks = [data.bookmarks];
           }
-
-          let parsedSecondary: string[] = [];
-          if (Array.isArray(data.secondary_device_ids)) {
-            parsedSecondary = data.secondary_device_ids;
-          } else if (typeof data.secondary_device_ids === 'string') {
-            try {
-              const p = JSON.parse(data.secondary_device_ids);
-              if (Array.isArray(p)) parsedSecondary = p;
-            } catch {
-              parsedSecondary = [data.secondary_device_ids];
-            }
-          }
-
-          return {
-            secret_key: data.secret_key,
-            primary_device_id: data.primary_device_id,
-            secondary_device_ids: parsedSecondary,
-            bookmarks: parsedBookmarks,
-            created_at: data.created_at,
-            updated_at: data.updated_at,
-          };
         }
-      } catch (e) {
-        console.warn(`[Vault] Error querying Supabase table "${tableName}":`, e);
+
+        let parsedSecondary: string[] = [];
+        if (Array.isArray(data.secondary_device_ids)) {
+          parsedSecondary = data.secondary_device_ids;
+        } else if (typeof data.secondary_device_ids === 'string') {
+          try {
+            const p = JSON.parse(data.secondary_device_ids);
+            if (Array.isArray(p)) parsedSecondary = p;
+          } catch {
+            parsedSecondary = [data.secondary_device_ids];
+          }
+        }
+
+        return {
+          secret_key: data.secret_key,
+          primary_device_id: data.primary_device_id,
+          secondary_device_ids: parsedSecondary,
+          bookmarks: parsedBookmarks,
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+        };
       }
+    } catch (e) {
+      console.warn(`[Vault] Error querying Supabase table "${tableName}":`, e);
     }
   }
 
@@ -121,33 +119,33 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
     return result;
   }
 
-  const tableCandidates = ['user_vaults', 'user_vault'];
-  for (const tableName of tableCandidates) {
-    try {
-      // 1. Check if record already exists to avoid ON CONFLICT constraint requirements
-      const { data: existingRow, error: checkErr } = await client
-        .from(tableName)
-        .select('secret_key')
-        .eq('secret_key', record.secret_key)
-        .maybeSingle();
+  const tableName = 'user_vaults';
+  try {
+    // 1. Check if record already exists to avoid ON CONFLICT constraint requirements
+    const { data: existingRow, error: checkErr } = await client
+      .from(tableName)
+      .select('secret_key')
+      .eq('secret_key', record.secret_key)
+      .maybeSingle();
 
-      // If relation does not exist or route invalid (PGRST106), try next candidate table name
-      if (
-        checkErr &&
-        (checkErr.code === '42P01' ||
-          checkErr.code === 'PGRST106' ||
-          checkErr.message?.includes('does not exist') ||
-          checkErr.message?.includes('Invalid path'))
-      ) {
-        result.supabaseError = `Tabel "${tableName}" belum dibuat di Supabase (PGRST106). Jalankan query SQL pembuatan tabel di Supabase SQL Editor.`;
-        continue;
-      }
+    // If relation does not exist or route invalid (PGRST125/PGRST106)
+    if (
+      checkErr &&
+      (checkErr.code === '42P01' ||
+        checkErr.code === 'PGRST106' ||
+        checkErr.code === 'PGRST125' ||
+        checkErr.message?.includes('does not exist') ||
+        checkErr.message?.includes('Invalid path'))
+    ) {
+      result.supabaseError = `Tabel "user_vaults" di Supabase belum terdeteksi oleh API PostgREST (Error ${checkErr.code}). Jalankan di SQL Editor Supabase: notify pgrst, 'reload schema';`;
+      return result;
+    }
 
-      // If RLS blocked reading, report it
-      if (checkErr && (checkErr.code === '42501' || checkErr.message?.includes('row-level security') || checkErr.message?.includes('policy'))) {
-        result.supabaseError = `Supabase RLS memblokir read/write di tabel "${tableName}". Jalankan di SQL Editor: alter table public.${tableName} disable row level security;`;
-        continue;
-      }
+    // If RLS blocked reading, report it
+    if (checkErr && (checkErr.code === '42501' || checkErr.message?.includes('row-level security') || checkErr.message?.includes('policy'))) {
+      result.supabaseError = `Supabase RLS memblokir read/write di tabel "${tableName}". Jalankan di SQL Editor: alter table public.${tableName} disable row level security;`;
+      return result;
+    }
 
       // Base payload
       const basePayload: Record<string, any> = {
@@ -255,7 +253,6 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
       console.error(`[Vault] Exception during save to "${tableName}":`, e);
       result.supabaseError = e?.message || 'Exception during upsert';
     }
-  }
 
   return result;
 }
@@ -292,7 +289,7 @@ export async function GET(request: NextRequest) {
 
       // Probe tables
       const tableReport: Record<string, any> = {};
-      const candidates = ['user_vaults', 'user_vault'];
+      const candidates = ['user_vaults'];
 
       for (const table of candidates) {
         try {
@@ -303,14 +300,19 @@ export async function GET(request: NextRequest) {
             .limit(1);
 
           if (selectErr) {
+            const isCacheError = selectErr.code === 'PGRST125' || selectErr.code === 'PGRST106';
             tableReport[table] = {
-              exists: false,
+              exists: isCacheError ? true : false,
               readable: false,
               writable: false,
               errorCode: selectErr.code,
-              errorMessage: selectErr.code === 'PGRST106' ? `Tabel "${table}" belum dibuat di Supabase (Error PGRST106)` : selectErr.message,
+              errorMessage: isCacheError
+                ? `Tabel "${table}" sudah dibuat di Table Editor, namun API PostgREST belum mengenali rutenya (Error ${selectErr.code}).`
+                : selectErr.message,
               details: selectErr.details,
-              hint: selectErr.code === 'PGRST106' ? 'Tabel belum ada di database. Jalankan query SQL di bawah pada Supabase SQL Editor.' : selectErr.hint,
+              hint: isCacheError
+                ? 'Jalankan query di bawah pada Supabase SQL Editor untuk reload cache API PostgREST.'
+                : selectErr.hint,
             };
             continue;
           }
