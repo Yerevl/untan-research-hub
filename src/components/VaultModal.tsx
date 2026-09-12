@@ -6,17 +6,14 @@ import {
   X,
   Bookmark,
   Key,
-  ShieldCheck,
-  ShieldAlert,
-  Smartphone,
   Copy,
   Check,
   RefreshCw,
   LogOut,
   FileText,
   Trash2,
-  ChevronDown,
-  ChevronUp,
+  Smartphone,
+  ArrowRightLeft,
   Sparkles,
 } from 'lucide-react';
 import { LocalVault, normalizeSecretKey } from '@/lib/vault';
@@ -46,14 +43,10 @@ export const VaultModal: React.FC<VaultModalProps> = ({
   onFilterBookmarksOnly,
   isFilterActive,
 }) => {
-  const [activeTab, setActiveTab] = useState<'bookmarks' | 'sync'>('bookmarks');
+  const [activeTab, setActiveTab] = useState<'bookmarks' | 'my-key' | 'enter-key'>('bookmarks');
   const [copiedKey, setCopiedKey] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
-
-  // Progressive disclosure accordions for secondary actions
-  const [showLinkInput, setShowLinkInput] = useState(false);
-  const [showTransferSelect, setShowTransferSelect] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Form states
   const [inputKey, setInputKey] = useState('');
@@ -65,15 +58,15 @@ export const VaultModal: React.FC<VaultModalProps> = ({
   // Filter bookmarked articles
   const bookmarkedArticles = allArticles.filter((a) => vault.bookmarks.includes(a.ojs_id));
 
-  // Clear toast feedback
+  // Auto-clear notification
   useEffect(() => {
-    if (syncFeedback) {
-      const timer = setTimeout(() => setSyncFeedback(null), 3500);
+    if (feedback) {
+      const timer = setTimeout(() => setFeedback(null), 3500);
       return () => clearTimeout(timer);
     }
-  }, [syncFeedback]);
+  }, [feedback]);
 
-  // Fetch connected devices when sync tab opens
+  // Fetch connected devices when modal opens
   useEffect(() => {
     if (isOpen && vault.secretKey) {
       fetch(`/api/vault?key=${encodeURIComponent(vault.secretKey)}&deviceId=${encodeURIComponent(vault.deviceId)}`)
@@ -90,7 +83,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
     }
   }, [isOpen, vault.secretKey, vault.deviceId, activeTab]);
 
-  // Copy key
+  // Copy secret key
   const handleCopyKey = () => {
     if (!vault.secretKey) return;
     navigator.clipboard.writeText(vault.secretKey);
@@ -98,10 +91,10 @@ export const VaultModal: React.FC<VaultModalProps> = ({
     setTimeout(() => setCopiedKey(false), 2000);
   };
 
-  // Manual cloud sync
+  // Manual sync
   const handleManualSync = async () => {
     if (!vault.secretKey) {
-      setSyncFeedback('Simpan minimal 1 artikel untuk sinkronisasi.');
+      setFeedback({ type: 'error', text: 'Simpan minimal satu artikel terlebih dahulu.' });
       return;
     }
     setIsSyncing(true);
@@ -124,23 +117,23 @@ export const VaultModal: React.FC<VaultModalProps> = ({
           isPrimary: data.vault.isPrimary,
           lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
         });
-        setSyncFeedback('Tersinkronisasi dengan Cloud!');
+        setFeedback({ type: 'success', text: 'Daftar artikel berhasil diperbarui!' });
       } else {
-        setSyncFeedback(data.error || 'Gagal sinkronisasi.');
+        setFeedback({ type: 'error', text: data.error || 'Gagal memperbarui.' });
       }
     } catch {
-      setSyncFeedback('Tersimpan di perangkat lokal.');
+      setFeedback({ type: 'error', text: 'Gagal menghubungkan ke server.' });
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // Link device
+  // Connect from another device using 4 words
   const handleLinkDevice = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanKey = normalizeSecretKey(inputKey);
     if (!cleanKey || cleanKey.split('-').length < 4) {
-      setSyncFeedback('Format: 4 kata slang (contoh: ngopi-santai-skripsi-mantap)');
+      setFeedback({ type: 'error', text: 'Masukkan 4 kata (contoh: ngopi-santai-skripsi-mantap).' });
       return;
     }
 
@@ -165,23 +158,22 @@ export const VaultModal: React.FC<VaultModalProps> = ({
           lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
         });
         setInputKey('');
-        setShowLinkInput(false);
-        setSyncFeedback('Berhasil terhubung!');
+        setFeedback({ type: 'success', text: 'Berhasil! Artikel tersimpan kamu sudah muncul.' });
         setActiveTab('bookmarks');
       } else {
-        setSyncFeedback(data.error || 'Kunci rahasia tidak ditemukan.');
+        setFeedback({ type: 'error', text: data.error || 'Kode salah atau tidak ditemukan.' });
       }
     } catch {
-      setSyncFeedback('Gagal menghubungkan perangkat.');
+      setFeedback({ type: 'error', text: 'Gagal terhubung ke server.' });
     } finally {
       setIsLinking(false);
     }
   };
 
-  // Transfer primary
+  // Transfer permission to another connected device
   const handleTransferPrimary = async () => {
     if (!targetDeviceId || !vault.secretKey) return;
-    if (!confirm('Pindahkan status Perangkat Utama? Kunci akan disembunyikan di perangkat ini setelahnya.')) return;
+    if (!confirm('Pindahkan izin melihat kode ke perangkat ini?')) return;
 
     setIsTransferring(true);
     try {
@@ -198,21 +190,21 @@ export const VaultModal: React.FC<VaultModalProps> = ({
       const data = await res.json();
       if (data.success) {
         onVaultSynced({ ...vault, isPrimary: false });
-        setSyncFeedback('Status Utama berhasil dialihkan.');
-        setShowTransferSelect(false);
+        setFeedback({ type: 'success', text: 'Izin berhasil dipindahkan ke perangkat tersebut.' });
+        setTargetDeviceId('');
       } else {
-        setSyncFeedback(data.error || 'Gagal mengalihkan status.');
+        setFeedback({ type: 'error', text: data.error || 'Gagal memindahkan izin.' });
       }
     } catch {
-      setSyncFeedback('Kesalahan jaringan.');
+      setFeedback({ type: 'error', text: 'Terjadi kesalahan jaringan.' });
     } finally {
       setIsTransferring(false);
     }
   };
 
-  // Disconnect
+  // Remove local data on this computer
   const handleDisconnect = () => {
-    if (confirm('Putus sinkronisasi di perangkat ini? Koleksi Anda tetap tersimpan di cloud & perangkat utama.')) {
+    if (confirm('Hapus daftar tersimpan dari komputer ini? Artikel kamu tetap aman di HP / laptop utama.')) {
       onVaultSynced({
         secretKey: null,
         isPrimary: false,
@@ -226,165 +218,181 @@ export const VaultModal: React.FC<VaultModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Light click-outside backdrop */}
-      <div
-        onClick={onClose}
-        className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[2px] transition-opacity animate-in fade-in"
-      />
-
-      {/* Floating Widget: Expands from Top-Right on Mobile, Bottom-Right on PC */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
       <motion.div
-        initial={{ opacity: 0, scale: 0.94, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.94, y: 10 }}
+        initial={{ scale: 0.94, opacity: 0, y: 15 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.94, opacity: 0, y: 15 }}
         transition={{ type: 'spring', damping: 26, stiffness: 450 }}
-        className="fixed z-50 bg-white dark:bg-[#161920] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] flex flex-col overflow-hidden
-          top-14 right-3 left-3 sm:left-auto sm:top-auto sm:bottom-20 sm:right-6 sm:w-[410px] max-h-[82vh]"
+        className="relative w-full max-w-lg bg-white dark:bg-[#181B22] border-[3px] border-black dark:border-white shadow-[8px_8px_0px_0px_#16181D] dark:shadow-[8px_8px_0px_0px_#D4D4D8] flex flex-col max-h-[85vh] overflow-hidden select-none"
       >
-        {/* Compact Header */}
-        <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#FEF08A] dark:bg-[#202530] border-b-2 border-black dark:border-white select-none">
-          <div className="flex items-center gap-2">
-            <Bookmark className="w-4 h-4 fill-current stroke-[2.5]" />
-            <span className="font-black text-xs uppercase tracking-wider text-black dark:text-white">
-              Koleksi & Kunci
-            </span>
+        {/* Modal Top Bar - Clean & Human */}
+        <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#FEF08A] dark:bg-[#202530] border-b-[2.5px] border-black dark:border-white">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-yellow-400 dark:text-black border-2 border-black font-black text-sm">
+              <Bookmark className="w-4 h-4 fill-current" />
+            </div>
+            <div>
+              <h2 className="font-black text-base sm:text-lg uppercase tracking-tight text-black dark:text-white leading-tight">
+                Koleksi Skripsi Saya
+              </h2>
+              <p className="text-[11px] text-slate-700 dark:text-slate-300 font-medium">
+                {vault.bookmarks.length} artikel tersimpan
+              </p>
+            </div>
           </div>
 
           <button
             onClick={onClose}
-            className="w-6 h-6 flex items-center justify-center bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white hover:bg-[#FECDD3] hover:text-black transition-colors"
+            className="w-8 h-8 flex items-center justify-center bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FECDD3] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
             title="Tutup"
           >
-            <X className="w-3.5 h-3.5 stroke-[3]" />
+            <X className="w-4 h-4 stroke-[3]" />
           </button>
         </div>
 
-        {/* Minimalist Tabs */}
-        <div className="flex border-b-2 border-black dark:border-white bg-[#F8FAFC] dark:bg-[#111317]">
+        {/* 3 Simple, Distinct Tabs */}
+        <div className="flex border-b-[2.5px] border-black dark:border-white bg-[#F1F5F9] dark:bg-[#13151A] text-xs">
+          {/* Tab 1: Tersimpan */}
           <button
             onClick={() => setActiveTab('bookmarks')}
-            className={`flex-1 py-2 px-3 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors border-r-2 border-black dark:border-white ${
+            className={`flex-1 py-2.5 px-2 font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 border-r border-black dark:border-white ${
               activeTab === 'bookmarks'
-                ? 'bg-white dark:bg-[#161920] text-black dark:text-white border-b-2 border-b-transparent -mb-[2px]'
-                : 'text-slate-500 hover:text-black dark:hover:text-white'
+                ? 'bg-white dark:bg-[#181B22] text-black dark:text-white border-b-2 border-b-white dark:border-b-[#181B22] -mb-[2px]'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
             }`}
           >
             <Bookmark className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Koleksi ({vault.bookmarks.length})</span>
+            <span>Tersimpan ({vault.bookmarks.length})</span>
           </button>
 
+          {/* Tab 2: Kode Akses HP */}
           <button
-            onClick={() => setActiveTab('sync')}
-            className={`flex-1 py-2 px-3 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors ${
-              activeTab === 'sync'
-                ? 'bg-white dark:bg-[#161920] text-black dark:text-white border-b-2 border-b-transparent -mb-[2px]'
-                : 'text-slate-500 hover:text-black dark:hover:text-white'
+            onClick={() => setActiveTab('my-key')}
+            className={`flex-1 py-2.5 px-2 font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 border-r border-black dark:border-white ${
+              activeTab === 'my-key'
+                ? 'bg-white dark:bg-[#181B22] text-black dark:text-white border-b-2 border-b-white dark:border-b-[#181B22] -mb-[2px]'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
             }`}
           >
             <Key className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Kunci & Sync</span>
+            <span>Buka di HP</span>
             {vault.isPrimary ? (
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Perangkat Utama" />
             ) : vault.secretKey ? (
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+              <span className="w-2 h-2 rounded-full bg-sky-500" title="Perangkat Terhubung" />
             ) : null}
+          </button>
+
+          {/* Tab 3: Masukkan Kode */}
+          <button
+            onClick={() => setActiveTab('enter-key')}
+            className={`flex-1 py-2.5 px-2 font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'enter-key'
+                ? 'bg-white dark:bg-[#181B22] text-black dark:text-white border-b-2 border-b-white dark:border-b-[#181B22] -mb-[2px]'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>Hubungkan HP</span>
           </button>
         </div>
 
-        {/* Feedback Bar */}
+        {/* Feedback Alert */}
         <AnimatePresence>
-          {syncFeedback && (
+          {feedback && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="px-3 py-1.5 text-[11px] font-bold bg-[#A3E635] text-black border-b border-black flex items-center justify-between"
+              className={`px-4 py-2 text-xs font-bold border-b-2 border-black flex items-center justify-between ${
+                feedback.type === 'success' ? 'bg-[#A3E635] text-black' : 'bg-[#FDA4AF] text-black'
+              }`}
             >
-              <span>{syncFeedback}</span>
-              <button onClick={() => setSyncFeedback(null)} className="font-mono text-xs underline ml-2">OK</button>
+              <span>{feedback.text}</span>
+              <button onClick={() => setFeedback(null)} className="font-mono text-xs underline">TUTUP</button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-3.5 space-y-3">
-          {/* TAB 1: KOLEKSI ARTIKEL */}
+        {/* Modal Body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+          {/* TAB 1: DAFTAR ARTIKEL TERSIMPAN */}
           {activeTab === 'bookmarks' && (
-            <div className="space-y-2.5">
-              {/* Filter Catalog Quick Button */}
+            <div className="space-y-3">
+              {/* Quick Filter Bar */}
               {vault.bookmarks.length > 0 && onFilterBookmarksOnly && (
-                <div className="flex items-center justify-between pb-2 border-b border-black/15 dark:border-white/15">
-                  <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
-                    Filter katalog utama?
+                <div className="flex items-center justify-between p-2.5 bg-[#FEF08A]/30 dark:bg-yellow-400/10 border border-black/30 dark:border-white/30 text-xs">
+                  <span className="font-bold text-slate-800 dark:text-yellow-200">
+                    Saring katalog utama?
                   </span>
                   <button
                     onClick={() => {
                       onFilterBookmarksOnly();
                       onClose();
                     }}
-                    className={`px-2.5 py-1 text-[10px] font-black uppercase border border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
-                      isFilterActive ? 'bg-[#FDA4AF] text-black' : 'bg-[#FEF08A] text-black'
+                    className={`px-2.5 py-1 text-[11px] font-black uppercase border border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                      isFilterActive ? 'bg-[#FDA4AF] text-black' : 'bg-[#FACC15] text-black'
                     }`}
                   >
-                    {isFilterActive ? 'BATAL FILTER' : 'FILTER SEKARANG'}
+                    {isFilterActive ? 'RESET KATALOG' : 'TAMPILKAN SAJA'}
                   </button>
                 </div>
               )}
 
-              {/* Bookmarked list */}
+              {/* Bookmarks List */}
               {bookmarkedArticles.length === 0 ? (
-                <div className="text-center py-8 px-3">
-                  <Bookmark className="w-8 h-8 stroke-[2] mx-auto text-slate-400 mb-2" />
-                  <p className="text-xs font-bold text-black dark:text-white uppercase mb-1">
-                    Belum Ada Artikel Tersimpan
-                  </p>
-                  <p className="text-[11px] text-slate-500 leading-relaxed max-w-xs mx-auto">
-                    Klik tombol <strong>🔖 SIMPAN</strong> pada artikel skripsi yang Anda minati.
+                <div className="text-center py-12 px-4">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-[#FEF08A] text-black border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_#16181D]">
+                    <Bookmark className="w-6 h-6 stroke-[2.5]" />
+                  </div>
+                  <h3 className="text-sm font-black text-black dark:text-white uppercase mb-1">
+                    Belum Ada Artikel yang Disimpan
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                    Klik tombol <strong>🔖 SIMPAN</strong> pada artikel mana pun untuk menyimpannya ke daftar ini.
                   </p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {bookmarkedArticles.map((art) => (
                     <div
                       key={art.ojs_id}
-                      className="p-2.5 bg-slate-50 dark:bg-[#1c202a] border border-black/30 dark:border-white/30 flex flex-col gap-2"
+                      className="p-3 bg-slate-50 dark:bg-[#1E232E] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
                     >
-                      <div>
-                        <span className="text-[9px] font-black font-mono px-1 py-0.2 bg-slate-200 dark:bg-slate-700 text-black dark:text-white uppercase mr-1.5">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 text-black dark:text-white uppercase mr-1.5">
                           {art.prodi || 'UNTAN'}
                         </span>
-                        <h4 className="font-bold text-xs text-black dark:text-white leading-snug line-clamp-2 inline">
+                        <h4 className="font-bold text-xs sm:text-sm text-black dark:text-white leading-snug line-clamp-2 inline">
                           {art.title}
                         </h4>
+                        <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate">
+                          {art.student || (art.authors && art.authors[0])} • {art.issue_name?.replace(/:.*/, '')}
+                        </p>
                       </div>
 
-                      <div className="flex items-center justify-between pt-1.5 border-t border-black/10 dark:border-white/10">
-                        <span className="text-[10px] text-slate-500 truncate max-w-[170px] font-mono">
-                          {art.student || (art.authors && art.authors[0])}
-                        </span>
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        <button
+                          onClick={() => {
+                            onReadPdf(art);
+                            onClose();
+                          }}
+                          className="px-2.5 py-1 text-xs font-black bg-[#A3E635] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] hover:bg-[#84CC16]"
+                        >
+                          BACA
+                        </button>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            onClick={() => {
-                              onReadPdf(art);
-                              onClose();
-                            }}
-                            className="px-2 py-0.5 text-[10px] font-black bg-[#A3E635] text-black border border-black shadow-[1px_1px_0px_0px_#16181D] hover:bg-[#84CC16]"
-                          >
-                            BACA
-                          </button>
+                        <CitationButton article={art} />
 
-                          <CitationButton article={art} />
-
-                          <button
-                            onClick={() => onToggleBookmark(art.ojs_id)}
-                            className="p-1 text-[10px] font-black bg-[#FDA4AF] text-black border border-black hover:bg-[#FB7185]"
-                            title="Hapus"
-                          >
-                            <Trash2 className="w-3 h-3 stroke-[2.5]" />
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => onToggleBookmark(art.ojs_id)}
+                          className="p-1 text-xs font-black bg-[#FDA4AF] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] hover:bg-[#FB7185]"
+                          title="Hapus"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -393,196 +401,174 @@ export const VaultModal: React.FC<VaultModalProps> = ({
             </div>
           )}
 
-          {/* TAB 2: KUNCI & SYNC (CLEAN, UN-CLUTTERED) */}
-          {activeTab === 'sync' && (
-            <div className="space-y-3.5 text-xs">
-              {/* Status Header Row */}
-              <div className="flex items-center justify-between pb-2 border-b border-black/15 dark:border-white/15">
-                <div className="flex items-center gap-1.5">
-                  {vault.isPrimary ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#A3E635] text-black text-[10px] font-black uppercase border border-black">
-                      <ShieldCheck className="w-3 h-3 stroke-[3]" />
-                      Perangkat Utama
-                    </span>
-                  ) : vault.secretKey ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#38BDF8] text-black text-[10px] font-black uppercase border border-black">
-                      <Smartphone className="w-3 h-3 stroke-[2.5]" />
-                      Perangkat Kedua
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-bold text-slate-500">Belum Terhubung</span>
-                  )}
-                </div>
-
-                {vault.secretKey && (
-                  <button
-                    onClick={handleManualSync}
-                    disabled={isSyncing}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-black uppercase bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#16181D] hover:bg-[#FEF08A] hover:text-black transition-all"
-                  >
-                    <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
-                    <span>{isSyncing ? 'Sync...' : 'Sinkron'}</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Secret Key Box */}
+          {/* TAB 2: KODE RAHASIA SAYA (UNTUK DIBUKA DI HP) */}
+          {activeTab === 'my-key' && (
+            <div className="space-y-4">
               {vault.secretKey ? (
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                    Kunci Rahasia (4 Kata)
-                  </span>
+                <>
+                  <div className="text-center py-2">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] mb-3">
+                      <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>{vault.isPrimary ? 'Perangkat Utama Anda' : 'Perangkat Terhubung'}</span>
+                    </span>
 
+                    <h3 className="text-sm font-black text-black dark:text-white uppercase mb-1">
+                      Kode Rahasia untuk Buka di HP
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 max-w-sm mx-auto leading-relaxed">
+                      Ketik 4 kata ini di HP atau laptop lain agar semua artikel tersimpan kamu otomatis muncul:
+                    </p>
+                  </div>
+
+                  {/* The 4-word code display */}
                   {vault.isPrimary ? (
-                    <div className="flex items-center gap-1.5 bg-[#FEF08A] dark:bg-yellow-400 p-2 border-2 border-black">
-                      <code className="font-mono font-black text-xs text-black tracking-wide flex-1 break-all select-all">
+                    <div className="p-3.5 bg-[#FEF08A] dark:bg-yellow-400 border-2 border-black shadow-[3px_3px_0px_0px_#16181D] flex items-center justify-between gap-2">
+                      <code className="font-mono font-black text-sm sm:text-base text-black tracking-wide break-all select-all flex-1">
                         {vault.secretKey}
                       </code>
                       <button
                         onClick={handleCopyKey}
-                        className="px-2 py-1 text-[10px] font-black uppercase bg-black text-white hover:bg-slate-800 transition-colors flex items-center gap-1 shrink-0"
+                        className="px-3 py-1.5 text-xs font-black uppercase bg-black text-white hover:bg-slate-800 transition-colors flex items-center gap-1.5 shrink-0"
                       >
                         {copiedKey ? (
                           <>
-                            <Check className="w-3 h-3 text-green-400 stroke-[3]" />
-                            <span>SALIN!</span>
+                            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+                            <span>TERSALIN!</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="w-3 h-3 stroke-[2.5]" />
+                            <Copy className="w-3.5 h-3.5 stroke-[2.5]" />
                             <span>SALIN</span>
                           </>
                         )}
                       </button>
                     </div>
                   ) : (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 bg-slate-100 dark:bg-black/40 p-2 border border-black/40 dark:border-white/40">
-                        <code className="font-mono font-bold text-xs tracking-widest text-slate-500 flex-1 select-none">
-                          •••• - •••• - •••• - ••••
-                        </code>
-                        <span className="text-[9px] font-bold uppercase bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 text-slate-600 dark:text-slate-300">
-                          TERKUNCI
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 leading-tight">
-                        🔒 Kunci disembunyikan demi keamanan di komputer umum/lab.
+                    <div className="p-3 bg-slate-100 dark:bg-[#1E232E] border-2 border-black dark:border-white text-center space-y-2">
+                      <code className="font-mono font-bold text-sm tracking-widest text-slate-500 block">
+                        •••• - •••• - •••• - ••••
+                      </code>
+                      <p className="text-xs text-slate-500">
+                        Kode disembunyikan di perangkat ini agar tetap aman saat digunakan di komputer umum atau lab.
                       </p>
                     </div>
                   )}
-                </div>
-              ) : null}
 
-              {/* Accordion 1: Hubungkan Kunci Lain */}
-              <div className="pt-2 border-t border-black/15 dark:border-white/15">
-                <button
-                  type="button"
-                  onClick={() => setShowLinkInput(!showLinkInput)}
-                  className="w-full flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 hover:text-black dark:hover:text-white"
-                >
-                  <span>+ Hubungkan Kunci dari Perangkat Lain</span>
-                  {showLinkInput ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                </button>
-
-                <AnimatePresence>
-                  {showLinkInput && (
-                    <motion.form
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      onSubmit={handleLinkDevice}
-                      className="pt-2 flex gap-1.5 overflow-hidden"
+                  {/* Sync status & Refresh */}
+                  <div className="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-black/10 dark:border-white/10">
+                    <span>{vault.lastSyncedAt ? `Sinkron terakhir: ${vault.lastSyncedAt}` : 'Tersimpan lokal'}</span>
+                    <button
+                      onClick={handleManualSync}
+                      disabled={isSyncing}
+                      className="font-bold text-black dark:text-white hover:underline flex items-center gap-1"
                     >
-                      <input
-                        type="text"
-                        value={inputKey}
-                        onChange={(e) => setInputKey(e.target.value)}
-                        placeholder="kata1-kata2-kata3-kata4"
-                        className="flex-1 px-2 py-1 text-xs font-mono bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white focus:outline-none"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isLinking || !inputKey.trim()}
-                        className="px-2.5 py-1 text-[10px] font-black uppercase bg-[#38BDF8] text-black border border-black hover:bg-[#0284C7] hover:text-white disabled:opacity-50"
-                      >
-                        {isLinking ? '...' : 'LINK'}
-                      </button>
-                    </motion.form>
+                      <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                      <span>{isSyncing ? 'Menyinkronkan...' : 'Perbarui'}</span>
+                    </button>
+                  </div>
+
+                  {/* Optional: Pindahkan izin jika Perangkat Utama */}
+                  {vault.isPrimary && connectedDevices.length > 0 && (
+                    <div className="pt-3 border-t border-black/10 dark:border-white/10 text-xs">
+                      <span className="font-bold text-black dark:text-white block mb-1.5">
+                        Pindahkan Izin Melihat Kode ke HP:
+                      </span>
+                      <div className="flex gap-2">
+                        <select
+                          value={targetDeviceId}
+                          onChange={(e) => setTargetDeviceId(e.target.value)}
+                          className="flex-1 px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white"
+                        >
+                          <option value="">-- Pilih HP / Laptop Terhubung --</option>
+                          {connectedDevices.map((dev, idx) => (
+                            <option key={dev} value={dev}>
+                              Perangkat #{idx + 1}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={handleTransferPrimary}
+                          disabled={isTransferring || !targetDeviceId}
+                          className="px-3 py-1.5 text-xs font-black uppercase bg-[#F472B6] text-black border-2 border-black hover:bg-[#DB2777] hover:text-white disabled:opacity-50"
+                        >
+                          {isTransferring ? '...' : 'PINDAHKAN'}
+                        </button>
+                      </div>
+                    </div>
                   )}
-                </AnimatePresence>
-              </div>
 
-              {/* Accordion 2: Alihkan Status Utama (Khusus Primary) */}
-              {vault.isPrimary && (
-                <div className="pt-2 border-t border-black/15 dark:border-white/15">
+                  {/* Keluar dari komputer lab */}
+                  <div className="pt-3 border-t border-black/10 dark:border-white/10 flex items-center justify-between text-xs">
+                    <span className="text-slate-500 text-[11px]">Pakai komputer lab kampus?</span>
+                    <button
+                      onClick={handleDisconnect}
+                      className="font-bold text-red-500 hover:text-red-700 hover:underline flex items-center gap-1 text-[11px]"
+                    >
+                      <LogOut className="w-3 h-3" />
+                      <span>Hapus data dari komputer ini</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-10 px-4">
+                  <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed mb-3">
+                    Kamu belum menyimpan artikel apa pun. Simpan minimal satu artikel untuk mendapatkan 4 kata rahasia.
+                  </p>
                   <button
-                    type="button"
-                    onClick={() => setShowTransferSelect(!showTransferSelect)}
-                    className="w-full flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 hover:text-black dark:hover:text-white"
+                    onClick={() => setActiveTab('bookmarks')}
+                    className="px-3 py-1.5 text-xs font-black uppercase bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D]"
                   >
-                    <span>⇄ Alihkan Status Perangkat Utama</span>
-                    {showTransferSelect ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  </button>
-
-                  <AnimatePresence>
-                    {showTransferSelect && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="pt-2 overflow-hidden"
-                      >
-                        {connectedDevices.length > 0 ? (
-                          <div className="flex gap-1.5">
-                            <select
-                              value={targetDeviceId}
-                              onChange={(e) => setTargetDeviceId(e.target.value)}
-                              className="flex-1 px-2 py-1 text-[10px] font-mono bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white"
-                            >
-                              <option value="">Pilih Perangkat</option>
-                              {connectedDevices.map((dev, idx) => (
-                                <option key={dev} value={dev}>
-                                  Perangkat #{idx + 1} ({dev.substring(0, 8)})
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              type="button"
-                              onClick={handleTransferPrimary}
-                              disabled={isTransferring || !targetDeviceId}
-                              className="px-2.5 py-1 text-[10px] font-black uppercase bg-[#F472B6] text-black border border-black hover:bg-[#DB2777] hover:text-white disabled:opacity-50"
-                            >
-                              {isTransferring ? '...' : 'ALIHKAN'}
-                            </button>
-                          </div>
-                        ) : (
-                          <p className="text-[10px] text-slate-400 italic">
-                            Belum ada perangkat kedua yang terhubung.
-                          </p>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
-
-              {/* Disconnect text link */}
-              {vault.secretKey && (
-                <div className="pt-2.5 border-t border-black/15 dark:border-white/15 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleDisconnect}
-                    className="text-[10px] font-bold text-red-500 hover:text-red-700 hover:underline flex items-center gap-1"
-                  >
-                    <LogOut className="w-3 h-3" />
-                    <span>Putus koneksi di perangkat ini</span>
+                    KEMBALI KE KOLEKSI
                   </button>
                 </div>
               )}
             </div>
           )}
+
+          {/* TAB 3: MASUKKAN KODE DARI HP / PERANGKAT LAIN */}
+          {activeTab === 'enter-key' && (
+            <div className="space-y-4 py-2">
+              <div className="text-center">
+                <div className="w-10 h-10 mx-auto mb-2 bg-[#38BDF8] text-black border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#16181D]">
+                  <Smartphone className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <h3 className="text-sm font-black text-black dark:text-white uppercase mb-1">
+                  Punya Kode dari HP atau Laptop Lain?
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 max-w-xs mx-auto leading-relaxed">
+                  Masukkan 4 kata rahasia kamu di bawah ini untuk memunculkan semua artikel yang sudah kamu simpan:
+                </p>
+              </div>
+
+              {/* Input form */}
+              <form onSubmit={handleLinkDevice} className="space-y-2.5 max-w-sm mx-auto">
+                <input
+                  type="text"
+                  value={inputKey}
+                  onChange={(e) => setInputKey(e.target.value)}
+                  placeholder="contoh: ngopi-santai-skripsi-mantap"
+                  className="w-full px-3 py-2 text-xs font-mono bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                />
+
+                <button
+                  type="submit"
+                  disabled={isLinking || !inputKey.trim()}
+                  className="w-full py-2 px-4 text-xs font-black uppercase tracking-wider bg-[#38BDF8] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#0284C7] hover:text-white disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>{isLinking ? 'Menghubungkan...' : 'BUKA ARTIKEL SAYA'}</span>
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+
+        {/* Minimal Footer */}
+        <div className="px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#111317] border-t-2 border-black dark:border-white flex items-center justify-between text-[10px] font-mono text-slate-500">
+          <span>UNTAN RESEARCH HUB</span>
+          <span>{vault.bookmarks.length} TERSIMPAN</span>
         </div>
       </motion.div>
-    </>
+    </div>
   );
 };

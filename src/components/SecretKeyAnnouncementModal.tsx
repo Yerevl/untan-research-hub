@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Key, Copy, Check, Sparkles, ShieldCheck, ArrowRight } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Key, Copy, Check, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 
 interface SecretKeyAnnouncementModalProps {
   isOpen: boolean;
@@ -22,40 +22,38 @@ export const SecretKeyAnnouncementModal: React.FC<SecretKeyAnnouncementModalProp
   const handleCopy = () => {
     navigator.clipboard.writeText(secretKey);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
       <motion.div
-        initial={{ scale: 0.88, opacity: 0, y: 25 }}
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.88, opacity: 0, y: 25 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 400 }}
-        className="relative w-full max-w-md bg-white dark:bg-[#1A1F29] border-[3.5px] border-black dark:border-white shadow-[10px_10px_0px_0px_#16181D] dark:shadow-[10px_10px_0px_0px_#D4D4D8] p-6 text-center select-none"
+        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 450 }}
+        className="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-[#181B22] border-[3px] border-black dark:border-white shadow-[8px_8px_0px_0px_#16181D] dark:shadow-[8px_8px_0px_0px_#D4D4D8] p-5 sm:p-6 text-center select-none"
       >
-        {/* Celebration Header Graphic */}
-        <div className="w-16 h-16 mx-auto mb-4 bg-[#FEF08A] text-black border-3 border-black shadow-[4px_4px_0px_0px_#16181D] flex items-center justify-center -rotate-3">
-          <Key className="w-8 h-8 stroke-[2.5]" />
+        <div className="w-14 h-14 mx-auto mb-3 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] flex items-center justify-center -rotate-2">
+          <Key className="w-7 h-7 stroke-[2.5]" />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#A3E635] text-black text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#16181D] mb-3">
-          <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
-          <span>Koleksi Rahasia Dibuat</span>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#A3E635] text-black text-[11px] font-black uppercase border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] mb-2.5">
+          <Sparkles className="w-3 h-3 stroke-[2.5]" />
+          <span>Artikel Berhasil Disimpan</span>
         </div>
 
-        <h3 className="text-xl font-black text-black dark:text-white uppercase leading-tight mb-2">
-          Kunci Rahasia Brankas Anda
+        <h3 className="text-lg font-black text-black dark:text-white uppercase leading-snug mb-1.5">
+          Kode Rahasia untuk Buka di HP
         </h3>
 
         <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-          Artikel pertama Anda berhasil disimpan! Ini adalah <strong>4 kata rahasia unik</strong> Anda. 
-          Gunakan untuk mengakses koleksi skripsi ini di HP atau perangkat lain tanpa perlu akun/password:
+          Mau buka artikel yang kamu simpan ini di HP atau laptop lain? Cukup ketik 4 kata ini:
         </p>
 
-        {/* The 4-word Slang Passphrase Box */}
-        <div className="bg-[#FEF08A] border-3 border-black shadow-[4px_4px_0px_0px_#16181D] p-3.5 mb-4">
-          <code className="block font-mono font-black text-lg sm:text-xl text-black tracking-wider break-all select-all">
+        {/* 4-Word Box */}
+        <div className="bg-[#FEF08A] dark:bg-yellow-400 border-2 border-black shadow-[3px_3px_0px_0px_#16181D] p-3 mb-3.5">
+          <code className="block font-mono font-black text-base sm:text-lg text-black tracking-wide break-all select-all">
             {secretKey}
           </code>
         </div>
@@ -63,39 +61,35 @@ export const SecretKeyAnnouncementModal: React.FC<SecretKeyAnnouncementModalProp
         {/* Copy Button */}
         <button
           onClick={handleCopy}
-          className="w-full py-2.5 px-4 mb-4 text-xs font-black uppercase tracking-wider bg-black text-white dark:bg-yellow-400 dark:text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-all flex items-center justify-center gap-2"
+          className="w-full py-2.5 px-3 mb-4 text-xs font-black uppercase tracking-wider bg-black text-white dark:bg-yellow-400 dark:text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
         >
           {copied ? (
             <>
               <Check className="w-4 h-4 text-emerald-400 dark:text-black stroke-[3]" />
-              <span>KUNCI BERHASIL DISALIN!</span>
+              <span>KODE BERHASIL DISALIN!</span>
             </>
           ) : (
             <>
               <Copy className="w-4 h-4 stroke-[2.5]" />
-              <span>SALIN KUNCI 4 KATA</span>
+              <span>SALIN 4 KATA INI</span>
             </>
           )}
         </button>
 
-        {/* Security Note */}
-        <div className="flex items-start gap-2 p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-left text-[11px] text-slate-600 dark:text-slate-400 mb-5">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-          <span>
-            Perangkat ini terdaftar sebagai <strong>Perangkat Utama</strong>. Anda dapat melihat kunci kapan saja melalui tombol <strong>KOLEKSI</strong> di layar.
-          </span>
-        </div>
+        {/* Helpful Tip */}
+        <p className="text-[11px] text-slate-500 mb-4 text-center">
+          💡 Kamu bisa melihat atau menyalin kode ini lagi kapan saja lewat tombol <strong>KOLEKSI</strong> di layar.
+        </p>
 
         {/* Dismiss Button */}
         <button
           onClick={onClose}
-          className="w-full py-3 px-4 text-xs font-black uppercase tracking-wider bg-[#38BDF8] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] hover:bg-[#0284C7] hover:text-white active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
+          className="w-full py-2.5 px-4 text-xs font-black uppercase tracking-wider bg-[#38BDF8] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#0284C7] hover:text-white active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-1"
         >
-          <span>SAYA MENGERTI & LANJUTKAN</span>
+          <span>OKE, SAYA MENGERTI</span>
           <ArrowRight className="w-4 h-4 stroke-[3]" />
         </button>
       </motion.div>
     </div>
   );
 };
-
