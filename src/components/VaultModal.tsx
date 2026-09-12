@@ -65,17 +65,29 @@ export const VaultModal: React.FC<VaultModalProps> = ({
     }
   }, [feedback]);
 
-  // Fetch connected devices when modal opens
+  // Sync bookmarks and fetch connected devices when modal opens
   useEffect(() => {
     if (isOpen && vault.secretKey) {
-      fetch(`/api/vault?key=${encodeURIComponent(vault.secretKey)}&deviceId=${encodeURIComponent(vault.deviceId)}`)
+      fetch('/api/vault', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sync',
+          secretKey: vault.secretKey,
+          deviceId: vault.deviceId,
+          bookmarks: vault.bookmarks,
+        }),
+      })
         .then((res) => res.json())
         .then((data) => {
           if (data.success && data.vault) {
             setConnectedDevices(data.vault.secondaryDevices || []);
-            if (data.vault.isPrimary !== vault.isPrimary) {
-              onVaultSynced({ ...vault, isPrimary: data.vault.isPrimary });
-            }
+            onVaultSynced({
+              ...vault,
+              bookmarks: data.vault.bookmarks,
+              isPrimary: data.vault.isPrimary,
+              lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+            });
           }
         })
         .catch(() => {});

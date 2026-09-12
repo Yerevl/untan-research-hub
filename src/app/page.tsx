@@ -108,6 +108,34 @@ export default function HomePage() {
     const v = getLocalVault();
     setVault(v);
 
+    // If local vault has secret key, auto-sync to cloud on load
+    if (v.secretKey) {
+      fetch('/api/vault', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sync',
+          secretKey: v.secretKey,
+          deviceId: v.deviceId,
+          bookmarks: v.bookmarks,
+        }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && data.vault) {
+            const updated: LocalVault = {
+              ...v,
+              bookmarks: data.vault.bookmarks,
+              isPrimary: data.vault.isPrimary,
+              lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+            };
+            saveLocalVault(updated);
+            setVault(updated);
+          }
+        })
+        .catch((e) => console.warn('Auto-sync deferred:', e));
+    }
+
     const handleVaultUpdate = (e: any) => {
       if (e.detail) {
         setVault(e.detail);
