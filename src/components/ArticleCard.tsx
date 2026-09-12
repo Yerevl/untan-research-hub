@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import { Article, Supervisor } from '@/lib/types';
 import {
-  FileText,
-  Download,
   Calendar,
   ChevronDown,
   ChevronUp,
@@ -17,9 +15,10 @@ import {
   Server,
   Layers,
 } from 'lucide-react';
+import { ArticleActionsButton } from './ArticleActionsButton';
 import { CitationButton } from './CitationButton';
-import { HoldableButton } from './HoldableButton';
 import { motion, Variants } from 'motion/react';
+import { lockTouchScrollOnPointerDown } from '@/lib/touchLock';
 
 interface ArticleCardProps {
   article: Article;
@@ -27,6 +26,8 @@ interface ArticleCardProps {
   onFilterDosen?: (dosenName: string) => void;
   onFilterKeahlian?: (keahlianName: string) => void;
   onFilterProdi?: (prodiName: string) => void;
+  isBookmarked?: boolean;
+  onToggleBookmark?: (article: Article) => void;
 }
 
 const comicCardVariants: Variants = {
@@ -49,6 +50,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   onFilterDosen,
   onFilterKeahlian,
   onFilterProdi,
+  isBookmarked = false,
+  onToggleBookmark,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -146,7 +149,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
     <motion.article
       variants={comicCardVariants}
       whileHover={{ x: -3, y: -3 }}
-      className="group bg-white dark:bg-[#1A1F29] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
+      className="group bg-white dark:bg-[#1A1F29] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-4 sm:p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
     >
       <div>
         {/* Badges Row: Issue (flat stamp), Prodi (elevated button), Keahlian (elevated button), Date (flat stamp) */}
@@ -190,12 +193,14 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               );
             })}
 
-          {/* Date Stamp: Static Metadata (Flat, No Shadow) */}
+          {/* Date Stamp */}
           {formattedDate && (
-            <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#20242C] border border-slate-300 dark:border-slate-700 ml-auto shrink-0 select-none cursor-default shadow-none rounded-sm">
-              <Calendar className="w-3 h-3 mr-1 stroke-[2] opacity-70" />
-              <span>{formattedDate}</span>
-            </span>
+            <div className="ml-auto flex items-center shrink-0">
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#20242C] border border-slate-300 dark:border-slate-700 select-none cursor-default shadow-none rounded-sm">
+                <Calendar className="w-3 h-3 mr-1 stroke-[2] opacity-70" />
+                <span>{formattedDate}</span>
+              </span>
+            </div>
           )}
         </div>
 
@@ -281,57 +286,33 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
       </div>
 
       {/* Card Footer Actions */}
-      <div className="pt-3.5 sm:pt-4 border-t-2 border-black dark:border-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 mt-auto">
-        <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-2">
-          {pdfUrl ? (
-            <>
-              <HoldableButton
-                onTrigger={() => onReadPdf(article)}
-                icon={<FileText className="w-3.5 h-3.5 stroke-[2.5]" />}
-                label="BACA PDF"
-                title={`Baca PDF: ${article.title}`}
-                className="justify-center"
-              />
+      <div className="pt-3.5 sm:pt-4 border-t-2 border-black dark:border-white flex items-center gap-2 mt-auto">
+        <ArticleActionsButton
+          article={article}
+          isBookmarked={isBookmarked}
+          onReadPdf={onReadPdf}
+          onToggleBookmark={onToggleBookmark}
+          className="flex-1 min-w-0"
+        />
 
-              <HoldableButton
-                onTrigger={() => {
-                  const downloadUrl = `/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`;
-                  const a = document.createElement('a');
-                  a.href = downloadUrl;
-                  a.download = `${article.title}.pdf`;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                }}
-                icon={<Download className="w-3.5 h-3.5 stroke-[2.5]" />}
-                label="UNDUH"
-                title={`Unduh: ${article.title}`}
-                className="justify-center"
-              />
+        <CitationButton
+          article={article}
+          className="flex-1 min-w-0"
+        />
 
-              <CitationButton article={article} className="w-full flex" />
-            </>
-          ) : (
-            <>
-              <span className="text-xs text-slate-500 font-mono italic col-span-2 sm:col-span-1">PDF belum tersedia</span>
-              <CitationButton article={article} className="w-full flex" />
-            </>
-          )}
-        </div>
-
-        <div className="flex items-center justify-end gap-2">
-          {article.doi && (
-            <a
-              href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] px-2.5 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center"
-              title={`DOI: ${article.doi}`}
-            >
-              DOI
-            </a>
-          )}
-        </div>
+        {article.doi && (
+          <a
+            href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onPointerDown={lockTouchScrollOnPointerDown}
+            className="shrink-0 h-[36px] px-2.5 sm:px-3 text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center justify-center uppercase touch-none select-none"
+            style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
+            title={`DOI: ${article.doi}`}
+          >
+            DOI
+          </a>
+        )}
       </div>
     </motion.article>
   );

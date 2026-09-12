@@ -73,6 +73,16 @@ body {
   transform: scale(0.98) !important;
   transition: filter 0.15s ease, opacity 0.15s ease, transform 0.15s ease !important;
 }
+
+/* Universal touch action & callout prevention on interactive buttons & touch-none elements */
+button,
+[role="button"],
+.touch-none {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 /* Aurora Glow Mesh Animations */
 @keyframes auroraMorph1 {
   0%, 100% {
