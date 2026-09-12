@@ -23,6 +23,7 @@ import { motion } from 'motion/react';
 
 interface ArticleCardProps {
   article: Article;
+  index?: number;
   onReadPdf: (article: Article) => void;
   onFilterDosen?: (dosenName: string) => void;
   onFilterKeahlian?: (keahlianName: string) => void;
@@ -31,6 +32,7 @@ interface ArticleCardProps {
 
 export const ArticleCard: React.FC<ArticleCardProps> = ({
   article,
+  index,
   onReadPdf,
   onFilterDosen,
   onFilterKeahlian,
@@ -130,16 +132,18 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
   return (
     <motion.article
-      layout="position"
-      initial={{ opacity: 0, y: 12, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.85 }}
+      whileHover={{ x: -3, y: -3 }}
       transition={{
-        layout: { type: 'spring', stiffness: 450, damping: 35 },
-        opacity: { duration: 0.15 },
-        scale: { duration: 0.15 },
+        type: 'spring',
+        stiffness: 600,
+        damping: 22,
+        mass: 0.7,
+        delay: index !== undefined ? Math.min(index * 0.035, 0.28) : 0,
       }}
-      className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
+      className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
     >
       <div>
         {/* Badges Row: Issue (flat stamp), Prodi (elevated button), Keahlian (elevated button), Date (flat stamp) */}

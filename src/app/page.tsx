@@ -746,12 +746,13 @@ export default function HomePage() {
         ) : (
           <>
             {/* Articles Grid */}
-            <motion.div layout className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AnimatePresence mode="popLayout">
-                {articles.map((article) => (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AnimatePresence>
+                {articles.map((article, index) => (
                   <ArticleCard
                     key={article.ojs_id}
                     article={article}
+                    index={index}
                     onReadPdf={(art) => setActivePdfArticle(art)}
                     onFilterDosen={(dosenName) => {
                       handleDosenChange(dosenName);
@@ -768,7 +769,7 @@ export default function HomePage() {
                   />
                 ))}
               </AnimatePresence>
-            </motion.div>
+            </div>
 
             {/* Neo-Brutalist Pagination & View Bar */}
             <div className="mt-10 p-4 sm:p-5 bg-white dark:bg-[#181B20] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] flex flex-col md:flex-row items-center justify-between gap-4">
