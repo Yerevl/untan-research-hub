@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #FAF8F3;
+  --background: #FAF8F4;
   --foreground: #16181D;
+}
+
+.dark {
+  --background: #111317;
+  --foreground: #EDEDED;
 }
 
 @theme inline {
@@ -14,25 +21,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #101216;
-    --foreground: #EDEDED;
-  }
-}
-
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-image: radial-gradient(rgba(22, 24, 29, 0.06) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background-image: radial-gradient(rgba(237, 237, 237, 0.07) 1px, transparent 1px);
-  }
 }
 
 /* Neo-brutalist solid shadow utility helpers (Softened tones) */
@@ -48,16 +40,14 @@ body {
   box-shadow: 2.5px 2.5px 0px 0px #16181D;
 }
 
-@media (prefers-color-scheme: dark) {
-  .brutal-shadow {
-    box-shadow: 4px 4px 0px 0px #D4D4D8;
-  }
-  .brutal-shadow-lg {
-    box-shadow: 6px 6px 0px 0px #D4D4D8;
-  }
-  .brutal-shadow-sm {
-    box-shadow: 2.5px 2.5px 0px 0px #D4D4D8;
-  }
+.dark .brutal-shadow {
+  box-shadow: 4px 4px 0px 0px #D4D4D8;
+}
+.dark .brutal-shadow-lg {
+  box-shadow: 6px 6px 0px 0px #D4D4D8;
+}
+.dark .brutal-shadow-sm {
+  box-shadow: 2.5px 2.5px 0px 0px #D4D4D8;
 }
 
 /* Flyout Slide-Left & Overlap Animation */
@@ -83,5 +73,71 @@ body {
   transform: scale(0.98) !important;
   transition: filter 0.15s ease, opacity 0.15s ease, transform 0.15s ease !important;
 }
+/* Aurora Glow Mesh Animations */
+@keyframes auroraMorph1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(50px, -40px) scale(1.12);
+  }
+  66% {
+    transform: translate(-40px, 45px) scale(0.92);
+  }
+}
+
+@keyframes auroraMorph2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-45px, 50px) scale(1.14);
+  }
+  66% {
+    transform: translate(40px, -35px) scale(0.94);
+  }
+}
+
+@keyframes auroraMorph3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  40% {
+    transform: translate(35px, 40px) scale(0.95);
+  }
+  80% {
+    transform: translate(-30px, -25px) scale(1.08);
+  }
+}
+
+@keyframes auroraMorph4 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+}
+
+.animate-aurora-1 {
+  animation: auroraMorph1 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-aurora-2 {
+  animation: auroraMorph2 22s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-aurora-3 {
+  animation: auroraMorph3 26s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-aurora-4 {
+  animation: auroraMorph4 20s ease-in-out infinite;
+  will-change: transform;
+}
+
 
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { BookOpen, Database } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 interface NavbarProps {
   onOpenSync?: () => void;
@@ -13,7 +14,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   totalArticles,
 }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b-[3px] border-black dark:border-white bg-[#FAF8F3] dark:bg-[#101216] transition-colors">
+    <header className="sticky top-0 z-40 w-full border-b-[3.5px] border-black dark:border-white bg-[#E5DFD3] dark:bg-[#1A1F29] transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         {/* Brand & Logo */}
         <div className="flex items-center space-x-3.5">
@@ -44,6 +45,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Database className="w-3.5 h-3.5 stroke-[2.5]" />
             <span className="hidden sm:inline">{supabaseConnected ? 'SUPABASE CLOUD' : 'LOCAL STORAGE'}</span>
           </div>
+
+          {/* Tactile Theme Toggle Switch */}
+          <ThemeToggle />
         </div>
       </div>
     </header>
