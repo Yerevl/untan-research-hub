@@ -131,9 +131,15 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
         .eq('secret_key', record.secret_key)
         .maybeSingle();
 
-      // If relation does not exist, try next candidate table name
-      if (checkErr && (checkErr.code === '42P01' || checkErr.message?.includes('does not exist'))) {
-        result.supabaseError = `Table "${tableName}" does not exist in Supabase.`;
+      // If relation does not exist or route invalid (PGRST106), try next candidate table name
+      if (
+        checkErr &&
+        (checkErr.code === '42P01' ||
+          checkErr.code === 'PGRST106' ||
+          checkErr.message?.includes('does not exist') ||
+          checkErr.message?.includes('Invalid path'))
+      ) {
+        result.supabaseError = `Tabel "${tableName}" belum dibuat di Supabase (PGRST106). Jalankan query SQL pembuatan tabel di Supabase SQL Editor.`;
         continue;
       }
 
@@ -294,9 +300,9 @@ export async function GET(request: NextRequest) {
               readable: false,
               writable: false,
               errorCode: selectErr.code,
-              errorMessage: selectErr.message,
+              errorMessage: selectErr.code === 'PGRST106' ? `Tabel "${table}" belum dibuat di Supabase (Error PGRST106)` : selectErr.message,
               details: selectErr.details,
-              hint: selectErr.hint,
+              hint: selectErr.code === 'PGRST106' ? 'Tabel belum ada di database. Jalankan query SQL di bawah pada Supabase SQL Editor.' : selectErr.hint,
             };
             continue;
           }
