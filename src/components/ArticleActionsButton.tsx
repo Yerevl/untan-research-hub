@@ -32,6 +32,7 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
+  const hasDraggedRef = useRef(false);
   const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
@@ -112,10 +113,12 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
 
     startPosRef.current = { x: e.clientX, y: e.clientY };
     isDraggingRef.current = false;
+    hasDraggedRef.current = false;
 
     // Start hold detection timer (150ms)
     pressTimerRef.current = setTimeout(() => {
       isDraggingRef.current = true;
+      hasDraggedRef.current = true;
       setIsHolding(true);
       setIsOpen(true);
       if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
@@ -131,6 +134,7 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
         if (dist > 7 && pressTimerRef.current) {
           clearTimeout(pressTimerRef.current);
           isDraggingRef.current = true;
+          hasDraggedRef.current = true;
           setIsHolding(true);
           setIsOpen(true);
         }
@@ -156,41 +160,53 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
       }
       setIsHolding(false);
 
-      if (isDraggingRef.current) {
+      if (hasDraggedRef.current || isDraggingRef.current) {
         const selected = checkHoveredOption(e.clientX, e.clientY);
         if (selected) {
           triggerAction(selected);
         } else {
-          // If released over trigger button, keep open for tap
-          const containerRect = containerRef.current?.getBoundingClientRect();
-          const inContainer =
-            containerRect &&
-            e.clientX >= containerRect.left &&
-            e.clientX <= containerRect.right &&
-            e.clientY >= containerRect.top &&
-            e.clientY <= containerRect.bottom;
-
-          if (!inContainer) {
-            setIsOpen(false);
-          }
+          // Releasing outside or sliding back to trigger button cancels the hold action and removes appearing options
+          setIsOpen(false);
         }
         isDraggingRef.current = false;
         setActiveOption(null);
+
+        // Suppress any synthetic click event firing immediately after pointerup
+        setTimeout(() => {
+          hasDraggedRef.current = false;
+        }, 80);
       }
+    };
+
+    const handleGlobalPointerCancel = () => {
+      if (pressTimerRef.current) {
+        clearTimeout(pressTimerRef.current);
+        pressTimerRef.current = null;
+      }
+      isDraggingRef.current = false;
+      hasDraggedRef.current = false;
+      setIsHolding(false);
+      setActiveOption(null);
+      setIsOpen(false);
     };
 
     window.addEventListener('pointermove', handleGlobalPointerMove);
     window.addEventListener('pointerup', handleGlobalPointerUp);
+    window.addEventListener('pointercancel', handleGlobalPointerCancel);
     return () => {
       window.removeEventListener('pointermove', handleGlobalPointerMove);
       window.removeEventListener('pointerup', handleGlobalPointerUp);
+      window.removeEventListener('pointercancel', handleGlobalPointerCancel);
     };
   }, [checkHoveredOption, triggerAction]);
 
-  const handleClick = () => {
-    if (!isDraggingRef.current) {
-      setIsOpen((prev) => !prev);
+  const handleClick = (e: React.MouseEvent) => {
+    if (hasDraggedRef.current || isDraggingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
     }
+    setIsOpen((prev) => !prev);
   };
 
   useEffect(() => {
@@ -314,7 +330,7 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
         title="Klik atau Tahan & Geser (Hold & Drag) untuk BACA, UNDUH, atau SIMPAN"
       >
         <FileText className="w-3.5 h-3.5 stroke-[2.5]" />
-        <span>BACA PDF</span>
+        <span>AKSI</span>
         {isBookmarked && <span className="font-bold text-amber-600">★</span>}
       </button>
     </div>

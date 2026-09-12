@@ -29,6 +29,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
   const ieeeBtnRef = useRef<HTMLButtonElement>(null);
 
   const isDraggingRef = useRef(false);
+  const hasDraggedRef = useRef(false);
   const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
@@ -95,10 +96,12 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
 
     startPosRef.current = { x: e.clientX, y: e.clientY };
     isDraggingRef.current = false;
+    hasDraggedRef.current = false;
 
     // Start hold detection timer (150ms)
     pressTimerRef.current = setTimeout(() => {
       isDraggingRef.current = true;
+      hasDraggedRef.current = true;
       setIsHolding(true);
       setIsOpen(true);
       if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
@@ -114,6 +117,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
         if (dist > 7 && pressTimerRef.current) {
           clearTimeout(pressTimerRef.current);
           isDraggingRef.current = true;
+          hasDraggedRef.current = true;
           setIsHolding(true);
           setIsOpen(true);
         }
@@ -139,26 +143,21 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
       }
       setIsHolding(false);
 
-      if (isDraggingRef.current) {
+      if (hasDraggedRef.current || isDraggingRef.current) {
         const selected = checkHoveredOption(e.clientX, e.clientY);
         if (selected) {
           copyCitation(selected);
         } else {
-          // If released over the main container button, keep it open for normal click
-          const containerRect = containerRef.current?.getBoundingClientRect();
-          const inContainer =
-            containerRect &&
-            e.clientX >= containerRect.left &&
-            e.clientX <= containerRect.right &&
-            e.clientY >= containerRect.top &&
-            e.clientY <= containerRect.bottom;
-
-          if (!inContainer) {
-            setIsOpen(false);
-            setActiveFormat(null);
-          }
+          // Releasing outside or sliding back to trigger button cancels the hold action and closes the flyout
+          setIsOpen(false);
+          setActiveFormat(null);
         }
         isDraggingRef.current = false;
+
+        // Suppress any synthetic click event firing immediately after pointerup
+        setTimeout(() => {
+          hasDraggedRef.current = false;
+        }, 80);
       }
     };
 
@@ -168,8 +167,10 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
         pressTimerRef.current = null;
       }
       isDraggingRef.current = false;
+      hasDraggedRef.current = false;
       setIsHolding(false);
       setActiveFormat(null);
+      setIsOpen(false);
     };
 
     window.addEventListener('pointermove', handleGlobalPointerMove);
@@ -183,10 +184,13 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
     };
   }, [checkHoveredOption, copyCitation]);
 
-  const handleClick = () => {
-    if (!isDraggingRef.current) {
-      setIsOpen((prev) => !prev);
+  const handleClick = (e: React.MouseEvent) => {
+    if (hasDraggedRef.current || isDraggingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
     }
+    setIsOpen((prev) => !prev);
   };
 
   useEffect(() => {
