@@ -84,4 +84,49 @@ body {
   transition: filter 0.15s ease, opacity 0.15s ease, transform 0.15s ease !important;
 }
 
+/* Idle Ambient Background Animation */
+@keyframes ambientDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-18px, -22px, 0);
+  }
+  100% {
+    transform: translate3d(14px, -36px, 0);
+  }
+}
+
+@keyframes gentleFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(3deg);
+  }
+}
+
+.animate-ambient-drift {
+  animation: ambientDrift 30s ease-in-out infinite alternate;
+}
+
+.animate-gentle-float {
+  animation: gentleFloat 16s ease-in-out infinite alternate;
+}
+
+.bg-academic-grid {
+  background-image: 
+    linear-gradient(to right, rgba(22, 24, 29, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(22, 24, 29, 0.045) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.dark .bg-academic-grid {
+  background-image: 
+    linear-gradient(to right, rgba(212, 212, 216, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212, 212, 216, 0.04) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+
 
