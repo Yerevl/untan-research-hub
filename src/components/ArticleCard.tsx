@@ -148,7 +148,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
     <motion.article
       variants={comicCardVariants}
       whileHover={{ x: -3, y: -3 }}
-      className="group bg-white dark:bg-[#1A1F29] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
+      className="group bg-white dark:bg-[#1A1F29] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-4 sm:p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
     >
       <div>
         {/* Badges Row: Issue (flat stamp), Prodi (elevated button), Keahlian (elevated button), Date (flat stamp) */}
@@ -285,31 +285,32 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
       </div>
 
       {/* Card Footer Actions */}
-      <div className="pt-3.5 sm:pt-4 border-t-2 border-black dark:border-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 mt-auto">
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
-          <ArticleActionsButton
-            article={article}
-            isBookmarked={isBookmarked}
-            onReadPdf={onReadPdf}
-            onToggleBookmark={onToggleBookmark}
-            className="w-full sm:w-auto"
-          />
-          <CitationButton article={article} className="w-full sm:w-auto" />
-        </div>
+      <div className="pt-3.5 sm:pt-4 border-t-2 border-black dark:border-white flex items-center gap-2 mt-auto">
+        <ArticleActionsButton
+          article={article}
+          isBookmarked={isBookmarked}
+          onReadPdf={onReadPdf}
+          onToggleBookmark={onToggleBookmark}
+          className="flex-1 min-w-0"
+        />
 
-        <div className="flex items-center justify-end gap-2">
-          {article.doi && (
-            <a
-              href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] px-2.5 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center"
-              title={`DOI: ${article.doi}`}
-            >
-              DOI
-            </a>
-          )}
-        </div>
+        <CitationButton
+          article={article}
+          flyoutDirection="left"
+          className="flex-1 min-w-0"
+        />
+
+        {article.doi && (
+          <a
+            href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 h-[36px] px-2.5 sm:px-3 text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center justify-center uppercase"
+            title={`DOI: ${article.doi}`}
+          >
+            DOI
+          </a>
+        )}
       </div>
     </motion.article>
   );
