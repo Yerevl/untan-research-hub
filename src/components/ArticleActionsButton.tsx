@@ -30,7 +30,7 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
   const [activeOption, setActiveOption] = useState<ActionOption | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isHolding, setIsHolding] = useState(false);
-  const [resolvedDirection, setResolvedDirection] = useState<'left' | 'right'>('right');
+  const [flyoutCoords, setFlyoutCoords] = useState<{ x: number; y: number } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
@@ -111,28 +111,65 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
     }
   }, []);
 
-  // Update flyout direction to prevent overflowing the screen edge
+  // Prevent page scroll when holding or dragging
   useEffect(() => {
-    if (flyoutDirection !== 'auto') {
-      setResolvedDirection(flyoutDirection);
-      return;
-    }
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      if (rect.right + 120 > window.innerWidth) {
-        setResolvedDirection('left');
-      } else {
-        setResolvedDirection('right');
+    if (!isHolding && !isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    const originalTouchAction = document.body.style.touchAction;
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
+    const preventTouch = (e: TouchEvent) => {
+      if (e.cancelable) {
+        e.preventDefault();
       }
-    }
-  }, [flyoutDirection, isOpen]);
+    };
+
+    window.addEventListener('touchmove', preventTouch, { passive: false });
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.touchAction = originalTouchAction;
+      window.removeEventListener('touchmove', preventTouch);
+    };
+  }, [isHolding, isOpen]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
 
+    if (e.target instanceof Element && 'setPointerCapture' in e.target) {
+      try {
+        e.target.setPointerCapture(e.pointerId);
+      } catch {}
+    }
+
     startPosRef.current = { x: e.clientX, y: e.clientY };
     isDraggingRef.current = false;
     hasDraggedRef.current = false;
+
+    // Calculate flyout position relative to where the hold started
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const flyoutWidth = 105;
+      const flyoutHeight = 105;
+
+      // Position to the right of touch point
+      const targetScreenX = e.clientX + 8;
+      // Clamp within screen bounds so it never goes off-screen
+      const clampedScreenX = Math.max(8, Math.min(targetScreenX, window.innerWidth - flyoutWidth - 8));
+      const relX = clampedScreenX - rect.left;
+
+      // Center vertically on touch point, clamped to viewport
+      const clampedScreenY = Math.max(
+        flyoutHeight / 2 + 10,
+        Math.min(e.clientY, window.innerHeight - flyoutHeight / 2 - 10)
+      );
+      const relY = clampedScreenY - rect.top;
+
+      setFlyoutCoords({ x: relX, y: relY });
+    }
 
     // Start hold detection timer (150ms)
     pressTimerRef.current = setTimeout(() => {
@@ -253,9 +290,7 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.88 }}
             transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-            className={`absolute -top-9 ${
-              resolvedDirection === 'left' ? 'right-0' : 'left-0'
-            } whitespace-nowrap z-50 px-2.5 py-1 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] text-[11px] font-black uppercase tracking-wider`}
+            className="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap z-50 px-2.5 py-1 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] text-[11px] font-black uppercase tracking-wider"
           >
             ✓ {toastMessage}
           </motion.div>
@@ -270,7 +305,7 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
             initial={{
               opacity: 0,
               scaleX: 0.4,
-              x: resolvedDirection === 'left' ? -12 : 12,
+              x: 10,
               y: '-50%',
               skewY: -6,
             }}
@@ -284,15 +319,18 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
             exit={{
               opacity: 0,
               scaleX: 0.4,
-              x: resolvedDirection === 'left' ? -10 : 10,
+              x: 8,
               y: '-50%',
               skewY: -6,
             }}
             transition={{ type: 'spring', stiffness: 500, damping: 26 }}
-            style={{ transformOrigin: resolvedDirection === 'left' ? 'right center' : 'left center' }}
-            className={`absolute ${
-              resolvedDirection === 'left' ? 'right-full -mr-2.5' : 'left-full -ml-2.5'
-            } top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8] overflow-hidden min-w-[100px]`}
+            style={{
+              position: 'absolute',
+              left: flyoutCoords ? `${flyoutCoords.x}px` : 'calc(100% - 10px)',
+              top: flyoutCoords ? `${flyoutCoords.y}px` : '50%',
+              transformOrigin: 'left center',
+            }}
+            className="z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8] overflow-hidden min-w-[100px]"
           >
             {/* 1. BACA Option (Top) */}
             <button
@@ -355,7 +393,7 @@ export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
         type="button"
         onPointerDown={handlePointerDown}
         onClick={handleClick}
-        className={`w-full inline-flex items-center justify-center space-x-1.5 border-2 border-black dark:border-white font-black text-xs uppercase tracking-wide transition-all duration-150 active:translate-x-0.5 active:translate-y-0.5 ${
+        className={`w-full inline-flex items-center justify-center space-x-1.5 touch-none select-none border-2 border-black dark:border-white font-black text-xs uppercase tracking-wide transition-all duration-150 active:translate-x-0.5 active:translate-y-0.5 ${
           size === 'sm' ? 'h-8 px-2.5 py-0' : 'px-3 py-2'
         } ${
           isHolding ? 'blur-[1.5px] opacity-70 scale-[0.98]' : 'blur-none opacity-100'

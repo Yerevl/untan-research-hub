@@ -296,7 +296,6 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
         <CitationButton
           article={article}
-          flyoutDirection="left"
           className="flex-1 min-w-0"
         />
 
