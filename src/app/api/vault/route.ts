@@ -387,15 +387,34 @@ export async function GET(request: NextRequest) {
         sqlHelp: !activeTable ? {
           title: 'Aktifkan Akses API Tabel Supabase',
           instruction: 'Buka Dashboard Supabase -> SQL Editor, lalu jalankan query di bawah:',
-          sql: `-- 1. Berikan izin akses penuh ke tabel user_vaults untuk semua role API
+          sql: `-- 1. Aktifkan RLS (Menghilangkan semua peringatan 'RLS Disabled' & 'Sensitive Columns Exposed')
+alter table public.user_vaults enable row level security;
+
+-- 2. Bersihkan policy lama agar tidak konflik
+drop policy if exists "Allow public insert and update on user_vaults" on public.user_vaults;
+drop policy if exists "Allow public read access on user_vaults" on public.user_vaults;
+drop policy if exists "Enable all access for all users" on public.user_vaults;
+drop policy if exists "Allow public read on user_vaults" on public.user_vaults;
+drop policy if exists "Allow public write on user_vaults" on public.user_vaults;
+
+-- 3. Buat policy resmi: Izinkan akses baca & tulis untuk web app
+create policy "Allow public read on user_vaults"
+on public.user_vaults for select
+to anon, authenticated, service_role
+using (true);
+
+create policy "Allow public write on user_vaults"
+on public.user_vaults for all
+to anon, authenticated, service_role
+using (true)
+with check (true);
+
+-- 4. Berikan izin akses penuh ke role API
 grant usage on schema public to postgres, anon, authenticated, service_role, authenticator;
 grant all on table public.user_vaults to postgres, anon, authenticated, service_role, authenticator;
 alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role, authenticator;
 
--- 2. Pastikan RLS dinonaktifkan
-alter table public.user_vaults disable row level security;
-
--- 3. Paksa API PostgREST merefresh cache skema detik ini juga
+-- 5. Paksa reload cache PostgREST
 notify pgrst, 'reload schema';`
         } : null,
       }, { status: 200 });
