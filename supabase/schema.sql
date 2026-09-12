@@ -82,20 +82,14 @@ create table if not exists public.user_vaults (
 -- Index untuk pencarian instan berdasarkan secret_key
 create index if not exists idx_user_vaults_secret_key on public.user_vaults (secret_key);
 
--- Row Level Security (RLS)
-alter table public.user_vaults enable row level security;
+-- Row Level Security (RLS) - Jika Anda ingin menonaktifkan RLS sepenuhnya (Paling Mudah):
+alter table public.user_vaults disable row level security;
 
--- Kebijakan RLS: Akses publik membaca vault berdasarkan secret key
-create policy "Allow public read access on user_vaults"
-  on public.user_vaults
-  for select
-  using (true);
-
--- Kebijakan RLS: Akses publik insert dan update bookmark
-create policy "Allow public insert and update on user_vaults"
-  on public.user_vaults
-  for all
-  using (true)
-  with check (true);
+-- Atau jika ingin tetap mengaktifkan RLS dengan kebijakan publik:
+-- alter table public.user_vaults enable row level security;
+-- drop policy if exists "Allow public read access on user_vaults" on public.user_vaults;
+-- create policy "Allow public read access on user_vaults" on public.user_vaults for select using (true);
+-- drop policy if exists "Allow public insert and update on user_vaults" on public.user_vaults;
+-- create policy "Allow public insert and update on user_vaults" on public.user_vaults for all using (true) with check (true);
 
 

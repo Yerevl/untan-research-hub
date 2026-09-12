@@ -187,6 +187,12 @@ export default function HomePage() {
           };
           saveLocalVault(updated);
           setVault(updated);
+
+          if (syncData.supabaseStatus?.saved) {
+            console.log(`[Vault] Synced to Supabase table: ${syncData.supabaseStatus.table}`);
+          } else if (syncData.supabaseStatus?.error) {
+            console.warn(`[Vault] Supabase sync status: ${syncData.supabaseStatus.error}`);
+          }
         }
       } catch (err) {
         console.warn('Background sync deferred:', err);
@@ -1146,6 +1152,7 @@ export default function HomePage() {
         onReadPdf={(art) => setActivePdfArticle(art)}
         onFilterBookmarksOnly={() => setIsBookmarkFilterActive(!isBookmarkFilterActive)}
         isFilterActive={isBookmarkFilterActive}
+        onShowKeyAnnouncement={(key) => setNewSecretKeyAnnounce(key)}
       />
 
       {/* First-Time Secret Key Celebration Modal */}

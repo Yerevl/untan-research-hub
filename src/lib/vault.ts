@@ -216,3 +216,29 @@ export function clearLocalVault(): void {
   window.dispatchEvent(new CustomEvent('untan_vault_updated', { detail: empty }));
 }
 
+/**
+ * Reset vault and generate a brand new 4-word secret key for fresh testing
+ */
+export function resetAndGenerateNewVault(): LocalVault {
+  if (typeof window === 'undefined') {
+    return {
+      secretKey: null,
+      isPrimary: false,
+      deviceId: 'server_side',
+      bookmarks: [],
+      hasSeenWelcome: false,
+    };
+  }
+  const deviceId = getOrCreateDeviceId();
+  const newKey = generateSecretKey();
+  const fresh: LocalVault = {
+    secretKey: newKey,
+    isPrimary: true,
+    deviceId,
+    bookmarks: [],
+    hasSeenWelcome: false,
+  };
+  saveLocalVault(fresh);
+  return fresh;
+}
+

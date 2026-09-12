@@ -114,116 +114,128 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
     console.warn('[Vault] Local JSON fallback deferred (read-only environment):', e?.message);
   }
 
-  // If Supabase is active, upsert
+  // If Supabase is active, persist to database
   const client = getSupabaseClient();
   if (!client) {
-    result.supabaseError = 'Supabase client is not configured (missing URL or API keys)';
+    result.supabaseError = 'Supabase client is not configured (missing URL or API keys in environment variables)';
     return result;
   }
 
   const tableCandidates = ['user_vaults', 'user_vault'];
   for (const tableName of tableCandidates) {
     try {
-      const payload: Record<string, any> = {
-        secret_key: record.secret_key,
-        primary_device_id: record.primary_device_id,
-        secondary_device_ids: record.secondary_device_ids,
-        bookmarks: record.bookmarks,
-        updated_at: record.updated_at,
-        created_at: record.created_at,
-      };
-
-      // 1. Try standard upsert
-      const { error: upsertErr } = await client
-        .from(tableName)
-        .upsert(payload, { onConflict: 'secret_key' });
-
-      if (!upsertErr) {
-        result.savedToSupabase = true;
-        result.tableUsed = tableName;
-        result.supabaseError = null;
-        console.log(`[Vault] Successfully synced to Supabase table "${tableName}"`);
-        return result;
-      }
-
-      console.warn(`[Vault] Upsert to "${tableName}" returned code ${upsertErr.code}: ${upsertErr.message}`);
-
-      // If relation does not exist, try next candidate table name
-      if (upsertErr.code === '42P01' || upsertErr.message?.includes('does not exist')) {
-        result.supabaseError = `Table "${tableName}" does not exist in Supabase.`;
-        continue;
-      }
-
-      // 2. If upsert failed due to missing UNIQUE constraint on secret_key (code 42P10) or other constraints,
-      // try explicit check: select then update or insert
+      // 1. Check if record already exists to avoid ON CONFLICT constraint requirements
       const { data: existingRow, error: checkErr } = await client
         .from(tableName)
         .select('secret_key')
         .eq('secret_key', record.secret_key)
         .maybeSingle();
 
-      if (!checkErr) {
-        let opErr: any = null;
-        if (existingRow) {
-          const { error } = await client
-            .from(tableName)
-            .update({
-              primary_device_id: record.primary_device_id,
-              secondary_device_ids: record.secondary_device_ids,
-              bookmarks: record.bookmarks,
-              updated_at: record.updated_at,
-            })
-            .eq('secret_key', record.secret_key);
-          opErr = error;
-        } else {
-          const { error } = await client
-            .from(tableName)
-            .insert({
-              secret_key: record.secret_key,
-              primary_device_id: record.primary_device_id,
-              secondary_device_ids: record.secondary_device_ids,
-              bookmarks: record.bookmarks,
-              created_at: record.created_at,
-              updated_at: record.updated_at,
-            });
-          opErr = error;
-        }
+      // If relation does not exist, try next candidate table name
+      if (checkErr && (checkErr.code === '42P01' || checkErr.message?.includes('does not exist'))) {
+        result.supabaseError = `Table "${tableName}" does not exist in Supabase.`;
+        continue;
+      }
 
-        if (!opErr) {
-          result.savedToSupabase = true;
-          result.tableUsed = tableName;
-          result.supabaseError = null;
-          console.log(`[Vault] Successfully updated/inserted into Supabase table "${tableName}"`);
-          return result;
-        }
+      // If RLS blocked reading, report it
+      if (checkErr && (checkErr.code === '42501' || checkErr.message?.includes('row-level security') || checkErr.message?.includes('policy'))) {
+        result.supabaseError = `Supabase RLS memblokir read/write di tabel "${tableName}". Jalankan di SQL Editor: alter table public.${tableName} disable row level security;`;
+        continue;
+      }
 
-        // Check if RLS is blocking
-        if (opErr.code === '42501' || opErr.message?.includes('row-level security') || opErr.message?.includes('policy')) {
-          result.supabaseError = `Supabase RLS is blocking writes on "${tableName}". Run in SQL Editor: alter table public.${tableName} disable row level security;`;
-          return result;
-        }
+      // Base payload
+      const basePayload: Record<string, any> = {
+        secret_key: record.secret_key,
+        primary_device_id: record.primary_device_id,
+        secondary_device_ids: record.secondary_device_ids,
+        bookmarks: record.bookmarks,
+        updated_at: record.updated_at,
+      };
 
-        // Try stringified JSON payload fallback
-        try {
+      if (existingRow) {
+        // UPDATE existing row
+        let { error: updateErr } = await client
+          .from(tableName)
+          .update(basePayload)
+          .eq('secret_key', record.secret_key);
+
+        // Fallback: If column types expect text instead of jsonb/array
+        if (updateErr && (updateErr.message?.includes('json') || updateErr.message?.includes('array') || updateErr.code === '42804')) {
           const stringPayload = {
-            ...payload,
+            ...basePayload,
             bookmarks: JSON.stringify(record.bookmarks),
             secondary_device_ids: JSON.stringify(record.secondary_device_ids),
           };
-          const { error: stringErr } = existingRow
-            ? await client.from(tableName).update(stringPayload).eq('secret_key', record.secret_key)
-            : await client.from(tableName).insert(stringPayload);
-          if (!stringErr) {
-            result.savedToSupabase = true;
-            result.tableUsed = tableName;
-            result.supabaseError = null;
-            return result;
-          }
-        } catch {}
+          const { error: stringErr } = await client
+            .from(tableName)
+            .update(stringPayload)
+            .eq('secret_key', record.secret_key);
+          updateErr = stringErr;
+        }
 
-        result.supabaseError = `[${tableName}] ${opErr.message} (code: ${opErr.code})`;
+        if (!updateErr) {
+          result.savedToSupabase = true;
+          result.tableUsed = tableName;
+          result.supabaseError = null;
+          console.log(`[Vault] Successfully updated Supabase table "${tableName}"`);
+          return result;
+        }
+
+        result.supabaseError = `[${tableName} UPDATE] ${updateErr.message} (code: ${updateErr.code})`;
       } else {
-        result.supabaseError = `[${tableName}] ${checkErr.message}`;
+        // INSERT new row
+        let insertPayload: Record<string, any> = {
+          ...basePayload,
+          created_at: record.created_at,
+        };
+
+        let { error: insertErr } = await client
+          .from(tableName)
+          .insert(insertPayload);
+
+        // Retry 1: If table requires an 'id' column without a default UUID generator
+        if (insertErr && (insertErr.code === '23502' || insertErr.message?.includes('column "id"'))) {
+          try {
+            insertPayload = {
+              ...insertPayload,
+              id: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `vault_${Date.now()}`,
+            };
+            const { error: idRetryErr } = await client.from(tableName).insert(insertPayload);
+            insertErr = idRetryErr;
+          } catch {}
+        }
+
+        // Retry 2: If table has 'device_id' column instead of 'primary_device_id'
+        if (insertErr && insertErr.message?.includes('primary_device_id')) {
+          delete insertPayload.primary_device_id;
+          insertPayload.device_id = record.primary_device_id;
+          const { error: devRetryErr } = await client.from(tableName).insert(insertPayload);
+          insertErr = devRetryErr;
+        }
+
+        // Retry 3: Stringified JSON fallback for text columns
+        if (insertErr && (insertErr.message?.includes('json') || insertErr.message?.includes('array') || insertErr.code === '42804')) {
+          insertPayload.bookmarks = JSON.stringify(record.bookmarks);
+          insertPayload.secondary_device_ids = JSON.stringify(record.secondary_device_ids);
+          const { error: strRetryErr } = await client.from(tableName).insert(insertPayload);
+          insertErr = strRetryErr;
+        }
+
+        if (!insertErr) {
+          result.savedToSupabase = true;
+          result.tableUsed = tableName;
+          result.supabaseError = null;
+          console.log(`[Vault] Successfully inserted into Supabase table "${tableName}"`);
+          return result;
+        }
+
+        // Check if RLS is blocking insert
+        if (insertErr.code === '42501' || insertErr.message?.includes('row-level security') || insertErr.message?.includes('policy')) {
+          result.supabaseError = `Supabase RLS memblokir insert di tabel "${tableName}". Jalankan di SQL Editor: alter table public.${tableName} disable row level security;`;
+          return result;
+        }
+
+        result.supabaseError = `[${tableName} INSERT] ${insertErr.message} (code: ${insertErr.code})`;
       }
     } catch (e: any) {
       console.error(`[Vault] Exception during save to "${tableName}":`, e);
@@ -234,15 +246,152 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
   return result;
 }
 
-// GET: Retrieve vault info
+// GET: Retrieve vault info or run live diagnostic
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
     const deviceId = searchParams.get('deviceId');
 
+    // LIVE DIAGNOSTIC MODE (?diag=true)
+    if (searchParams.get('diag') === 'true' || searchParams.has('diag')) {
+      const client = getSupabaseClient();
+      const urlRaw = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
+      const hasUrl = Boolean(urlRaw && urlRaw.startsWith('https://'));
+      const maskedUrl = hasUrl ? urlRaw.replace(/(https:\/\/[^.]+)\..*/, '$1.supabase.co') : null;
+      const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+      const hasAnonKey = Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY);
+
+      if (!client) {
+        return NextResponse.json({
+          status: 'UNCONFIGURED',
+          message: 'Supabase credentials missing or invalid on server environment.',
+          env: {
+            hasUrl,
+            maskedUrl,
+            hasServiceKey,
+            hasAnonKey,
+          },
+          help: 'Tambahkan NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY (atau SUPABASE_SERVICE_ROLE_KEY) di Vercel Settings -> Environment Variables.',
+        }, { status: 200 });
+      }
+
+      // Probe tables
+      const tableReport: Record<string, any> = {};
+      const candidates = ['user_vaults', 'user_vault'];
+
+      for (const table of candidates) {
+        try {
+          // 1. SELECT test
+          const { data: selectData, error: selectErr } = await client
+            .from(table)
+            .select('*')
+            .limit(1);
+
+          if (selectErr) {
+            tableReport[table] = {
+              exists: false,
+              readable: false,
+              writable: false,
+              errorCode: selectErr.code,
+              errorMessage: selectErr.message,
+              details: selectErr.details,
+              hint: selectErr.hint,
+            };
+            continue;
+          }
+
+          // 2. INSERT probe test
+          const probeKey = `diag-probe-${Date.now()}`;
+          const { error: insertErr } = await client
+            .from(table)
+            .insert({
+              secret_key: probeKey,
+              primary_device_id: 'probe-diag-device',
+              secondary_device_ids: [],
+              bookmarks: ['probe_test_art'],
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+
+          if (insertErr) {
+            tableReport[table] = {
+              exists: true,
+              readable: true,
+              writable: false,
+              sampleRowsCount: selectData?.length || 0,
+              writeError: {
+                code: insertErr.code,
+                message: insertErr.message,
+                details: insertErr.details,
+                hint: insertErr.hint,
+              },
+            };
+          } else {
+            // Delete probe row
+            await client.from(table).delete().eq('secret_key', probeKey);
+            tableReport[table] = {
+              exists: true,
+              readable: true,
+              writable: true,
+              sampleRowsCount: selectData?.length || 0,
+              message: 'Tabel aktif dan dapat dibaca serta ditulis secara normal!',
+            };
+          }
+        } catch (err: any) {
+          tableReport[table] = {
+            error: err?.message || 'Exception during table test',
+          };
+        }
+      }
+
+      // Check articles table for general database health
+      let articlesStatus: any = null;
+      try {
+        const { count, error: artErr } = await client.from('articles').select('*', { count: 'exact', head: true });
+        articlesStatus = artErr ? { readable: false, error: artErr.message } : { readable: true, totalArticles: count };
+      } catch (e: any) {
+        articlesStatus = { error: e.message };
+      }
+
+      const activeTable = candidates.find((t) => tableReport[t]?.writable) || null;
+
+      return NextResponse.json({
+        status: activeTable ? 'OPERATIONAL' : 'ACTION_REQUIRED',
+        env: {
+          hasUrl,
+          maskedUrl,
+          hasServiceKey,
+          hasAnonKey,
+          authRole: hasServiceKey ? 'SERVICE_ROLE (RLS dibypass)' : 'ANON_KEY (Tergantung RLS)',
+        },
+        activeTable,
+        tables: tableReport,
+        articlesTable: articlesStatus,
+        sqlHelp: !activeTable ? {
+          title: 'Perbaiki Tabel Supabase',
+          instruction: 'Buka Dashboard Supabase -> SQL Editor, lalu jalankan query di bawah:',
+          sql: `create table if not exists public.user_vaults (
+  secret_key text primary key,
+  primary_device_id text not null,
+  secondary_device_ids jsonb default '[]'::jsonb,
+  bookmarks jsonb default '[]'::jsonb,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.user_vaults disable row level security;`
+        } : null,
+      }, { status: 200 });
+    }
+
+    // Default overview if no key provided
     if (!key) {
-      return NextResponse.json({ success: false, error: 'Parameter key dibutuhkan.' }, { status: 400 });
+      return NextResponse.json({
+        service: 'Untan Research Hub Vault API',
+        status: 'ready',
+        help: 'Untuk cek kesehatan database Supabase, buka: /api/vault?diag=true',
+      }, { status: 200 });
     }
 
     const vault = await getCloudVault(key);

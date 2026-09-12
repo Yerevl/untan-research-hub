@@ -14,8 +14,11 @@ import {
   Smartphone,
   Sparkles,
   ShieldCheck,
+  Database,
+  AlertCircle,
+  Terminal,
 } from 'lucide-react';
-import { LocalVault, normalizeSecretKey } from '@/lib/vault';
+import { LocalVault, normalizeSecretKey, resetAndGenerateNewVault } from '@/lib/vault';
 import { Article } from '@/lib/types';
 import { CitationButton } from './CitationButton';
 
@@ -29,6 +32,7 @@ interface VaultModalProps {
   onReadPdf: (article: Article) => void;
   onFilterBookmarksOnly?: () => void;
   isFilterActive?: boolean;
+  onShowKeyAnnouncement?: (key: string) => void;
 }
 
 export const VaultModal: React.FC<VaultModalProps> = ({
@@ -41,11 +45,19 @@ export const VaultModal: React.FC<VaultModalProps> = ({
   onReadPdf,
   onFilterBookmarksOnly,
   isFilterActive,
+  onShowKeyAnnouncement,
 }) => {
   const [activeTab, setActiveTab] = useState<'bookmarks' | 'my-key' | 'enter-key'>('bookmarks');
   const [copiedKey, setCopiedKey] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [supabaseStatus, setSupabaseStatus] = useState<{ saved?: boolean; table?: string | null; error?: string | null } | null>(null);
+
+  // Diagnostic states
+  const [isCheckingDiag, setIsCheckingDiag] = useState(false);
+  const [diagResult, setDiagResult] = useState<any>(null);
+  const [showDiagPanel, setShowDiagPanel] = useState(false);
+  const [copiedSql, setCopiedSql] = useState(false);
 
   // Form states
   const [inputKey, setInputKey] = useState('');
@@ -88,6 +100,9 @@ export const VaultModal: React.FC<VaultModalProps> = ({
               isPrimary: data.vault.isPrimary,
               lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
             });
+            if (data.supabaseStatus) {
+              setSupabaseStatus(data.supabaseStatus);
+            }
           }
         })
         .catch(() => {});
@@ -128,6 +143,9 @@ export const VaultModal: React.FC<VaultModalProps> = ({
           isPrimary: data.vault.isPrimary,
           lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
         });
+        if (data.supabaseStatus) {
+          setSupabaseStatus(data.supabaseStatus);
+        }
         if (data.supabaseStatus?.saved) {
           setFeedback({ type: 'success', text: `Tersinkronisasi ke Supabase (${data.supabaseStatus.table})!` });
         } else if (data.supabaseStatus?.error) {
@@ -142,6 +160,54 @@ export const VaultModal: React.FC<VaultModalProps> = ({
       setFeedback({ type: 'error', text: 'Gagal menghubungkan ke server.' });
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  // Live diagnostic check
+  const handleCheckDiag = async () => {
+    setIsCheckingDiag(true);
+    try {
+      const res = await fetch('/api/vault?diag=true');
+      const data = await res.json();
+      setDiagResult(data);
+      setShowDiagPanel(true);
+    } catch (err: any) {
+      setFeedback({ type: 'error', text: 'Gagal menjalankan tes diagnostik server.' });
+    } finally {
+      setIsCheckingDiag(false);
+    }
+  };
+
+  // Reset vault and generate a brand new secret key (allows re-testing celebration modal)
+  const handleResetKey = () => {
+    if (confirm('Buat 4 kata rahasia baru? Ini akan mereset brankas di perangkat ini dan menampilkan jendela kode baru.')) {
+      const fresh = resetAndGenerateNewVault();
+      onVaultSynced(fresh);
+      if (onShowKeyAnnouncement && fresh.secretKey) {
+        onShowKeyAnnouncement(fresh.secretKey);
+      }
+      setFeedback({ type: 'success', text: 'Kunci rahasia baru berhasil dibuat!' });
+
+      // Immediate background sync to Supabase
+      if (fresh.secretKey) {
+        fetch('/api/vault', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'sync',
+            secretKey: fresh.secretKey,
+            deviceId: fresh.deviceId,
+            bookmarks: fresh.bookmarks,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.supabaseStatus) {
+              setSupabaseStatus(data.supabaseStatus);
+            }
+          })
+          .catch(() => {});
+      }
     }
   };
 
@@ -482,21 +548,123 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                     </div>
                   )}
 
-                  {/* Sync status & Refresh Button */}
-                  <div className="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-black/10 dark:border-white/10">
-                    <span className="font-mono text-[11px]">
-                      {vault.lastSyncedAt ? `Sinkron terakhir: ${vault.lastSyncedAt}` : 'Tersimpan lokal'}
-                    </span>
+                  {/* Supabase Cloud Live Status & Action Buttons */}
+                  <div className="pt-2.5 space-y-2 border-t border-black/10 dark:border-white/10 text-xs">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        {supabaseStatus?.saved ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase bg-[#A3E635] text-black border border-black truncate">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                            <span>Tersimpan di Cloud ({supabaseStatus.table})</span>
+                          </span>
+                        ) : supabaseStatus?.error ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase bg-[#FECDD3] text-red-900 border border-black truncate" title={supabaseStatus.error}>
+                            <AlertCircle className="w-3 h-3 shrink-0" />
+                            <span className="truncate">Cloud: {supabaseStatus.error}</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono text-slate-500 border border-slate-300 dark:border-slate-700 truncate">
+                            <Database className="w-3 h-3 shrink-0" />
+                            <span>{vault.lastSyncedAt ? `Sinkron: ${vault.lastSyncedAt}` : 'Tersimpan lokal'}</span>
+                          </span>
+                        )}
+                      </div>
 
-                    {/* Perbarui BUTTON: ELEVATED WITH SHADOW */}
-                    <button
-                      onClick={handleManualSync}
-                      disabled={isSyncing}
-                      className="px-2.5 py-1 text-xs font-black uppercase bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5"
-                    >
-                      <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
-                      <span>{isSyncing ? 'Menyinkronkan...' : 'Perbarui'}</span>
-                    </button>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {/* Cek Diagnostik Button */}
+                        <button
+                          onClick={handleCheckDiag}
+                          disabled={isCheckingDiag}
+                          className="px-2 py-1 text-[11px] font-black uppercase bg-[#38BDF8] text-black hover:bg-[#0284C7] hover:text-white border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1"
+                          title="Cek koneksi & izin tulis tabel Supabase langsung"
+                        >
+                          <Database className={`w-3 h-3 ${isCheckingDiag ? 'animate-spin' : ''}`} />
+                          <span>{isCheckingDiag ? '...' : 'CEK SUPABASE'}</span>
+                        </button>
+
+                        {/* Perbarui Manual Button */}
+                        <button
+                          onClick={handleManualSync}
+                          disabled={isSyncing}
+                          className="px-2 py-1 text-[11px] font-black uppercase bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1"
+                          title="Sinkronkan ulang daftar tersimpan"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                          <span>{isSyncing ? '...' : 'SINKRON'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Expandable Diagnostic Panel */}
+                    {showDiagPanel && diagResult && (
+                      <div className="p-3 bg-slate-50 dark:bg-black border-2 border-black dark:border-white space-y-2 text-[11px]">
+                        <div className="flex items-center justify-between font-black uppercase">
+                          <span className="flex items-center gap-1">
+                            <Terminal className="w-3.5 h-3.5" />
+                            <span>Diagnostik Supabase Server</span>
+                          </span>
+                          <span className={`px-1.5 py-0.2 text-[10px] font-mono font-bold ${diagResult.status === 'OPERATIONAL' ? 'bg-[#A3E635] text-black' : 'bg-red-200 text-red-900'}`}>
+                            {diagResult.status}
+                          </span>
+                        </div>
+
+                        <div className="font-mono text-[10px] text-slate-600 dark:text-slate-400 space-y-0.5 bg-white dark:bg-[#111317] p-2 border border-black/20">
+                          <p>• Auth Role: <strong>{diagResult.env?.authRole || 'Unknown'}</strong></p>
+                          <p>• URL Configured: <strong>{diagResult.env?.hasUrl ? 'Ya' : 'Tidak'}</strong> ({diagResult.env?.maskedUrl || '-'})</p>
+                          <p>• Tabel user_vaults: <strong>{diagResult.tables?.user_vaults?.writable ? 'BISA TULIS & BACA ✓' : diagResult.tables?.user_vaults?.exists ? 'Bisa baca, Gagal tulis' : 'Tidak Ditemukan (42P01)'}</strong></p>
+                          {diagResult.tables?.user_vaults?.writeError && (
+                            <p className="text-red-600 dark:text-red-400 font-bold mt-1">
+                              ✕ Error Supabase: [{diagResult.tables.user_vaults.writeError.code}] {diagResult.tables.user_vaults.writeError.message}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* SQL Help Box if not operational */}
+                        {diagResult.sqlHelp && (
+                          <div className="space-y-1.5 pt-1">
+                            <p className="font-bold text-amber-700 dark:text-yellow-400">
+                              💡 Solusi: Jalankan SQL ini di Dashboard Supabase → SQL Editor:
+                            </p>
+                            <pre className="p-2 text-[9.5px] font-mono bg-black text-emerald-400 border border-black overflow-x-auto select-all max-h-24">
+                              {diagResult.sqlHelp.sql}
+                            </pre>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(diagResult.sqlHelp.sql);
+                                setCopiedSql(true);
+                                setTimeout(() => setCopiedSql(false), 2000);
+                              }}
+                              className="px-2 py-1 text-[10px] font-black uppercase bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
+                            >
+                              {copiedSql ? '✓ SQL BERHASIL DISALIN' : 'SALIN QUERY SQL'}
+                            </button>
+                          </div>
+                        )}
+
+                        <div className="text-right pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setShowDiagPanel(false)}
+                            className="text-[10px] font-bold text-slate-500 hover:text-black dark:hover:text-white underline"
+                          >
+                            Tutup Panel Diagnostik
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reset / Regenerate Key Button */}
+                    <div className="pt-1 flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Mau reset & buat 4 kata baru?</span>
+                      <button
+                        onClick={handleResetKey}
+                        className="px-2 py-1 text-[10px] font-black uppercase bg-amber-100 hover:bg-amber-200 text-amber-900 border border-black shadow-[1.5px_1.5px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                        title="Buat 4 kata rahasia baru dan reset brankas"
+                      >
+                        BUAT KUNCI BARU
+                      </button>
+                    </div>
                   </div>
 
                   {/* Optional: Pindahkan izin jika Perangkat Utama */}
@@ -546,16 +714,25 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                   </div>
                 </>
               ) : (
-                <div className="text-center py-10 px-4">
-                  <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed mb-3">
-                    Kamu belum menyimpan artikel apa pun. Simpan minimal satu artikel untuk mendapatkan 4 kata rahasia.
+                <div className="text-center py-8 px-4 space-y-3">
+                  <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                    Kamu belum memiliki kode rahasia. Simpan minimal satu artikel atau buat kode rahasia sekarang:
                   </p>
-                  <button
-                    onClick={() => setActiveTab('bookmarks')}
-                    className="px-3.5 py-2 text-xs font-black uppercase bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all"
-                  >
-                    KEMBALI KE KOLEKSI
-                  </button>
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={handleResetKey}
+                      className="px-3.5 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5"
+                    >
+                      <Key className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>BUAT KODE RAHASIA SEKARANG</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('bookmarks')}
+                      className="px-3 py-2 text-xs font-black uppercase bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                    >
+                      KE KOLEKSI
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
