@@ -19,20 +19,32 @@ import {
 } from 'lucide-react';
 import { CitationButton } from './CitationButton';
 import { HoldableButton } from './HoldableButton';
-import { motion } from 'motion/react';
+import { motion, Variants } from 'motion/react';
 
 interface ArticleCardProps {
   article: Article;
-  index?: number;
   onReadPdf: (article: Article) => void;
   onFilterDosen?: (dosenName: string) => void;
   onFilterKeahlian?: (keahlianName: string) => void;
   onFilterProdi?: (prodiName: string) => void;
 }
 
+const comicCardVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 600,
+      damping: 22,
+      mass: 0.7,
+    },
+  },
+};
+
 export const ArticleCard: React.FC<ArticleCardProps> = ({
   article,
-  index,
   onReadPdf,
   onFilterDosen,
   onFilterKeahlian,
@@ -132,17 +144,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
   return (
     <motion.article
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.85 }}
+      variants={comicCardVariants}
       whileHover={{ x: -3, y: -3 }}
-      transition={{
-        type: 'spring',
-        stiffness: 600,
-        damping: 22,
-        mass: 0.7,
-        delay: index !== undefined ? Math.min(index * 0.035, 0.28) : 0,
-      }}
       className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
     >
       <div>
