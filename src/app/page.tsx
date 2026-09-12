@@ -6,7 +6,6 @@ import { DosenItem } from '@/lib/dosen';
 import { IdleBackground } from '@/components/IdleBackground';
 import { ArticleCard } from '@/components/ArticleCard';
 import { PdfViewerModal } from '@/components/PdfViewerModal';
-import { MobileFilterDrawer } from '@/components/MobileFilterDrawer';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
@@ -81,7 +80,6 @@ export default function HomePage() {
 
   // Modal State
   const [activePdfArticle, setActivePdfArticle] = useState<Article | null>(null);
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
 
   // In-memory page cache to retain visited pages and avoid redundant network calls
   const pageCacheRef = useRef<Map<string, CachedPageData>>(new Map());
@@ -346,86 +344,16 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Mobile Filter & Controls Row (< md) */}
-          <div className="flex md:hidden items-center justify-between gap-2 pt-2.5 border-t-2 border-dashed border-black/20 dark:border-white/20">
-            {/* Segmented Prodi Control */}
-            <div className="inline-flex border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] overflow-hidden text-xs font-black uppercase shrink-0">
-              <button
-                type="button"
-                onClick={() => handleProdiChange('all')}
-                className={`px-2.5 py-1.5 transition-all ${
-                  selectedProdi === 'all'
-                    ? 'bg-black text-white dark:bg-white dark:text-black font-black'
-                    : 'bg-white dark:bg-[#181B20] text-black dark:text-white'
-                }`}
-              >
-                Semua
-              </button>
-              <button
-                type="button"
-                onClick={() => handleProdiChange('SISKOM')}
-                className={`px-2.5 py-1.5 border-l-2 border-black dark:border-white transition-all ${
-                  selectedProdi === 'SISKOM'
-                    ? 'bg-[#38BDF8] text-black font-black'
-                    : 'bg-white dark:bg-[#181B20] text-black dark:text-white'
-                }`}
-              >
-                Siskom
-              </button>
-              <button
-                type="button"
-                onClick={() => handleProdiChange('SISFO')}
-                className={`px-2.5 py-1.5 border-l-2 border-black dark:border-white transition-all ${
-                  selectedProdi === 'SISFO'
-                    ? 'bg-[#F472B6] text-black font-black'
-                    : 'bg-white dark:bg-[#181B20] text-black dark:text-white'
-                }`}
-              >
-                Sisfo
-              </button>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              {/* Quick Reset if filters active */}
-              {hasActiveFilters && (
-                <button
-                  onClick={handleResetFilters}
-                  className="p-1.5 border-2 border-black dark:border-white bg-slate-100 dark:bg-slate-800 text-black dark:text-white text-xs font-black shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5"
-                  title="Reset Filter"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 stroke-[2.5]" />
-                </button>
-              )}
-
-              {/* Mobile Filter Drawer Trigger Button */}
-              <button
-                type="button"
-                onClick={() => setIsMobileFilterOpen(true)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 border-2 border-black dark:border-white text-xs font-black uppercase shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
-                  selectedDosen !== 'all' || selectedKeahlian !== 'all' || selectedIssue !== 'all' || selectedYear !== 'all' || sortBy !== 'newest'
-                    ? 'bg-[#FACC15] text-black font-black'
-                    : 'bg-white dark:bg-[#181B20] text-black dark:text-white font-bold'
-                }`}
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Filter</span>
-                {(selectedDosen !== 'all' || selectedKeahlian !== 'all' || selectedIssue !== 'all' || selectedYear !== 'all' || sortBy !== 'newest') && (
-                  <span className="w-2 h-2 rounded-full bg-[#EF4444] border border-black animate-pulse" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Desktop Filters & Results Controls Row (>= md) */}
-          <div className="hidden md:flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
+          {/* Filters & Results Controls Row (Directly shown on all screens) */}
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
             {/* Filter Dropdowns & Segmented Prodi Control */}
-            <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-xs font-bold">
               <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
                 <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
                 <span>Filter:</span>
               </div>
 
-              {/* Segmented Prodi Control (Replaces clumsy dropdown) */}
+              {/* Segmented Prodi Control */}
               <div className="inline-flex border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] overflow-hidden text-xs font-black uppercase">
                 <button
                   type="button"
@@ -993,29 +921,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-
-      {/* Mobile Filter Drawer (Bottom Sheet) */}
-      <MobileFilterDrawer
-        isOpen={isMobileFilterOpen}
-        onClose={() => setIsMobileFilterOpen(false)}
-        selectedDosen={selectedDosen}
-        onDosenChange={handleDosenChange}
-        displayedDosenList={displayedDosenList}
-        selectedKeahlian={selectedKeahlian}
-        onKeahlianChange={handleKeahlianChange}
-        displayedKeahlianList={displayedKeahlianList}
-        selectedIssue={selectedIssue}
-        onIssueChange={setSelectedIssue}
-        issues={issues}
-        selectedYear={selectedYear}
-        onYearChange={setSelectedYear}
-        years={years}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-        onResetFilters={handleResetFilters}
-        hasActiveFilters={hasActiveFilters}
-        filteredCount={filteredCount}
-      />
 
       {/* In-App PDF Viewer Modal */}
       <PdfViewerModal
