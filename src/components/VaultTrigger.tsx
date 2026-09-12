@@ -71,7 +71,7 @@ export const VaultTrigger: React.FC<VaultTriggerProps> = ({
             {isFilterActive ? 'FILTER KOLEKSI AKTIF' : 'KOLEKSI SAYA'}
           </span>
 
-          <span className="px-2 py-0.5 bg-black text-white dark:bg-black dark:text-yellow-400 text-xs font-mono font-black border border-black shadow-[1px_1px_0px_0px_#16181D]">
+          <span className="px-2 py-0.5 bg-black text-white dark:bg-black dark:text-yellow-400 text-xs font-mono font-black border border-black shadow-none">
             {bookmarkCount}
           </span>
 

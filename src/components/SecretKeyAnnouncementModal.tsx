@@ -34,12 +34,12 @@ export const SecretKeyAnnouncementModal: React.FC<SecretKeyAnnouncementModalProp
         transition={{ type: 'spring', damping: 25, stiffness: 450 }}
         className="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-[#181B22] border-[3px] border-black dark:border-white shadow-[8px_8px_0px_0px_#16181D] dark:shadow-[8px_8px_0px_0px_#D4D4D8] p-5 sm:p-6 text-center select-none"
       >
-        <div className="w-14 h-14 mx-auto mb-3 bg-[#FEF08A] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] flex items-center justify-center -rotate-2">
+        <div className="w-14 h-14 mx-auto mb-3 bg-[#FEF08A] text-black border-2 border-black shadow-none flex items-center justify-center -rotate-2">
           <Key className="w-7 h-7 stroke-[2.5]" />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#A3E635] text-black text-[11px] font-black uppercase border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] mb-2.5">
-          <Sparkles className="w-3 h-3 stroke-[2.5]" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#A3E635] text-black text-[11px] font-black uppercase border border-black shadow-none mb-2.5">
+          <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
           <span>Artikel Berhasil Disimpan</span>
         </div>
 
@@ -51,8 +51,8 @@ export const SecretKeyAnnouncementModal: React.FC<SecretKeyAnnouncementModalProp
           Mau buka artikel yang kamu simpan ini di HP atau laptop lain? Cukup ketik 4 kata ini:
         </p>
 
-        {/* 4-Word Box */}
-        <div className="bg-[#FEF08A] dark:bg-yellow-400 border-2 border-black shadow-[3px_3px_0px_0px_#16181D] p-3 mb-3.5">
+        {/* 4-Word Box (Non-button: flat container, no shadow) */}
+        <div className="bg-[#FEF08A] dark:bg-yellow-400 border-2 border-black shadow-none p-3 mb-3.5">
           <code className="block font-mono font-black text-base sm:text-lg text-black tracking-wide break-all select-all">
             {secretKey}
           </code>

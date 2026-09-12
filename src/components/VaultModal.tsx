@@ -10,11 +10,10 @@ import {
   Check,
   RefreshCw,
   LogOut,
-  FileText,
   Trash2,
   Smartphone,
-  ArrowRightLeft,
   Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import { LocalVault, normalizeSecretKey } from '@/lib/vault';
 import { Article } from '@/lib/types';
@@ -229,7 +228,8 @@ export const VaultModal: React.FC<VaultModalProps> = ({
         {/* Modal Top Bar - Clean & Human */}
         <div className="flex items-center justify-between p-3.5 sm:p-4 bg-[#FEF08A] dark:bg-[#202530] border-b-[2.5px] border-black dark:border-white">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-yellow-400 dark:text-black border-2 border-black font-black text-sm">
+            {/* Non-button: flat stamp, no shadow */}
+            <div className="w-8 h-8 flex items-center justify-center bg-black text-white dark:bg-yellow-400 dark:text-black border-2 border-black font-black text-sm shadow-none">
               <Bookmark className="w-4 h-4 fill-current" />
             </div>
             <div>
@@ -242,6 +242,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
             </div>
           </div>
 
+          {/* Button: elevated with hard shadow */}
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FECDD3] hover:text-black active:translate-x-0.5 active:translate-y-0.5 transition-all"
@@ -253,7 +254,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
 
         {/* 3 Simple, Distinct Tabs */}
         <div className="flex border-b-[2.5px] border-black dark:border-white bg-[#F1F5F9] dark:bg-[#13151A] text-xs">
-          {/* Tab 1: Tersimpan */}
+          {/* Tab 1 Button */}
           <button
             onClick={() => setActiveTab('bookmarks')}
             className={`flex-1 py-2.5 px-2 font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 border-r border-black dark:border-white ${
@@ -266,7 +267,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
             <span>Tersimpan ({vault.bookmarks.length})</span>
           </button>
 
-          {/* Tab 2: Kode Akses HP */}
+          {/* Tab 2 Button */}
           <button
             onClick={() => setActiveTab('my-key')}
             className={`flex-1 py-2.5 px-2 font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 border-r border-black dark:border-white ${
@@ -284,7 +285,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
             ) : null}
           </button>
 
-          {/* Tab 3: Masukkan Kode */}
+          {/* Tab 3 Button */}
           <button
             onClick={() => setActiveTab('enter-key')}
             className={`flex-1 py-2.5 px-2 font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
@@ -322,16 +323,17 @@ export const VaultModal: React.FC<VaultModalProps> = ({
             <div className="space-y-3">
               {/* Quick Filter Bar */}
               {vault.bookmarks.length > 0 && onFilterBookmarksOnly && (
-                <div className="flex items-center justify-between p-2.5 bg-[#FEF08A]/30 dark:bg-yellow-400/10 border border-black/30 dark:border-white/30 text-xs">
+                <div className="flex items-center justify-between p-2.5 bg-[#FEF08A]/30 dark:bg-yellow-400/10 border border-black/30 dark:border-white/30 text-xs shadow-none">
                   <span className="font-bold text-slate-800 dark:text-yellow-200">
                     Saring katalog utama?
                   </span>
+                  {/* Button: elevated with shadow */}
                   <button
                     onClick={() => {
                       onFilterBookmarksOnly();
                       onClose();
                     }}
-                    className={`px-2.5 py-1 text-[11px] font-black uppercase border border-black dark:border-white shadow-[1.5px_1.5px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
+                    className={`px-2.5 py-1 text-[11px] font-black uppercase border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
                       isFilterActive ? 'bg-[#FDA4AF] text-black' : 'bg-[#FACC15] text-black'
                     }`}
                   >
@@ -343,7 +345,8 @@ export const VaultModal: React.FC<VaultModalProps> = ({
               {/* Bookmarks List */}
               {bookmarkedArticles.length === 0 ? (
                 <div className="text-center py-12 px-4">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-[#FEF08A] text-black border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_#16181D]">
+                  {/* Non-button: flat stamp, no shadow */}
+                  <div className="w-12 h-12 mx-auto mb-3 bg-[#FEF08A] text-black border-2 border-black flex items-center justify-center shadow-none">
                     <Bookmark className="w-6 h-6 stroke-[2.5]" />
                   </div>
                   <h3 className="text-sm font-black text-black dark:text-white uppercase mb-1">
@@ -356,12 +359,14 @@ export const VaultModal: React.FC<VaultModalProps> = ({
               ) : (
                 <div className="space-y-2.5">
                   {bookmarkedArticles.map((art) => (
+                    /* Non-button item container: flat list row, no shadow */
                     <div
                       key={art.ojs_id}
-                      className="p-3 bg-slate-50 dark:bg-[#1E232E] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                      className="p-3 bg-slate-50 dark:bg-[#1E232E] border-2 border-black/25 dark:border-white/25 shadow-none flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
                     >
                       <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 text-black dark:text-white uppercase mr-1.5">
+                        {/* Non-button prodi badge: flat stamp, no shadow */}
+                        <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 bg-slate-200 dark:bg-slate-700 text-black dark:text-white uppercase mr-1.5 border border-black/20 shadow-none">
                           {art.prodi || 'UNTAN'}
                         </span>
                         <h4 className="font-bold text-xs sm:text-sm text-black dark:text-white leading-snug line-clamp-2 inline">
@@ -372,14 +377,14 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                         </p>
                       </div>
 
-                      {/* Action buttons */}
+                      {/* Action buttons: elevated with shadow */}
                       <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                         <button
                           onClick={() => {
                             onReadPdf(art);
                             onClose();
                           }}
-                          className="px-2.5 py-1 text-xs font-black bg-[#A3E635] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] hover:bg-[#84CC16]"
+                          className="px-2.5 py-1 text-xs font-black bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#84CC16] active:translate-x-0.5 active:translate-y-0.5 transition-all"
                         >
                           BACA
                         </button>
@@ -388,7 +393,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
 
                         <button
                           onClick={() => onToggleBookmark(art.ojs_id)}
-                          className="p-1 text-xs font-black bg-[#FDA4AF] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] hover:bg-[#FB7185]"
+                          className="p-1.5 text-xs font-black bg-[#FDA4AF] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FB7185] active:translate-x-0.5 active:translate-y-0.5 transition-all"
                           title="Hapus"
                         >
                           <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -407,7 +412,8 @@ export const VaultModal: React.FC<VaultModalProps> = ({
               {vault.secretKey ? (
                 <>
                   <div className="text-center py-2">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] mb-3">
+                    {/* Non-button badge: FLAT STAMP, NO SHADOW */}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider bg-[#FEF08A] text-black border-2 border-black shadow-none mb-3">
                       <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
                       <span>{vault.isPrimary ? 'Perangkat Utama Anda' : 'Perangkat Terhubung'}</span>
                     </span>
@@ -420,15 +426,18 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                     </p>
                   </div>
 
-                  {/* The 4-word code display */}
+                  {/* Code Container: NON-BUTTON (FLAT, NO SHADOW) */}
                   {vault.isPrimary ? (
-                    <div className="p-3.5 bg-[#FEF08A] dark:bg-yellow-400 border-2 border-black shadow-[3px_3px_0px_0px_#16181D] flex items-center justify-between gap-2">
+                    <div className="p-3 bg-[#FEF08A] dark:bg-yellow-400 border-2 border-black shadow-none flex items-center justify-between gap-2">
                       <code className="font-mono font-black text-sm sm:text-base text-black tracking-wide break-all select-all flex-1">
                         {vault.secretKey}
                       </code>
+
+                      {/* SALIN BUTTON: ELEVATED WITH SHADOW */}
                       <button
                         onClick={handleCopyKey}
-                        className="px-3 py-1.5 text-xs font-black uppercase bg-black text-white hover:bg-slate-800 transition-colors flex items-center gap-1.5 shrink-0"
+                        className="px-3 py-1.5 text-xs font-black uppercase bg-black text-white hover:bg-slate-800 border-2 border-black shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#fff] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5 shrink-0"
+                        title="Salin 4 kata rahasia"
                       >
                         {copiedKey ? (
                           <>
@@ -444,7 +453,8 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                       </button>
                     </div>
                   ) : (
-                    <div className="p-3 bg-slate-100 dark:bg-[#1E232E] border-2 border-black dark:border-white text-center space-y-2">
+                    /* Non-button masked container: FLAT, NO SHADOW */
+                    <div className="p-3 bg-slate-100 dark:bg-[#1E232E] border-2 border-black/40 dark:border-white/40 shadow-none text-center space-y-2">
                       <code className="font-mono font-bold text-sm tracking-widest text-slate-500 block">
                         •••• - •••• - •••• - ••••
                       </code>
@@ -454,13 +464,17 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                     </div>
                   )}
 
-                  {/* Sync status & Refresh */}
+                  {/* Sync status & Refresh Button */}
                   <div className="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-black/10 dark:border-white/10">
-                    <span>{vault.lastSyncedAt ? `Sinkron terakhir: ${vault.lastSyncedAt}` : 'Tersimpan lokal'}</span>
+                    <span className="font-mono text-[11px]">
+                      {vault.lastSyncedAt ? `Sinkron terakhir: ${vault.lastSyncedAt}` : 'Tersimpan lokal'}
+                    </span>
+
+                    {/* Perbarui BUTTON: ELEVATED WITH SHADOW */}
                     <button
                       onClick={handleManualSync}
                       disabled={isSyncing}
-                      className="font-bold text-black dark:text-white hover:underline flex items-center gap-1"
+                      className="px-2.5 py-1 text-xs font-black uppercase bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5"
                     >
                       <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
                       <span>{isSyncing ? 'Menyinkronkan...' : 'Perbarui'}</span>
@@ -477,7 +491,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                         <select
                           value={targetDeviceId}
                           onChange={(e) => setTargetDeviceId(e.target.value)}
-                          className="flex-1 px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white"
+                          className="flex-1 px-2.5 py-1.5 text-xs font-mono bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-none"
                         >
                           <option value="">-- Pilih HP / Laptop Terhubung --</option>
                           {connectedDevices.map((dev, idx) => (
@@ -486,10 +500,12 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                             </option>
                           ))}
                         </select>
+
+                        {/* PINDAHKAN BUTTON: ELEVATED WITH SHADOW */}
                         <button
                           onClick={handleTransferPrimary}
                           disabled={isTransferring || !targetDeviceId}
-                          className="px-3 py-1.5 text-xs font-black uppercase bg-[#F472B6] text-black border-2 border-black hover:bg-[#DB2777] hover:text-white disabled:opacity-50"
+                          className="px-3 py-1.5 text-xs font-black uppercase bg-[#F472B6] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 hover:bg-[#DB2777] hover:text-white disabled:opacity-50 transition-all"
                         >
                           {isTransferring ? '...' : 'PINDAHKAN'}
                         </button>
@@ -500,12 +516,14 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                   {/* Keluar dari komputer lab */}
                   <div className="pt-3 border-t border-black/10 dark:border-white/10 flex items-center justify-between text-xs">
                     <span className="text-slate-500 text-[11px]">Pakai komputer lab kampus?</span>
+
+                    {/* HAPUS DATA BUTTON: ELEVATED WITH SHADOW */}
                     <button
                       onClick={handleDisconnect}
-                      className="font-bold text-red-500 hover:text-red-700 hover:underline flex items-center gap-1 text-[11px]"
+                      className="px-2.5 py-1 text-[11px] font-black uppercase text-red-700 bg-red-100 hover:bg-red-200 border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1"
                     >
                       <LogOut className="w-3 h-3" />
-                      <span>Hapus data dari komputer ini</span>
+                      <span>Hapus data di sini</span>
                     </button>
                   </div>
                 </>
@@ -516,7 +534,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                   </p>
                   <button
                     onClick={() => setActiveTab('bookmarks')}
-                    className="px-3 py-1.5 text-xs font-black uppercase bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D]"
+                    className="px-3.5 py-2 text-xs font-black uppercase bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 transition-all"
                   >
                     KEMBALI KE KOLEKSI
                   </button>
@@ -529,7 +547,8 @@ export const VaultModal: React.FC<VaultModalProps> = ({
           {activeTab === 'enter-key' && (
             <div className="space-y-4 py-2">
               <div className="text-center">
-                <div className="w-10 h-10 mx-auto mb-2 bg-[#38BDF8] text-black border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#16181D]">
+                {/* Non-button icon: flat stamp, no shadow */}
+                <div className="w-10 h-10 mx-auto mb-2 bg-[#38BDF8] text-black border-2 border-black flex items-center justify-center shadow-none">
                   <Smartphone className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <h3 className="text-sm font-black text-black dark:text-white uppercase mb-1">
@@ -541,19 +560,20 @@ export const VaultModal: React.FC<VaultModalProps> = ({
               </div>
 
               {/* Input form */}
-              <form onSubmit={handleLinkDevice} className="space-y-2.5 max-w-sm mx-auto">
+              <form onSubmit={handleLinkDevice} className="space-y-3 max-w-sm mx-auto">
                 <input
                   type="text"
                   value={inputKey}
                   onChange={(e) => setInputKey(e.target.value)}
                   placeholder="contoh: ngopi-santai-skripsi-mantap"
-                  className="w-full px-3 py-2 text-xs font-mono bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full px-3 py-2 text-xs font-mono bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white shadow-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 />
 
+                {/* Submit BUTTON: ELEVATED WITH HARD SHADOW */}
                 <button
                   type="submit"
                   disabled={isLinking || !inputKey.trim()}
-                  className="w-full py-2 px-4 text-xs font-black uppercase tracking-wider bg-[#38BDF8] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#0284C7] hover:text-white disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 px-4 text-xs font-black uppercase tracking-wider bg-[#38BDF8] text-black border-2 border-black shadow-[2.5px_2.5px_0px_0px_#16181D] hover:bg-[#0284C7] hover:text-white active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
                 >
                   <Smartphone className="w-3.5 h-3.5" />
                   <span>{isLinking ? 'Menghubungkan...' : 'BUKA ARTIKEL SAYA'}</span>
@@ -563,8 +583,8 @@ export const VaultModal: React.FC<VaultModalProps> = ({
           )}
         </div>
 
-        {/* Minimal Footer */}
-        <div className="px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#111317] border-t-2 border-black dark:border-white flex items-center justify-between text-[10px] font-mono text-slate-500">
+        {/* Minimal Footer: Non-button, flat, no shadow */}
+        <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#111317] border-t-2 border-black dark:border-white flex items-center justify-between text-[10px] font-mono text-slate-500 shadow-none">
           <span>UNTAN RESEARCH HUB</span>
           <span>{vault.bookmarks.length} TERSIMPAN</span>
         </div>
