@@ -377,24 +377,24 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                         </p>
                       </div>
 
-                      {/* Action buttons: elevated with shadow */}
+                      {/* Action buttons: elevated with shadow and matching h-8 height */}
                       <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                         <button
                           onClick={() => {
                             onReadPdf(art);
                             onClose();
                           }}
-                          className="px-2.5 py-1 text-xs font-black bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#84CC16] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                          className="h-8 px-3 text-xs font-black bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#84CC16] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center justify-center"
                         >
                           BACA
                         </button>
 
-                        <CitationButton article={art} />
+                        <CitationButton article={art} size="sm" />
 
                         <button
                           onClick={() => onToggleBookmark(art.ojs_id)}
-                          className="p-1.5 text-xs font-black bg-[#FDA4AF] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FB7185] active:translate-x-0.5 active:translate-y-0.5 transition-all"
-                          title="Hapus"
+                          className="h-8 w-8 text-xs font-black bg-[#FDA4AF] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FB7185] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center justify-center"
+                          title="Hapus dari koleksi"
                         >
                           <Trash2 className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>

@@ -2,76 +2,90 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Article } from '@/lib/types';
-import { generateApaCitation, generateIeeeCitation } from '@/lib/citation';
-import { Quote, Check } from 'lucide-react';
+import { FileText, Download, Bookmark, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-interface CitationButtonProps {
+interface ArticleActionsButtonProps {
   article: Article;
+  isBookmarked?: boolean;
+  onReadPdf: (article: Article) => void;
+  onToggleBookmark?: (article: Article) => void;
   className?: string;
   size?: 'default' | 'sm';
 }
 
-export const CitationButton: React.FC<CitationButtonProps> = ({
+type ActionOption = 'BACA' | 'UNDUH' | 'SIMPAN';
+
+export const ArticleActionsButton: React.FC<ArticleActionsButtonProps> = ({
   article,
+  isBookmarked = false,
+  onReadPdf,
+  onToggleBookmark,
   className = '',
   size = 'default',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeFormat, setActiveFormat] = useState<'APA' | 'IEEE' | null>(null);
-  const [copiedFormat, setCopiedFormat] = useState<'APA' | 'IEEE' | null>(null);
+  const [activeOption, setActiveOption] = useState<ActionOption | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isHolding, setIsHolding] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
-  const apaBtnRef = useRef<HTMLButtonElement>(null);
-  const ieeeBtnRef = useRef<HTMLButtonElement>(null);
-
   const isDraggingRef = useRef(false);
   const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  const copyCitation = useCallback(
-    async (format: 'APA' | 'IEEE') => {
-      const citationText =
-        format === 'APA' ? generateApaCitation(article) : generateIeeeCitation(article);
+  const pdfUrl = article.storage_pdf_url || article.original_pdf_url || '';
 
-      try {
-        await navigator.clipboard.writeText(citationText);
-      } catch {
-        const textarea = document.createElement('textarea');
-        textarea.value = citationText;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-
-      setCopiedFormat(format);
-      setToastMessage(`Sitasi ${format} disalin!`);
+  const triggerAction = useCallback(
+    (action: ActionOption) => {
       setIsOpen(false);
-      setActiveFormat(null);
+      setActiveOption(null);
       setIsHolding(false);
 
       if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
         window.navigator.vibrate([20, 30, 20]);
       }
 
+      if (action === 'BACA') {
+        if (!pdfUrl) {
+          setToastMessage('PDF belum tersedia');
+        } else {
+          onReadPdf(article);
+          setToastMessage('Membuka PDF...');
+        }
+      } else if (action === 'UNDUH') {
+        if (!pdfUrl) {
+          setToastMessage('PDF belum tersedia');
+        } else {
+          const downloadUrl = `/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`;
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = `${article.title}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setToastMessage('Mengunduh PDF...');
+        }
+      } else if (action === 'SIMPAN') {
+        if (onToggleBookmark) {
+          onToggleBookmark(article);
+          setToastMessage(isBookmarked ? 'Dihapus dari Koleksi' : 'Disimpan ke Koleksi!');
+        }
+      }
+
       setTimeout(() => {
-        setCopiedFormat(null);
         setToastMessage(null);
       }, 2500);
     },
-    [article]
+    [article, pdfUrl, isBookmarked, onReadPdf, onToggleBookmark]
   );
 
-  // Hit-test coordinates against the two side options
-  const checkHoveredOption = useCallback((clientX: number, clientY: number) => {
+  // Hit-test coordinates against 3 stacked options: BACA (top 1/3), UNDUH (middle 1/3), SIMPAN (bottom 1/3)
+  const checkHoveredOption = useCallback((clientX: number, clientY: number): ActionOption | null => {
     if (!flyoutRef.current) return null;
 
     const flyoutRect = flyoutRef.current.getBoundingClientRect();
-    // Generous bounding area horizontally around the flyout
     if (
       clientX < flyoutRect.left - 15 ||
       clientX > flyoutRect.right + 25 ||
@@ -81,12 +95,15 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
       return null;
     }
 
-    // Check vertical midpoint to distinguish between top (APA) and bottom (IEEE)
-    const midY = flyoutRect.top + flyoutRect.height / 2;
-    if (clientY < midY) {
-      return 'APA';
+    const third = flyoutRect.height / 3;
+    const relY = clientY - flyoutRect.top;
+
+    if (relY < third) {
+      return 'BACA';
+    } else if (relY < third * 2) {
+      return 'UNDUH';
     } else {
-      return 'IEEE';
+      return 'SIMPAN';
     }
   }, []);
 
@@ -121,7 +138,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
 
       if (isDraggingRef.current) {
         const hovered = checkHoveredOption(e.clientX, e.clientY);
-        setActiveFormat((prev) => {
+        setActiveOption((prev) => {
           if (prev !== hovered && hovered) {
             if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
               window.navigator.vibrate(10);
@@ -142,9 +159,9 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
       if (isDraggingRef.current) {
         const selected = checkHoveredOption(e.clientX, e.clientY);
         if (selected) {
-          copyCitation(selected);
+          triggerAction(selected);
         } else {
-          // If released over the main container button, keep it open for normal click
+          // If released over trigger button, keep open for tap
           const containerRect = containerRef.current?.getBoundingClientRect();
           const inContainer =
             containerRect &&
@@ -155,33 +172,20 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
 
           if (!inContainer) {
             setIsOpen(false);
-            setActiveFormat(null);
           }
         }
         isDraggingRef.current = false;
+        setActiveOption(null);
       }
-    };
-
-    const handleGlobalPointerCancel = () => {
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current);
-        pressTimerRef.current = null;
-      }
-      isDraggingRef.current = false;
-      setIsHolding(false);
-      setActiveFormat(null);
     };
 
     window.addEventListener('pointermove', handleGlobalPointerMove);
     window.addEventListener('pointerup', handleGlobalPointerUp);
-    window.addEventListener('pointercancel', handleGlobalPointerCancel);
-
     return () => {
       window.removeEventListener('pointermove', handleGlobalPointerMove);
       window.removeEventListener('pointerup', handleGlobalPointerUp);
-      window.removeEventListener('pointercancel', handleGlobalPointerCancel);
     };
-  }, [checkHoveredOption, copyCitation]);
+  }, [checkHoveredOption, triggerAction]);
 
   const handleClick = () => {
     if (!isDraggingRef.current) {
@@ -193,7 +197,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
-        setActiveFormat(null);
+        setActiveOption(null);
       }
     };
     if (isOpen) {
@@ -205,7 +209,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} data-citation-container className={`relative inline-block select-none touch-none ${className}`}>
+    <div ref={containerRef} className={`relative inline-block select-none touch-none ${className}`}>
       {/* Toast Feedback */}
       <AnimatePresence>
         {toastMessage && (
@@ -221,7 +225,7 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Side Hold-and-Drag / Click Menu Flyout with Spring Physics */}
+      {/* Side Hold-and-Drag / Click Menu Flyout (Neo-Brutalist 3-Option Stack) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -231,42 +235,65 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
             exit={{ opacity: 0, scaleX: 0.4, x: 10, y: '-50%', skewY: -6 }}
             transition={{ type: 'spring', stiffness: 500, damping: 26 }}
             style={{ transformOrigin: 'left center' }}
-            className="absolute left-full -ml-2.5 top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8] overflow-hidden"
+            className="absolute left-full -ml-2.5 top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8] overflow-hidden min-w-[100px]"
           >
-            {/* APA Option (Top) */}
+            {/* 1. BACA Option (Top) */}
             <button
-              ref={apaBtnRef}
               type="button"
               onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => copyCitation('APA')}
-              className={`px-3.5 py-1.5 font-black text-xs uppercase border-b-2 border-black dark:border-white transition-all duration-100 flex items-center justify-center min-w-[70px] ${
-                activeFormat === 'APA'
-                  ? 'bg-[#F472B6] text-black scale-105'
-                  : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#F472B6] hover:text-black'
+              onClick={() => triggerAction('BACA')}
+              className={`px-3 py-1.5 font-black text-xs uppercase border-b-2 border-black dark:border-white transition-all duration-100 flex items-center justify-start gap-1.5 ${
+                activeOption === 'BACA'
+                  ? 'bg-[#A3E635] text-black scale-105'
+                  : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#A3E635] hover:text-black'
               }`}
             >
-              <span className="skew-y-6 inline-block">APA</span>
+              <span className="skew-y-6 inline-flex items-center gap-1.5 font-black">
+                <FileText className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>BACA</span>
+              </span>
             </button>
 
-            {/* IEEE Option (Bottom) */}
+            {/* 2. UNDUH Option (Middle) */}
             <button
-              ref={ieeeBtnRef}
               type="button"
               onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => copyCitation('IEEE')}
-              className={`px-3.5 py-1.5 font-black text-xs uppercase transition-all duration-100 flex items-center justify-center min-w-[70px] ${
-                activeFormat === 'IEEE'
+              onClick={() => triggerAction('UNDUH')}
+              className={`px-3 py-1.5 font-black text-xs uppercase border-b-2 border-black dark:border-white transition-all duration-100 flex items-center justify-start gap-1.5 ${
+                activeOption === 'UNDUH'
                   ? 'bg-[#38BDF8] text-black scale-105'
                   : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#38BDF8] hover:text-black'
               }`}
             >
-              <span className="skew-y-6 inline-block">IEEE</span>
+              <span className="skew-y-6 inline-flex items-center gap-1.5 font-black">
+                <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>UNDUH</span>
+              </span>
+            </button>
+
+            {/* 3. SIMPAN Option (Bottom) */}
+            <button
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => triggerAction('SIMPAN')}
+              className={`px-3 py-1.5 font-black text-xs uppercase transition-all duration-100 flex items-center justify-start gap-1.5 ${
+                activeOption === 'SIMPAN'
+                  ? 'bg-[#FEF08A] text-black scale-105'
+                  : isBookmarked
+                  ? 'bg-[#FEF08A]/70 text-black hover:bg-[#FEF08A]'
+                  : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#FEF08A] hover:text-black'
+              }`}
+            >
+              <span className="skew-y-6 inline-flex items-center gap-1.5 font-black">
+                <Bookmark className={`w-3.5 h-3.5 stroke-[2.5] ${isBookmarked ? 'fill-black' : ''}`} />
+                <span>{isBookmarked ? 'TERSIMPAN ★' : 'SIMPAN'}</span>
+              </span>
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Main Trigger Button */}
+      {/* Main Trigger Button (Identical style & height to CitationButton) */}
       <button
         type="button"
         onPointerDown={handlePointerDown}
@@ -276,27 +303,19 @@ export const CitationButton: React.FC<CitationButtonProps> = ({
         } ${
           isHolding ? 'blur-[1.5px] opacity-70 scale-[0.98]' : 'blur-none opacity-100'
         } ${
-          copiedFormat
-            ? 'bg-[#A3E635] text-black shadow-[2px_2px_0px_0px_#16181D]'
+          isBookmarked
+            ? 'bg-[#FEF08A] text-black shadow-[3px_3px_0px_0px_#16181D]'
             : isOpen
-            ? 'bg-[#FEF08A] text-black shadow-[2px_2px_0px_0px_#16181D]'
+            ? 'bg-[#FEF08A] text-black shadow-[3px_3px_0px_0px_#16181D]'
             : size === 'sm'
             ? 'bg-white dark:bg-black text-black dark:text-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black'
             : 'bg-white dark:bg-black text-black dark:text-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black'
         }`}
-        title="Klik atau Tahan & Geser (Hold & Drag) ke kanan untuk memilih format APA atau IEEE"
+        title="Klik atau Tahan & Geser (Hold & Drag) untuk BACA, UNDUH, atau SIMPAN"
       >
-        {copiedFormat ? (
-          <>
-            <Check className="w-3.5 h-3.5 stroke-[3]" />
-            <span>{copiedFormat} ✓</span>
-          </>
-        ) : (
-          <>
-            <Quote className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>KUTIP</span>
-          </>
-        )}
+        <FileText className="w-3.5 h-3.5 stroke-[2.5]" />
+        <span>BACA PDF</span>
+        {isBookmarked && <span className="font-bold text-amber-600">★</span>}
       </button>
     </div>
   );

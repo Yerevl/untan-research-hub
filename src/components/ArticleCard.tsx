@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import { Article, Supervisor } from '@/lib/types';
 import {
-  FileText,
-  Download,
   Calendar,
   ChevronDown,
   ChevronUp,
@@ -17,8 +15,8 @@ import {
   Server,
   Layers,
 } from 'lucide-react';
+import { ArticleActionsButton } from './ArticleActionsButton';
 import { CitationButton } from './CitationButton';
-import { HoldableButton } from './HoldableButton';
 import { motion, Variants } from 'motion/react';
 
 interface ArticleCardProps {
@@ -194,34 +192,15 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               );
             })}
 
-          {/* Date Stamp & Bookmark Button */}
-          <div className="ml-auto flex items-center gap-1.5 shrink-0">
-            {formattedDate && (
+          {/* Date Stamp */}
+          {formattedDate && (
+            <div className="ml-auto flex items-center shrink-0">
               <span className="hidden sm:inline-flex items-center px-2 py-0.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#20242C] border border-slate-300 dark:border-slate-700 select-none cursor-default shadow-none rounded-sm">
                 <Calendar className="w-3 h-3 mr-1 stroke-[2] opacity-70" />
                 <span>{formattedDate}</span>
               </span>
-            )}
-
-            {onToggleBookmark && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleBookmark(article);
-                }}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all ${
-                  isBookmarked
-                    ? 'bg-[#FEF08A] text-black hover:bg-[#FDE047]'
-                    : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#FEF08A] hover:text-black'
-                }`}
-                title={isBookmarked ? 'Hapus dari brankas tersimpan' : 'Simpan artikel ke brankas rahasia'}
-              >
-                <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-black stroke-[2.5]' : 'stroke-[2.5]'}`} />
-                <span className="text-[11px] uppercase tracking-wider">{isBookmarked ? 'SIMPAN ★' : 'SIMPAN'}</span>
-              </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Title */}
@@ -307,41 +286,15 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
       {/* Card Footer Actions */}
       <div className="pt-3.5 sm:pt-4 border-t-2 border-black dark:border-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 mt-auto">
-        <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-2">
-          {pdfUrl ? (
-            <>
-              <HoldableButton
-                onTrigger={() => onReadPdf(article)}
-                icon={<FileText className="w-3.5 h-3.5 stroke-[2.5]" />}
-                label="BACA PDF"
-                title={`Baca PDF: ${article.title}`}
-                className="justify-center"
-              />
-
-              <HoldableButton
-                onTrigger={() => {
-                  const downloadUrl = `/api/download?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(article.title)}`;
-                  const a = document.createElement('a');
-                  a.href = downloadUrl;
-                  a.download = `${article.title}.pdf`;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                }}
-                icon={<Download className="w-3.5 h-3.5 stroke-[2.5]" />}
-                label="UNDUH"
-                title={`Unduh: ${article.title}`}
-                className="justify-center"
-              />
-
-              <CitationButton article={article} className="w-full flex" />
-            </>
-          ) : (
-            <>
-              <span className="text-xs text-slate-500 font-mono italic col-span-2 sm:col-span-1">PDF belum tersedia</span>
-              <CitationButton article={article} className="w-full flex" />
-            </>
-          )}
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+          <ArticleActionsButton
+            article={article}
+            isBookmarked={isBookmarked}
+            onReadPdf={onReadPdf}
+            onToggleBookmark={onToggleBookmark}
+            className="w-full sm:w-auto"
+          />
+          <CitationButton article={article} className="w-full sm:w-auto" />
         </div>
 
         <div className="flex items-center justify-end gap-2">
