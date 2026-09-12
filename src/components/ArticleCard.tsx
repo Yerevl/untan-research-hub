@@ -146,7 +146,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
     <motion.article
       variants={comicCardVariants}
       whileHover={{ x: -3, y: -3 }}
-      className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
+      className="group bg-white dark:bg-[#1A1F29] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
     >
       <div>
         {/* Badges Row: Issue (flat stamp), Prodi (elevated button), Keahlian (elevated button), Date (flat stamp) */}

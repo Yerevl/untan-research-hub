@@ -10,10 +10,10 @@ export const ThemeToggle: React.FC = () => {
 
   useEffect(() => {
     setMounted(true);
-    // Determine initial theme
     const savedTheme = localStorage.getItem('theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialDark = savedTheme ? savedTheme === 'dark' : systemDark;
+    const hasDarkClass = document.documentElement.classList.contains('dark');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialDark = savedTheme ? savedTheme === 'dark' : hasDarkClass || prefersDark;
 
     setIsDark(initialDark);
     if (initialDark) {
@@ -36,10 +36,9 @@ export const ThemeToggle: React.FC = () => {
     }
   };
 
-  // Prevent hydration mismatch
   if (!mounted) {
     return (
-      <div className="w-[74px] h-[30px] border-2 border-black dark:border-white bg-[#EAE5DA] dark:bg-[#181B20] opacity-50" />
+      <div className="w-[82px] h-[34px] border-2 border-black dark:border-white bg-[#E5DFD3] dark:bg-[#252B37] opacity-60" />
     );
   }
 
@@ -47,35 +46,35 @@ export const ThemeToggle: React.FC = () => {
     <button
       type="button"
       onClick={toggleTheme}
-      className="relative flex items-center justify-between w-[76px] h-[32px] p-1 border-2 border-black dark:border-white bg-[#EAE5DA] dark:bg-[#181B20] shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all select-none cursor-pointer"
-      title={isDark ? 'Ganti ke Mode Terang (Light Mode)' : 'Ganti ke Mode Gelap (Dark Mode)'}
-      aria-label="Toggle dark/light theme"
+      className="relative flex items-center justify-between w-[84px] h-[34px] px-2 border-2 border-black dark:border-white bg-[#E5DFD3] dark:bg-[#252B37] shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all select-none cursor-pointer"
+      title={isDark ? 'Beralih ke Mode Terang (Light Mode)' : 'Beralih ke Mode Gelap (Dark Mode)'}
+      aria-label="Toggle theme mode"
     >
-      {/* Background Track Indicators */}
+      {/* Label under sliding knob */}
       <span
-        className={`text-[9px] font-black uppercase tracking-wider pl-1.5 transition-opacity ${
-          isDark ? 'text-slate-400 opacity-100' : 'opacity-0'
+        className={`text-[10px] font-black uppercase tracking-wider transition-all duration-150 ${
+          isDark ? 'text-white font-extrabold opacity-100' : 'opacity-0'
         }`}
       >
         DARK
       </span>
 
       <span
-        className={`text-[9px] font-black uppercase tracking-wider pr-1.5 transition-opacity ${
-          !isDark ? 'text-slate-600 opacity-100' : 'opacity-0'
+        className={`text-[10px] font-black uppercase tracking-wider transition-all duration-150 ${
+          !isDark ? 'text-black font-extrabold opacity-100 ml-auto' : 'opacity-0'
         }`}
       >
         LIGHT
       </span>
 
-      {/* Sliding Tactile Knob */}
+      {/* Tactile Sliding Knob */}
       <motion.div
         layout
-        transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-        className={`absolute top-[2.5px] w-[28px] h-[23px] border-2 border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#16181D] ${
+        transition={{ type: 'spring', stiffness: 550, damping: 26 }}
+        className={`absolute top-[3px] w-[30px] h-[24px] border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#16181D] ${
           isDark
-            ? 'right-[3px] bg-[#38BDF8] text-black'
-            : 'left-[3px] bg-[#FACC15] text-black'
+            ? 'right-[4px] bg-[#38BDF8] text-black'
+            : 'left-[4px] bg-[#FACC15] text-black'
         }`}
       >
         {isDark ? (
