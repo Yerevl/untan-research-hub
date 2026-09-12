@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Article } from '@/lib/types';
 import { DosenItem } from '@/lib/dosen';
-import { Navbar } from '@/components/Navbar';
 import { IdleBackground } from '@/components/IdleBackground';
 import { ArticleCard } from '@/components/ArticleCard';
 import { PdfViewerModal } from '@/components/PdfViewerModal';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -21,6 +21,8 @@ import {
   ArrowUpDown,
   Layers,
   ArrowUp,
+  Database,
+  RotateCcw,
 } from 'lucide-react';
 
 const PAGE_SIZE = 10;
@@ -310,18 +312,15 @@ export default function HomePage() {
       {/* Idle Ambient Background Animation */}
       <IdleBackground />
 
-      {/* Top Navigation Bar with Theme Switch & Status */}
-      <Navbar supabaseConnected={supabaseConnected} totalArticles={totalCount} />
-
-      {/* Main Content: Direct Search, Filters & Article Catalog */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      {/* Main Content: Direct Straight-Up Search, Filters & Article Catalog */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-10">
         <div id="catalog-top" className="scroll-mt-6" />
 
         {/* Unified Search & Filters Control Panel - Neo-Brutalist Box */}
-        <div className="mb-8 p-4 sm:p-5 bg-white dark:bg-[#1A1F29] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] space-y-4">
+        <div className="mb-8 p-3.5 sm:p-5 bg-white dark:bg-[#1A1F29] border-[3px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] space-y-3 sm:space-y-4">
           {/* Search Bar */}
           <div className="relative flex items-center bg-[#FAF8F4] dark:bg-[#101216] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8]">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-black dark:text-white">
+            <div className="absolute inset-y-0 left-0 pl-3.5 sm:pl-4 flex items-center pointer-events-none text-black dark:text-white">
               <Search className="w-5 h-5 stroke-[2.5]" />
             </div>
             <input
@@ -329,7 +328,7 @@ export default function HomePage() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Cari judul riset, nama mahasiswa, dosen pembimbing, atau topik..."
-              className="w-full pl-12 pr-10 py-3.5 text-sm sm:text-base font-bold bg-transparent text-black dark:text-white placeholder-slate-400 focus:outline-none"
+              className="w-full pl-11 sm:pl-12 pr-10 py-3 sm:py-3.5 text-sm sm:text-base font-bold bg-transparent text-black dark:text-white placeholder-slate-400 focus:outline-none"
             />
             {searchInput && (
               <button
@@ -345,16 +344,16 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Filters & Results Controls Row */}
+          {/* Filters & Results Controls Row (Directly shown on all screens) */}
           <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 pt-3 border-t-2 border-dashed border-black/20 dark:border-white/20">
             {/* Filter Dropdowns & Segmented Prodi Control */}
-            <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-xs font-bold">
               <div className="flex items-center gap-1.5 text-black dark:text-white mr-1 uppercase font-black">
                 <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
                 <span>Filter:</span>
               </div>
 
-              {/* Segmented Prodi Control (Replaces clumsy dropdown) */}
+              {/* Segmented Prodi Control */}
               <div className="inline-flex border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] overflow-hidden text-xs font-black uppercase">
                 <button
                   type="button"
@@ -860,45 +859,51 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* Footer - Neo-Brutalist */}
-      <footer className="mt-20 border-t-[3px] border-black dark:border-white bg-[#ECE7DE] dark:bg-[#0E1013] py-8 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div>
-            <p className="font-black text-sm uppercase tracking-wide">
-              UNTAN RESEARCH HUB • JCSKOMMIPA
-            </p>
-            <p className="mt-1 text-slate-600 dark:text-slate-400 font-medium">
-              Program Studi Rekayasa Sistem Komputer &amp; Sistem Informasi, Fakultas MIPA, Universitas Tanjungpura.
-            </p>
+      {/* Bottom Status & Control Bar - Neo-Brutalist Footer */}
+      <footer className="mt-16 border-t-[3.5px] border-black dark:border-white bg-[#E5DFD3] dark:bg-[#1A1F29] py-6 px-4 sm:px-6 lg:px-8 text-xs font-bold text-black dark:text-white transition-colors relative z-20">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5">
+          {/* Left: Cloud Database Status Indicator */}
+          <div className="flex items-center space-x-2 px-3 py-1.5 text-xs font-bold border-2 border-black dark:border-white bg-white dark:bg-black text-black dark:text-white shadow-[2.5px_2.5px_0px_0px_#16181D] dark:shadow-[2.5px_2.5px_0px_0px_#D4D4D8]">
+            <span
+              className={`w-2.5 h-2.5 rounded-full border border-black ${
+                supabaseConnected ? 'bg-[#4ADE80] animate-pulse' : 'bg-[#FBBF24]'
+              }`}
+            />
+            <Database className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span className="font-mono">{supabaseConnected ? 'SUPABASE CLOUD' : 'LOCAL STORAGE'}</span>
           </div>
-          <div className="flex items-center gap-3 font-black">
+
+          {/* Center: Minimal Links & Brand */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 font-black text-xs text-center">
+            <span className="uppercase font-black text-black dark:text-white">UNTAN RESEARCH HUB</span>
+            <span className="text-slate-400 hidden sm:inline">•</span>
             <a
               href="https://siskom.untan.ac.id/dosen-staf"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline"
+              className="hover:underline hover:text-[#38BDF8] transition-colors"
             >
               DOSEN SISKOM
             </a>
-            <span>•</span>
+            <span className="text-slate-400">•</span>
             <a
               href="https://sisfo.untan.ac.id/dosen-staff"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline"
+              className="hover:underline hover:text-[#F472B6] transition-colors"
             >
               DOSEN SISFO
             </a>
-            <span>•</span>
+            <span className="text-slate-400">•</span>
             <a
               href="https://jurnal.untan.ac.id/index.php/jcskommipa"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline"
+              className="hover:underline hover:text-[#FACC15] transition-colors"
             >
               OJS UNTAN
             </a>
-            <span>•</span>
+            <span className="text-slate-400">•</span>
             <Link
               href="/admin"
               className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FEF08A] text-black border border-black shadow-[1.5px_1.5px_0px_0px_#16181D] hover:-translate-x-0.5 hover:-translate-y-0.5 active:shadow-none transition-all"
@@ -907,6 +912,12 @@ export default function HomePage() {
               <Lock className="w-3 h-3 stroke-[2.5]" />
               <span>ADMIN</span>
             </Link>
+          </div>
+
+          {/* Right: Tactile Theme Toggle Switch */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black uppercase text-black dark:text-white hidden sm:inline">MODE:</span>
+            <ThemeToggle />
           </div>
         </div>
       </footer>

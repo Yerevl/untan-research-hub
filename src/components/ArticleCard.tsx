@@ -200,43 +200,39 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-black text-black dark:text-white leading-snug mb-4">
+        <h3 className="text-base sm:text-xl font-black text-black dark:text-white leading-snug mb-3 sm:mb-4">
           {article.title}
         </h3>
 
         {/* Authors Section: Student & Lecturers breakdown in Neo-brutalist box */}
-        <div className="space-y-2 mb-4 p-3 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] text-xs">
+        <div className="space-y-2 mb-4 p-2.5 sm:p-3 bg-[#F8FAFC] dark:bg-[#111317] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] text-xs">
           {/* Mahasiswa (Icon-only badge, no text) */}
           <div className="flex items-center gap-2.5 min-h-[26px]">
             <span
-              title="Mahasiswa (Penulis Utama)"
-              className="w-6 h-6 inline-flex items-center justify-center bg-[#60A5FA] text-black border border-black rounded-sm shrink-0 shadow-none"
+              className="w-7 h-7 shrink-0 flex items-center justify-center bg-[#FEF08A] text-black border-2 border-black shadow-[1.5px_1.5px_0px_0px_#16181D] rounded-none"
+              title="Penulis Utama (Mahasiswa)"
             >
-              <GraduationCap className="w-3.5 h-3.5 stroke-[2.5]" />
+              <GraduationCap className="w-4 h-4 stroke-[2.5]" />
             </span>
-            <span className="font-extrabold text-black dark:text-white break-words flex-1 min-w-0 text-xs">
+            <span className="font-bold text-black dark:text-white truncate">
               {studentName}
             </span>
           </div>
 
-          {/* Dosen Pembimbing (Icon-only badge, no text, no numbers before names) */}
+          {/* Dosen Pembimbing (Icon-only badge, no text) */}
           {supervisors.length > 0 && (
-            <div className="pt-2 border-t-2 border-dashed border-slate-300 dark:border-slate-700 space-y-1.5">
+            <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-black/15 dark:border-white/15">
+              <span
+                className="w-7 h-7 shrink-0 flex items-center justify-center bg-[#BAE6FD] text-black border-2 border-black shadow-[1.5px_1.5px_0px_0px_#16181D] rounded-none mr-1"
+                title="Dosen Pembimbing"
+              >
+                <Briefcase className="w-4 h-4 stroke-[2.5]" />
+              </span>
               {supervisors.map((s, idx) => (
-                <div key={idx} className="flex items-center gap-2.5 min-h-[26px]">
-                  {idx === 0 ? (
-                    <span
-                      title="Dosen Pembimbing"
-                      className="w-6 h-6 inline-flex items-center justify-center bg-[#FBBF24] text-black border border-black rounded-sm shrink-0 shadow-none"
-                    >
-                      <Briefcase className="w-3.5 h-3.5 stroke-[2.5]" />
-                    </span>
-                  ) : (
-                    <span className="w-6 shrink-0" />
-                  )}
+                <div key={idx} className="inline-flex items-center">
                   <button
                     onClick={() => onFilterDosen && onFilterDosen(s.cleanName)}
-                    className="inline-flex items-center px-2 py-0.5 bg-white dark:bg-black text-black dark:text-white border-2 border-black dark:border-white font-bold text-xs shadow-[2px_2px_0px_0px_#16181D] dark:shadow-[2px_2px_0px_0px_#D4D4D8] hover:bg-[#FEF08A] hover:text-black transition-colors max-w-full text-left"
+                    className="text-left font-bold text-black dark:text-white hover:underline hover:text-[#38BDF8] transition-colors"
                     title={`Lihat riset bimbingan ${s.cleanName}`}
                   >
                     <span className="break-words">{s.cleanName}</span>
@@ -254,9 +250,9 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
         {/* Abstract */}
         {article.abstract && (
-          <div className="relative mb-5">
+          <div className="relative mb-4 sm:mb-5">
             <p
-              className={`text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal ${
+              className={`text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal ${
                 !isExpanded ? 'line-clamp-3' : ''
               }`}
             >
@@ -285,8 +281,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
       </div>
 
       {/* Card Footer Actions */}
-      <div className="pt-4 border-t-2 border-black dark:border-white flex items-center justify-between gap-3 mt-auto">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="pt-3.5 sm:pt-4 border-t-2 border-black dark:border-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 mt-auto">
+        <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-2">
           {pdfUrl ? (
             <>
               <HoldableButton
@@ -294,6 +290,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                 icon={<FileText className="w-3.5 h-3.5 stroke-[2.5]" />}
                 label="BACA PDF"
                 title={`Baca PDF: ${article.title}`}
+                className="justify-center"
               />
 
               <HoldableButton
@@ -309,19 +306,20 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
                 icon={<Download className="w-3.5 h-3.5 stroke-[2.5]" />}
                 label="UNDUH"
                 title={`Unduh: ${article.title}`}
+                className="justify-center"
               />
 
-              <CitationButton article={article} />
+              <CitationButton article={article} className="w-full flex" />
             </>
           ) : (
             <>
-              <span className="text-xs text-slate-500 font-mono italic">PDF belum tersedia</span>
-              <CitationButton article={article} />
+              <span className="text-xs text-slate-500 font-mono italic col-span-2 sm:col-span-1">PDF belum tersedia</span>
+              <CitationButton article={article} className="w-full flex" />
             </>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           {article.doi && (
             <a
               href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
