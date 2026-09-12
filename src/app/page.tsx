@@ -12,7 +12,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
   BookOpen,
-  GraduationCap,
   X,
   SlidersHorizontal,
   Lock,
@@ -311,40 +310,11 @@ export default function HomePage() {
       {/* Idle Ambient Background Animation */}
       <IdleBackground />
 
-      {/* PART 1: Top Navigation (Untan Research Hub) */}
+      {/* Top Navigation Bar with Theme Switch & Status */}
       <Navbar supabaseConnected={supabaseConnected} totalArticles={totalCount} />
 
-      {/* PART 2: Hero Section (Eksplorasi Publikasi Riset) */}
-      <section className="relative z-10 pt-10 pb-8 px-4 sm:px-6 lg:px-8 border-b-[3.5px] border-black dark:border-white bg-[#F2ECE0] dark:bg-[#222837] transition-colors">
-        <div className="max-w-4xl mx-auto text-center space-y-4">
-          {/* Sticker Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 text-xs font-black bg-[#FACC15] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] uppercase tracking-widest transform -rotate-1">
-            <GraduationCap className="w-4 h-4 stroke-[2.5]" />
-            <span>★ SISKOM &amp; SISFO • FMIPA UNTAN ★</span>
-          </div>
-
-          {/* Punchy Title */}
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-none uppercase">
-            Eksplorasi Publikasi Riset
-          </h1>
-
-          <p className="text-sm sm:text-base font-medium text-slate-800 dark:text-slate-200 max-w-2xl mx-auto leading-relaxed">
-            Koleksi riset Tugas Akhir &amp; Skripsi mahasiswa Rekayasa Sistem Komputer &amp; Sistem Informasi Untan bersama dosen pembimbing.
-            Cari topik, saring bidang keahlian laboratorium, dan baca naskah PDF secara instan.
-          </p>
-
-          {/* Subtle Informational Stats Readout (Not Button-like) */}
-          <p className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400">
-            Mengindeks <strong className="font-black text-black dark:text-white">{totalCount}</strong> artikel riset •{' '}
-            <strong className="font-black text-black dark:text-white">{dosenList.length}</strong> dosen pembimbing •{' '}
-            <strong className="font-black text-black dark:text-white">{keahlianList.length}</strong> bidang keahlian •{' '}
-            <strong className="font-black text-black dark:text-white">{issues.length || 1}</strong> edisi publikasi
-          </p>
-        </div>
-      </section>
-
-      {/* PART 3: The Rest (Filter Console & Articles Catalog) */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content: Direct Search, Filters & Article Catalog */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div id="catalog-top" className="scroll-mt-6" />
 
         {/* Unified Search & Filters Control Panel - Neo-Brutalist Box */}
