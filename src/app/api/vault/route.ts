@@ -266,23 +266,45 @@ export async function GET(request: NextRequest) {
 
     // LIVE DIAGNOSTIC MODE (?diag=true)
     if (searchParams.get('diag') === 'true' || searchParams.has('diag')) {
-      const client = getSupabaseClient();
       const urlRaw = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
+      const apiKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
       const hasUrl = Boolean(urlRaw && urlRaw.startsWith('https://'));
       const maskedUrl = hasUrl ? urlRaw.replace(/(https:\/\/[^.]+)\..*/, '$1.supabase.co') : null;
       const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
       const hasAnonKey = Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY);
 
+      // --- RAW HTTP TEST (bypass supabase-js) ---
+      // This tells us exactly what PostgREST sees, no library abstraction
+      let rawTest: Record<string, any> = {};
+      if (hasUrl && apiKey) {
+        try {
+          const rawUrl = `${urlRaw}/rest/v1/user_vaults?limit=1`;
+          const rawRes = await fetch(rawUrl, {
+            headers: {
+              'apikey': apiKey,
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          });
+          const rawBody = await rawRes.json().catch(() => ({}));
+          rawTest = {
+            httpStatus: rawRes.status,
+            ok: rawRes.ok,
+            body: rawBody,
+          };
+        } catch (e: any) {
+          rawTest = { fetchError: e?.message };
+        }
+      }
+
+      const client = getSupabaseClient();
       if (!client) {
         return NextResponse.json({
           status: 'UNCONFIGURED',
           message: 'Supabase credentials missing or invalid on server environment.',
-          env: {
-            hasUrl,
-            maskedUrl,
-            hasServiceKey,
-            hasAnonKey,
-          },
+          env: { hasUrl, maskedUrl, hasServiceKey, hasAnonKey },
+          rawTest,
           help: 'Tambahkan NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY (atau SUPABASE_SERVICE_ROLE_KEY) di Vercel Settings -> Environment Variables.',
         }, { status: 200 });
       }
@@ -381,6 +403,7 @@ export async function GET(request: NextRequest) {
           hasAnonKey,
           authRole: hasServiceKey ? 'SERVICE_ROLE (RLS dibypass)' : 'ANON_KEY (Tergantung RLS)',
         },
+        rawTest,
         activeTable,
         tables: tableReport,
         articlesTable: articlesStatus,
