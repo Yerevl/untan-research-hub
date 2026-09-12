@@ -34,6 +34,7 @@ import {
 import { VaultTrigger } from '@/components/VaultTrigger';
 import { VaultModal } from '@/components/VaultModal';
 import { SecretKeyAnnouncementModal } from '@/components/SecretKeyAnnouncementModal';
+import { lockTouchScrollOnPointerDown } from '@/lib/touchLock';
 
 const PAGE_SIZE = 10;
 
@@ -645,6 +646,7 @@ export default function HomePage() {
 
                 <AnimatePresence>
                   {/* Active Bookmarks Filter Chip */}
+                  {/* Active Bookmark Filter */}
                   {isBookmarkFilterActive && (
                     <motion.button
                       layout
@@ -653,8 +655,10 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
                       type="button"
+                      onPointerDown={lockTouchScrollOnPointerDown}
                       onClick={() => setIsBookmarkFilterActive(false)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 touch-none select-none"
+                      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                       title="Hapus filter koleksi tersimpan"
                     >
                       <Bookmark className="w-3.5 h-3.5 fill-black stroke-[2.5]" />
@@ -672,10 +676,12 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
                       type="button"
+                      onPointerDown={lockTouchScrollOnPointerDown}
                       onClick={() => handleProdiChange('all')}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 touch-none select-none ${
                         selectedProdi === 'SISFO' ? 'bg-[#F472B6] text-black' : 'bg-[#38BDF8] text-black'
                       }`}
+                      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                       title="Hapus filter prodi"
                     >
                       <span>Prodi: {selectedProdi}</span>
@@ -692,8 +698,10 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
                       type="button"
+                      onPointerDown={lockTouchScrollOnPointerDown}
                       onClick={() => handleKeahlianChange('all')}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#A7F3D0] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#A7F3D0] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 touch-none select-none"
+                      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                       title="Hapus filter bidang keahlian"
                     >
                       <span>Keahlian: {selectedKeahlian}</span>
@@ -710,8 +718,10 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
                       type="button"
+                      onPointerDown={lockTouchScrollOnPointerDown}
                       onClick={() => handleDosenChange('all')}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FEF08A] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 touch-none select-none"
+                      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                       title="Hapus filter dosen"
                     >
                       <span>Dosen: {selectedDosen}</span>
@@ -728,8 +738,10 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
                       type="button"
+                      onPointerDown={lockTouchScrollOnPointerDown}
                       onClick={() => setSelectedIssue('all')}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FED7AA] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#FED7AA] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 touch-none select-none"
+                      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                       title="Hapus filter edisi"
                     >
                       <span>Edisi: {selectedIssue}</span>
@@ -746,8 +758,10 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
                       type="button"
+                      onPointerDown={lockTouchScrollOnPointerDown}
                       onClick={() => setSelectedYear('all')}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#DDD6FE] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-[#DDD6FE] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 touch-none select-none"
+                      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                       title="Hapus filter tahun"
                     >
                       <span>Tahun: {selectedYear}</span>
@@ -764,11 +778,13 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 28 }}
                       type="button"
+                      onPointerDown={lockTouchScrollOnPointerDown}
                       onClick={() => {
                         setSearchInput('');
                         setSearchQuery('');
                       }}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-slate-200 dark:bg-slate-700 text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black bg-slate-200 dark:bg-slate-700 text-black dark:text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_#16181D] uppercase transition-all hover:opacity-85 active:translate-x-0.5 active:translate-y-0.5 touch-none select-none"
+                      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                       title="Hapus kata kunci pencarian"
                     >
                       <span>Cari: &quot;{searchQuery}&quot;</span>
@@ -782,8 +798,10 @@ export default function HomePage() {
                   layout
                   whileTap={{ scale: 0.95 }}
                   type="button"
+                  onPointerDown={lockTouchScrollOnPointerDown}
                   onClick={handleResetFilters}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all ml-auto uppercase"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black bg-[#FECDD3] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] hover:bg-[#FDA4AF] active:translate-x-0.5 active:translate-y-0.5 transition-all ml-auto uppercase touch-none select-none"
+                  style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
                   title="Reset semua filter ke default"
                 >
                   <X className="w-3.5 h-3.5 stroke-[3]" />
@@ -822,8 +840,11 @@ export default function HomePage() {
             </p>
             {hasActiveFilters && (
               <button
+                type="button"
+                onPointerDown={lockTouchScrollOnPointerDown}
                 onClick={handleResetFilters}
-                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5"
+                className="mt-3 px-4 py-2 text-xs font-black uppercase bg-[#A3E635] text-black border-2 border-black shadow-[3px_3px_0px_0px_#16181D] active:translate-x-0.5 active:translate-y-0.5 touch-none select-none"
+                style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
               >
                 Reset Filter Pencarian
               </button>

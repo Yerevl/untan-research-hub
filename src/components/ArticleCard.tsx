@@ -18,6 +18,7 @@ import {
 import { ArticleActionsButton } from './ArticleActionsButton';
 import { CitationButton } from './CitationButton';
 import { motion, Variants } from 'motion/react';
+import { lockTouchScrollOnPointerDown } from '@/lib/touchLock';
 
 interface ArticleCardProps {
   article: Article;
@@ -304,7 +305,9 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
             href={`https://doi.org/${article.doi.replace(/^https?:\/\/doi\.org\//, '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 h-[36px] px-2.5 sm:px-3 text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center justify-center uppercase"
+            onPointerDown={lockTouchScrollOnPointerDown}
+            className="shrink-0 h-[36px] px-2.5 sm:px-3 text-xs font-mono font-black text-black bg-[#FECDD3] hover:bg-[#FDA4AF] border-2 border-black dark:border-white shadow-[3px_3px_0px_0px_#16181D] dark:shadow-[3px_3px_0px_0px_#D4D4D8] active:translate-x-0.5 active:translate-y-0.5 transition-all inline-flex items-center justify-center uppercase touch-none select-none"
+            style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
             title={`DOI: ${article.doi}`}
           >
             DOI
