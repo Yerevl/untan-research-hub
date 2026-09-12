@@ -227,6 +227,14 @@ async function saveCloudVault(record: CloudVaultRecord): Promise<SaveVaultResult
           insertErr = strRetryErr;
         }
 
+        // Retry 4: If created_at or updated_at columns don't exist in table
+        if (insertErr && (insertErr.message?.includes('created_at') || insertErr.message?.includes('updated_at') || insertErr.code === 'PGRST204')) {
+          delete insertPayload.created_at;
+          delete insertPayload.updated_at;
+          const { error: noTimeErr } = await client.from(tableName).insert(insertPayload);
+          insertErr = noTimeErr;
+        }
+
         if (!insertErr) {
           result.savedToSupabase = true;
           result.tableUsed = tableName;
@@ -375,18 +383,17 @@ export async function GET(request: NextRequest) {
         tables: tableReport,
         articlesTable: articlesStatus,
         sqlHelp: !activeTable ? {
-          title: 'Perbaiki Tabel Supabase',
+          title: 'Aktifkan Akses API Tabel Supabase',
           instruction: 'Buka Dashboard Supabase -> SQL Editor, lalu jalankan query di bawah:',
-          sql: `create table if not exists public.user_vaults (
-  secret_key text primary key,
-  primary_device_id text not null,
-  secondary_device_ids jsonb default '[]'::jsonb,
-  bookmarks jsonb default '[]'::jsonb,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
+          sql: `-- 1. Berikan izin akses penuh ke tabel user_vaults untuk API
+grant usage on schema public to postgres, anon, authenticated, service_role;
+grant all on table public.user_vaults to postgres, anon, authenticated, service_role;
 
-alter table public.user_vaults disable row level security;`
+-- 2. Pastikan RLS dinonaktifkan
+alter table public.user_vaults disable row level security;
+
+-- 3. Paksa API PostgREST merefresh cache skema (Mengatasi error PGRST106)
+notify pgrst, 'reload schema';`
         } : null,
       }, { status: 200 });
     }
