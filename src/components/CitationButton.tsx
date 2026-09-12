@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Article } from '@/lib/types';
 import { generateApaCitation, generateIeeeCitation } from '@/lib/citation';
 import { Quote, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface CitationButtonProps {
   article: Article;
@@ -200,49 +201,64 @@ export const CitationButton: React.FC<CitationButtonProps> = ({ article }) => {
   return (
     <div ref={containerRef} data-citation-container className="relative inline-block select-none touch-none">
       {/* Toast Feedback */}
-      {toastMessage && (
-        <div className="absolute -top-9 left-0 whitespace-nowrap z-50 px-2.5 py-1 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] text-[11px] font-black uppercase tracking-wider animate-in fade-in zoom-in-95 duration-150">
-          ✓ {toastMessage}
-        </div>
-      )}
-
-      {/* Side Hold-and-Drag / Click Menu Flyout */}
-      {isOpen && (
-        <div
-          ref={flyoutRef}
-          className="absolute left-full -ml-2.5 top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8] origin-left animate-flyout-slide-left overflow-hidden"
-        >
-          {/* APA Option (Top) */}
-          <button
-            ref={apaBtnRef}
-            type="button"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => copyCitation('APA')}
-            className={`px-3.5 py-1.5 font-black text-xs uppercase border-b-2 border-black dark:border-white transition-all duration-100 flex items-center justify-center min-w-[70px] ${
-              activeFormat === 'APA'
-                ? 'bg-[#F472B6] text-black scale-105'
-                : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#F472B6] hover:text-black'
-            }`}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.88 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.88 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            className="absolute -top-9 left-0 whitespace-nowrap z-50 px-2.5 py-1 bg-[#A3E635] text-black border-2 border-black shadow-[2px_2px_0px_0px_#16181D] text-[11px] font-black uppercase tracking-wider"
           >
-            <span className="skew-y-6 inline-block">APA</span>
-          </button>
+            ✓ {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-          {/* IEEE Option (Bottom) */}
-          <button
-            ref={ieeeBtnRef}
-            type="button"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => copyCitation('IEEE')}
-            className={`px-3.5 py-1.5 font-black text-xs uppercase transition-all duration-100 flex items-center justify-center min-w-[70px] ${
-              activeFormat === 'IEEE'
-                ? 'bg-[#38BDF8] text-black scale-105'
-                : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#38BDF8] hover:text-black'
-            }`}
+      {/* Side Hold-and-Drag / Click Menu Flyout with Spring Physics */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            ref={flyoutRef}
+            initial={{ opacity: 0, scaleX: 0.4, x: 12, y: '-50%', skewY: -6 }}
+            animate={{ opacity: 1, scaleX: 1, x: 0, y: '-50%', skewY: -6 }}
+            exit={{ opacity: 0, scaleX: 0.4, x: 10, y: '-50%', skewY: -6 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 26 }}
+            style={{ transformOrigin: 'left center' }}
+            className="absolute left-full -ml-2.5 top-1/2 z-50 flex flex-col border-[2.5px] border-black dark:border-white bg-white dark:bg-[#181B20] shadow-[4px_4px_0px_0px_#16181D] dark:shadow-[4px_4px_0px_0px_#D4D4D8] overflow-hidden"
           >
-            <span className="skew-y-6 inline-block">IEEE</span>
-          </button>
-        </div>
-      )}
+            {/* APA Option (Top) */}
+            <button
+              ref={apaBtnRef}
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => copyCitation('APA')}
+              className={`px-3.5 py-1.5 font-black text-xs uppercase border-b-2 border-black dark:border-white transition-all duration-100 flex items-center justify-center min-w-[70px] ${
+                activeFormat === 'APA'
+                  ? 'bg-[#F472B6] text-black scale-105'
+                  : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#F472B6] hover:text-black'
+              }`}
+            >
+              <span className="skew-y-6 inline-block">APA</span>
+            </button>
+
+            {/* IEEE Option (Bottom) */}
+            <button
+              ref={ieeeBtnRef}
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={() => copyCitation('IEEE')}
+              className={`px-3.5 py-1.5 font-black text-xs uppercase transition-all duration-100 flex items-center justify-center min-w-[70px] ${
+                activeFormat === 'IEEE'
+                  ? 'bg-[#38BDF8] text-black scale-105'
+                  : 'bg-white dark:bg-black text-black dark:text-white hover:bg-[#38BDF8] hover:text-black'
+              }`}
+            >
+              <span className="skew-y-6 inline-block">IEEE</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Trigger Button */}
       <button

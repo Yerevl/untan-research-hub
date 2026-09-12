@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { CitationButton } from './CitationButton';
 import { HoldableButton } from './HoldableButton';
+import { motion, Variants } from 'motion/react';
 
 interface ArticleCardProps {
   article: Article;
@@ -27,6 +28,20 @@ interface ArticleCardProps {
   onFilterKeahlian?: (keahlianName: string) => void;
   onFilterProdi?: (prodiName: string) => void;
 }
+
+const comicCardVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 600,
+      damping: 22,
+      mass: 0.7,
+    },
+  },
+};
 
 export const ArticleCard: React.FC<ArticleCardProps> = ({
   article,
@@ -128,7 +143,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   };
 
   return (
-    <article className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-all flex flex-col justify-between">
+    <motion.article
+      variants={comicCardVariants}
+      whileHover={{ x: -3, y: -3 }}
+      className="group bg-white dark:bg-[#181B20] border-[2.5px] border-black dark:border-white shadow-[6px_6px_0px_0px_#16181D] dark:shadow-[6px_6px_0px_0px_#D4D4D8] p-6 hover:shadow-[9px_9px_0px_0px_#16181D] dark:hover:shadow-[9px_9px_0px_0px_#D4D4D8] transition-shadow flex flex-col justify-between"
+    >
       <div>
         {/* Badges Row: Issue (flat stamp), Prodi (elevated button), Keahlian (elevated button), Date (flat stamp) */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -316,6 +335,6 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           )}
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 };
