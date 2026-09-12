@@ -1,1 +1,13 @@
-{}
+{
+  "acc-kalem-pontianak-kuota": {
+    "secret_key": "acc-kalem-pontianak-kuota",
+    "primary_device_id": "dev_skung3gwhbo",
+    "secondary_device_ids": [],
+    "bookmarks": [
+      "87609",
+      "90853"
+    ],
+    "created_at": "2026-09-12T10:38:18.169Z",
+    "updated_at": "2026-09-12T10:40:26.088Z"
+  }
+}

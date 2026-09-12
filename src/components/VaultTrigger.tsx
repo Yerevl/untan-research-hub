@@ -85,3 +85,4 @@ export const VaultTrigger: React.FC<VaultTriggerProps> = ({
     </>
   );
 };
+

@@ -98,3 +98,4 @@ export const SecretKeyAnnouncementModal: React.FC<SecretKeyAnnouncementModalProp
     </div>
   );
 };
+

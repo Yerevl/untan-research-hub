@@ -215,3 +215,4 @@ export function clearLocalVault(): void {
   localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(empty));
   window.dispatchEvent(new CustomEvent('untan_vault_updated', { detail: empty }));
 }
+
