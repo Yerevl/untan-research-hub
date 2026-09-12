@@ -387,14 +387,15 @@ export async function GET(request: NextRequest) {
         sqlHelp: !activeTable ? {
           title: 'Aktifkan Akses API Tabel Supabase',
           instruction: 'Buka Dashboard Supabase -> SQL Editor, lalu jalankan query di bawah:',
-          sql: `-- 1. Berikan izin akses penuh ke tabel user_vaults untuk API
-grant usage on schema public to postgres, anon, authenticated, service_role;
-grant all on table public.user_vaults to postgres, anon, authenticated, service_role;
+          sql: `-- 1. Berikan izin akses penuh ke tabel user_vaults untuk semua role API
+grant usage on schema public to postgres, anon, authenticated, service_role, authenticator;
+grant all on table public.user_vaults to postgres, anon, authenticated, service_role, authenticator;
+alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role, authenticator;
 
 -- 2. Pastikan RLS dinonaktifkan
 alter table public.user_vaults disable row level security;
 
--- 3. Paksa API PostgREST merefresh cache skema (Mengatasi error PGRST106)
+-- 3. Paksa API PostgREST merefresh cache skema detik ini juga
 notify pgrst, 'reload schema';`
         } : null,
       }, { status: 200 });

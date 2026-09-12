@@ -611,10 +611,21 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                         <div className="font-mono text-[10px] text-slate-600 dark:text-slate-400 space-y-0.5 bg-white dark:bg-[#111317] p-2 border border-black/20">
                           <p>• Auth Role: <strong>{diagResult.env?.authRole || 'Unknown'}</strong></p>
                           <p>• URL Configured: <strong>{diagResult.env?.hasUrl ? 'Ya' : 'Tidak'}</strong> ({diagResult.env?.maskedUrl || '-'})</p>
-                          <p>• Tabel user_vaults: <strong>{diagResult.tables?.user_vaults?.writable ? 'BISA TULIS & BACA ✓' : diagResult.tables?.user_vaults?.exists ? 'Bisa baca, Gagal tulis' : 'Tidak Ditemukan (42P01)'}</strong></p>
+                          <p>• Tabel user_vaults: <strong>
+                            {diagResult.tables?.user_vaults?.writable
+                              ? 'BISA TULIS & BACA ✓'
+                              : diagResult.tables?.user_vaults?.readable
+                              ? 'Bisa baca, Gagal tulis'
+                              : 'Belum Terdaftar di Cache API Supabase (PGRST125)'}
+                          </strong></p>
                           {diagResult.tables?.user_vaults?.writeError && (
                             <p className="text-red-600 dark:text-red-400 font-bold mt-1">
-                              ✕ Error Supabase: [{diagResult.tables.user_vaults.writeError.code}] {diagResult.tables.user_vaults.writeError.message}
+                              ✕ Error Tulis: [{diagResult.tables.user_vaults.writeError.code}] {diagResult.tables.user_vaults.writeError.message}
+                            </p>
+                          )}
+                          {diagResult.tables?.user_vaults?.errorMessage && !diagResult.tables?.user_vaults?.readable && (
+                            <p className="text-amber-600 dark:text-amber-400 font-bold mt-1">
+                              ⚠ Status API: {diagResult.tables.user_vaults.errorMessage}
                             </p>
                           )}
                         </div>
