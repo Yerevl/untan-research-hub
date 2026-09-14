@@ -4,11 +4,17 @@ import fs from 'fs';
 import path from 'path';
 
 // Environment variables (supports both manual and Vercel Supabase Integration)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey =
+const rawUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '').trim();
+const rawKey = (
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  process.env.SUPABASE_ANON_KEY;
+  process.env.SUPABASE_ANON_KEY ||
+  ''
+).trim();
+
+// Sanitize URL: Remove any trailing /rest/v1 or slashes so supabase-js doesn't duplicate paths
+export const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+export const supabaseKey = rawKey.replace(/[\r\n\t]/g, '');
 
 export const isSupabaseConfigured = (): boolean => {
   return Boolean(

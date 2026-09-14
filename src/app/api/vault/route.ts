@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getSupabaseClient } from '@/lib/supabase';
+import { getSupabaseClient, supabaseUrl, supabaseKey } from '@/lib/supabase';
 import { normalizeSecretKey } from '@/lib/vault';
 
 const getFallbackFilePath = () => path.join(process.cwd(), 'src', 'data', 'vaults_v2.json');
@@ -55,17 +55,15 @@ export async function GET(request: NextRequest) {
         keyHasWhitespace: /\s/.test(rawKey),
       };
 
-      // Test raw fetch without supabase-js
+      // Test raw fetch without supabase-js using sanitized URL and Key
       let rawFetchTest: any = null;
-      if (rawUrl && rawKey) {
+      if (supabaseUrl && supabaseKey) {
         try {
-          const cleanBase = rawUrl.trim().replace(/\/+$/, '');
-          const cleanKey = rawKey.trim();
-          const targetUrl = `${cleanBase}/rest/v1/articles?select=ojs_id&limit=1`;
+          const targetUrl = `${supabaseUrl}/rest/v1/articles?select=ojs_id&limit=1`;
           const res = await fetch(targetUrl, {
             headers: {
-              apikey: cleanKey,
-              Authorization: `Bearer ${cleanKey}`,
+              apikey: supabaseKey,
+              Authorization: `Bearer ${supabaseKey}`,
               Accept: 'application/json',
             },
           });
