@@ -40,6 +40,8 @@ export async function GET(request: NextRequest) {
     if (isHealthCheck) {
       let rpcWorks = false;
       let tableWorks = false;
+      let rowsCount: number | null = null;
+      let sampleRows: any[] = [];
 
       if (client) {
         try {
@@ -48,16 +50,25 @@ export async function GET(request: NextRequest) {
         } catch {}
 
         try {
-          const { error: tblErr } = await client.from('user_bookmarks').select('sync_code').limit(1);
-          tableWorks = !tblErr;
+          const { data: rows, count, error: tblErr } = await client.from('user_bookmarks').select('*', { count: 'exact' });
+          if (!tblErr) {
+            tableWorks = true;
+            rowsCount = count ?? (rows ? rows.length : 0);
+            sampleRows = rows || [];
+          }
         } catch {}
       }
+
+      const projectRef = supabaseUrl ? supabaseUrl.replace(/https?:\/\//, '').split('.')[0] : null;
 
       return NextResponse.json({
         service: 'Untan Bookmarks Sync API v2',
         cloudConnected: Boolean(client),
+        projectRef,
         rpcReady: rpcWorks,
         tableReady: tableWorks,
+        rowsCount,
+        sampleRows,
         status: rpcWorks || tableWorks ? 'healthy' : 'degraded',
       });
     }
