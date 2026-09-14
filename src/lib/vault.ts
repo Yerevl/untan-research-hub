@@ -1,12 +1,10 @@
 /**
- * Local-First Bookmark & Secret-Key Sync Vault
- * 
- * Rules:
- * 1. Generates 4-word Indonesian slang secret passphrase on first bookmark.
- * 2. Local-first immediate storage (0ms latency), background cloud sync.
- * 3. Multi-device sync by entering the 4-word passphrase.
- * 4. Secondary device masks secret passphrase (••••-••••-••••-••••) for lab/public safety.
- * 5. Primary status can be transferred between devices.
+ * Untan Research Hub - Local-First Bookmark & Cross-Device Sync (v2)
+ *
+ * Architecture:
+ * 1. Local-First: localStorage is the primary store (0ms latency, 100% offline).
+ * 2. Slang Passphrase: Fun, memorable 4-word Indonesian slang passkeys (e.g. "kopi-santai-skripsi-mantap").
+ * 3. Cross-Device Sync: Enter code on mobile/laptop or open link with `?sync=<code>`.
  */
 
 export const INDONESIAN_SLANG_WORDS: string[] = [
@@ -26,41 +24,19 @@ export const INDONESIAN_SLANG_WORDS: string[] = [
 ];
 
 export interface LocalVault {
-  secretKey: string | null;       // 4-word passphrase e.g. "kopi-santai-skripsi-mantap"
-  isPrimary: boolean;            // true if Primary Device (can view full key and transfer ownership)
-  deviceId: string;              // unique persistent UUID for this browser
-  bookmarks: string[];           // array of article ojs_id
+  syncCode: string | null;       // 4-word passphrase e.g. "kopi-santai-skripsi-mantap"
+  bookmarks: string[];          // array of article ojs_id
   lastSyncedAt?: string;
-  hasSeenWelcome?: boolean;      // whether first-time secret announcement modal has been seen
+  hasSeenWelcome?: boolean;
+  isPrimary?: boolean;          // backward compatibility
+  secretKey?: string | null;    // alias for syncCode for backward compatibility
 }
 
-export interface CloudVaultRecord {
-  secret_key: string;
-  primary_device_id: string;
-  secondary_device_ids: string[];
-  bookmarks: string[];
-  updated_at: string;
-  created_at: string;
-}
-
-const DEVICE_ID_KEY = 'untan_vault_device_id';
-const VAULT_STORAGE_KEY = 'untan_bookmark_vault_v1';
+const STORAGE_KEY_V2 = 'untan_bookmarks_v2';
+const STORAGE_KEY_V1 = 'untan_bookmark_vault_v1';
 
 /**
- * Returns or creates persistent device ID for this browser
- */
-export function getOrCreateDeviceId(): string {
-  if (typeof window === 'undefined') return 'server_side';
-  let devId = localStorage.getItem(DEVICE_ID_KEY);
-  if (!devId) {
-    devId = 'dev_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36).substring(4);
-    localStorage.setItem(DEVICE_ID_KEY, devId);
-  }
-  return devId;
-}
-
-/**
- * Generates a memorable 4-word Indonesian slang secret key
+ * Generates a memorable 4-word Indonesian slang sync code
  */
 export function generateSecretKey(): string {
   const words = [...INDONESIAN_SLANG_WORDS];
@@ -74,7 +50,7 @@ export function generateSecretKey(): string {
 }
 
 /**
- * Normalizes input secret key (trims whitespace, converts to lowercase, handles spaces/commas to hyphens)
+ * Normalizes input code (trims whitespace, converts to lowercase, handles spaces/commas to hyphens)
  */
 export function normalizeSecretKey(input: string): string {
   return input
@@ -86,98 +62,89 @@ export function normalizeSecretKey(input: string): string {
 }
 
 /**
- * Get current Local Vault from localStorage
+ * Reads local vault from localStorage with backward compatibility for v1
  */
 export function getLocalVault(): LocalVault {
   if (typeof window === 'undefined') {
-    return {
-      secretKey: null,
-      isPrimary: false,
-      deviceId: 'server_side',
-      bookmarks: [],
-    };
+    return { syncCode: null, bookmarks: [] };
   }
 
-  const deviceId = getOrCreateDeviceId();
   try {
-    const stored = localStorage.getItem(VAULT_STORAGE_KEY);
-    if (!stored) {
+    // 1. Try reading v2
+    const storedV2 = localStorage.getItem(STORAGE_KEY_V2);
+    if (storedV2) {
+      const parsed = JSON.parse(storedV2);
       return {
-        secretKey: null,
-        isPrimary: false,
-        deviceId,
-        bookmarks: [],
+        syncCode: parsed.syncCode || null,
+        bookmarks: Array.isArray(parsed.bookmarks) ? parsed.bookmarks : [],
+        lastSyncedAt: parsed.lastSyncedAt,
+        hasSeenWelcome: Boolean(parsed.hasSeenWelcome),
       };
     }
-    const parsed = JSON.parse(stored);
-    return {
-      secretKey: parsed.secretKey || null,
-      isPrimary: Boolean(parsed.isPrimary),
-      deviceId: parsed.deviceId || deviceId,
-      bookmarks: Array.isArray(parsed.bookmarks) ? parsed.bookmarks : [],
-      lastSyncedAt: parsed.lastSyncedAt,
-      hasSeenWelcome: Boolean(parsed.hasSeenWelcome),
-    };
-  } catch (e) {
-    console.error('Error parsing local vault:', e);
-    return {
-      secretKey: null,
-      isPrimary: false,
-      deviceId,
-      bookmarks: [],
-    };
+
+    // 2. Migration: Try reading legacy v1
+    const storedV1 = localStorage.getItem(STORAGE_KEY_V1);
+    if (storedV1) {
+      const parsed = JSON.parse(storedV1);
+      const migrated: LocalVault = {
+        syncCode: parsed.secretKey || null,
+        bookmarks: Array.isArray(parsed.bookmarks) ? parsed.bookmarks : [],
+        hasSeenWelcome: Boolean(parsed.hasSeenWelcome),
+      };
+      saveLocalVault(migrated);
+      return migrated;
+    }
+  } catch (err) {
+    console.warn('Error reading local vault:', err);
   }
+
+  return { syncCode: null, bookmarks: [] };
 }
 
 /**
- * Save Local Vault to localStorage and dispatch custom event
+ * Saves local vault to localStorage and triggers cross-tab/component sync event
  */
 export function saveLocalVault(vault: LocalVault): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(vault));
+    localStorage.setItem(STORAGE_KEY_V2, JSON.stringify(vault));
     window.dispatchEvent(new CustomEvent('untan_vault_updated', { detail: vault }));
-  } catch (e) {
-    console.error('Error saving local vault:', e);
+  } catch (err) {
+    console.error('Error saving local vault:', err);
   }
 }
 
 /**
- * Toggle an article bookmark in local vault.
- * If this is the user's very first bookmark ever, generates a new 4-word secret key and marks device as Primary.
+ * Toggles an article in bookmarks.
+ * If this is the user's first bookmark, generates a 4-word sync code automatically.
  */
 export function toggleBookmarkLocal(ojsId: string): {
   vault: LocalVault;
   isBookmarked: boolean;
   isFirstEver: boolean;
-  generatedKey?: string;
+  generatedCode?: string;
 } {
   const current = getLocalVault();
   const exists = current.bookmarks.includes(ojsId);
   let isFirstEver = false;
-  let generatedKey: string | undefined = undefined;
+  let syncCode = current.syncCode;
+  let generatedCode: string | undefined = undefined;
 
   let nextBookmarks: string[];
-  let secretKey = current.secretKey;
-  let isPrimary = current.isPrimary;
-
   if (exists) {
     nextBookmarks = current.bookmarks.filter((id) => id !== ojsId);
   } else {
     nextBookmarks = [...current.bookmarks, ojsId];
-    // If no secret key exists yet, this is first bookmark!
-    if (!secretKey) {
-      secretKey = generateSecretKey();
-      isPrimary = true;
+    if (!syncCode) {
+      syncCode = generateSecretKey();
       isFirstEver = true;
-      generatedKey = secretKey;
+      generatedCode = syncCode;
     }
   }
 
   const updated: LocalVault = {
     ...current,
-    secretKey,
-    isPrimary,
+    syncCode,
     bookmarks: nextBookmarks,
   };
 
@@ -187,12 +154,12 @@ export function toggleBookmarkLocal(ojsId: string): {
     vault: updated,
     isBookmarked: !exists,
     isFirstEver,
-    generatedKey,
+    generatedCode,
   };
 }
 
 /**
- * Check if an article is bookmarked in local vault
+ * Checks if an article is bookmarked
  */
 export function isArticleBookmarked(ojsId: string, vault?: LocalVault): boolean {
   const v = vault || getLocalVault();
@@ -200,45 +167,32 @@ export function isArticleBookmarked(ojsId: string, vault?: LocalVault): boolean 
 }
 
 /**
- * Disconnect / clear local vault on this device (e.g. logging out of a public PC)
+ * Clears local vault (disconnects device)
  */
 export function clearLocalVault(): void {
   if (typeof window === 'undefined') return;
-  const deviceId = getOrCreateDeviceId();
-  const empty: LocalVault = {
-    secretKey: null,
-    isPrimary: false,
-    deviceId,
-    bookmarks: [],
-    hasSeenWelcome: false,
-  };
-  localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(empty));
-  window.dispatchEvent(new CustomEvent('untan_vault_updated', { detail: empty }));
+  const empty: LocalVault = { syncCode: null, bookmarks: [] };
+  saveLocalVault(empty);
 }
 
 /**
- * Reset vault and generate a brand new 4-word secret key for fresh testing
+ * Generates a direct URL that automatically loads this vault on another device
+ */
+export function generateShareUrl(syncCode: string): string {
+  if (typeof window === 'undefined') return `https://untan-research-hub.vercel.app?sync=${syncCode}`;
+  return `${window.location.origin}?sync=${syncCode}`;
+}
+
+/**
+ * Resets and generates a fresh 4-word sync code
  */
 export function resetAndGenerateNewVault(): LocalVault {
-  if (typeof window === 'undefined') {
-    return {
-      secretKey: null,
-      isPrimary: false,
-      deviceId: 'server_side',
-      bookmarks: [],
-      hasSeenWelcome: false,
-    };
-  }
-  const deviceId = getOrCreateDeviceId();
-  const newKey = generateSecretKey();
+  const newCode = generateSecretKey();
   const fresh: LocalVault = {
-    secretKey: newKey,
-    isPrimary: true,
-    deviceId,
+    syncCode: newCode,
     bookmarks: [],
     hasSeenWelcome: false,
   };
   saveLocalVault(fresh);
   return fresh;
 }
-

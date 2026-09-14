@@ -30,6 +30,7 @@ import {
   getLocalVault,
   saveLocalVault,
   toggleBookmarkLocal,
+  normalizeSecretKey,
 } from '@/lib/vault';
 import { VaultTrigger } from '@/components/VaultTrigger';
 import { VaultModal } from '@/components/VaultModal';
@@ -92,48 +93,54 @@ export default function HomePage() {
   // Modal State
   const [activePdfArticle, setActivePdfArticle] = useState<Article | null>(null);
 
-  // Vault & Bookmark State
+  // Vault & Bookmark State (Local-First)
   const [vault, setVault] = useState<LocalVault>({
-    secretKey: null,
-    isPrimary: false,
-    deviceId: 'client',
+    syncCode: null,
     bookmarks: [],
   });
   const [isVaultOpen, setIsVaultOpen] = useState<boolean>(false);
   const [newSecretKeyAnnounce, setNewSecretKeyAnnounce] = useState<string | null>(null);
   const [isBookmarkFilterActive, setIsBookmarkFilterActive] = useState<boolean>(false);
 
-  // Sync vault on client mount and listen for storage/custom events
+  // Sync vault on client mount, handle ?sync= URL parameter, and listen for updates
   useEffect(() => {
     const v = getLocalVault();
     setVault(v);
 
-    // If local vault has secret key, auto-sync to cloud on load
-    if (v.secretKey) {
-      fetch('/api/vault', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'sync',
-          secretKey: v.secretKey,
-          deviceId: v.deviceId,
-          bookmarks: v.bookmarks,
-        }),
-      })
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.success && data.vault) {
-            const updated: LocalVault = {
-              ...v,
-              bookmarks: data.vault.bookmarks,
-              isPrimary: data.vault.isPrimary,
-              lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
-            };
-            saveLocalVault(updated);
-            setVault(updated);
-          }
-        })
-        .catch((e) => console.warn('Auto-sync deferred:', e));
+    // 1. Check if user opened a sync link (e.g. ?sync=kopi-santai-skripsi-mantap)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSyncCode = urlParams.get('sync');
+      if (urlSyncCode) {
+        const normalized = normalizeSecretKey(urlSyncCode);
+        fetch(`/api/vault?code=${encodeURIComponent(normalized)}`)
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success && Array.isArray(data.bookmarks)) {
+              const merged = Array.from(new Set([...v.bookmarks, ...data.bookmarks]));
+              const updated: LocalVault = {
+                syncCode: normalized,
+                bookmarks: merged,
+                lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+                hasSeenWelcome: true,
+              };
+              saveLocalVault(updated);
+              setVault(updated);
+              setIsVaultOpen(true);
+            }
+          })
+          .catch((e) => console.warn('URL sync import deferred:', e));
+      } else if (v.syncCode && v.bookmarks.length > 0) {
+        // 2. Background sync existing vault to cloud
+        fetch('/api/vault', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: v.syncCode,
+            bookmarks: v.bookmarks,
+          }),
+        }).catch((e) => console.warn('Auto-sync deferred:', e));
+      }
     }
 
     const handleVaultUpdate = (e: any) => {
@@ -157,43 +164,26 @@ export default function HomePage() {
     const res = toggleBookmarkLocal(article.ojs_id);
     setVault(res.vault);
 
+    const activeCode = res.vault.syncCode || res.generatedCode;
+
     // Show celebration announcement modal on first bookmark or if user hasn't seen it yet
-    if ((res.isFirstEver && res.generatedKey) || (!res.vault.hasSeenWelcome && res.vault.secretKey)) {
-      setNewSecretKeyAnnounce(res.vault.secretKey);
+    if ((res.isFirstEver && activeCode) || (!res.vault.hasSeenWelcome && activeCode)) {
+      setNewSecretKeyAnnounce(activeCode);
       const updatedVault: LocalVault = { ...res.vault, hasSeenWelcome: true };
       saveLocalVault(updatedVault);
       setVault(updatedVault);
     }
 
-    if (res.vault.secretKey) {
+    if (activeCode) {
       try {
-        const syncRes = await fetch('/api/vault', {
+        await fetch('/api/vault', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            action: 'sync',
-            secretKey: res.vault.secretKey,
-            deviceId: res.vault.deviceId,
+            code: activeCode,
             bookmarks: res.vault.bookmarks,
           }),
         });
-        const syncData = await syncRes.json();
-        if (syncData.success && syncData.vault) {
-          const updated: LocalVault = {
-            ...res.vault,
-            bookmarks: syncData.vault.bookmarks,
-            isPrimary: syncData.vault.isPrimary,
-            lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
-          };
-          saveLocalVault(updated);
-          setVault(updated);
-
-          if (syncData.supabaseStatus?.saved) {
-            console.log(`[Vault] Synced to Supabase table: ${syncData.supabaseStatus.table}`);
-          } else if (syncData.supabaseStatus?.error) {
-            console.warn(`[Vault] Supabase sync status: ${syncData.supabaseStatus.error}`);
-          }
-        }
       } catch (err) {
         console.warn('Background sync deferred:', err);
       }
