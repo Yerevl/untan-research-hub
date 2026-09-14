@@ -38,100 +38,27 @@ export async function GET(request: NextRequest) {
 
     // Healthcheck mode
     if (isHealthCheck) {
-      const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-      const rawKey =
-        process.env.SUPABASE_SERVICE_ROLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-        process.env.SUPABASE_ANON_KEY ||
-        '';
-
-      const urlInspection = {
-        length: rawUrl.length,
-        hasTrailingSlash: rawUrl.endsWith('/'),
-        hasWhitespace: /\s/.test(rawUrl),
-        startsWithHttps: rawUrl.startsWith('https://'),
-        cleanHost: rawUrl.replace(/https?:\/\//, '').split('/')[0],
-        keyLength: rawKey.length,
-        keyHasWhitespace: /\s/.test(rawKey),
-      };
-
-      // Test raw fetch without supabase-js using sanitized URL and Key
-      let rawFetchTest: any = null;
-      if (supabaseUrl && supabaseKey) {
-        try {
-          const targetUrl = `${supabaseUrl}/rest/v1/articles?select=ojs_id&limit=1`;
-          const res = await fetch(targetUrl, {
-            headers: {
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
-              Accept: 'application/json',
-            },
-          });
-          rawFetchTest = {
-            targetUrl,
-            status: res.status,
-            statusText: res.statusText,
-            body: await res.json().catch((e) => e?.message),
-          };
-        } catch (e: any) {
-          rawFetchTest = { exception: e?.message };
-        }
-      }
-
       let rpcWorks = false;
       let tableWorks = false;
-      let rpcErrorDetails: any = null;
-      let tableErrorDetails: any = null;
-      let articlesWorks = false;
-      let articlesErrorDetails: any = null;
 
       if (client) {
         try {
-          const { data: rpcData, error: rpcErr } = await client.rpc('get_bookmarks', { p_sync_code: '__healthcheck__' });
-          if (!rpcErr) {
-            rpcWorks = true;
-          } else {
-            rpcErrorDetails = { code: rpcErr.code, message: rpcErr.message, details: rpcErr.details, hint: rpcErr.hint };
-          }
-        } catch (e: any) {
-          rpcErrorDetails = { exception: e?.message };
-        }
+          const { error: rpcErr } = await client.rpc('get_bookmarks', { p_sync_code: '__healthcheck__' });
+          rpcWorks = !rpcErr;
+        } catch {}
 
         try {
           const { error: tblErr } = await client.from('user_bookmarks').select('sync_code').limit(1);
-          if (!tblErr) {
-            tableWorks = true;
-          } else {
-            tableErrorDetails = { code: tblErr.code, message: tblErr.message, details: tblErr.details, hint: tblErr.hint };
-          }
-        } catch (e: any) {
-          tableErrorDetails = { exception: e?.message };
-        }
-
-        try {
-          const { error: artErr } = await client.from('articles').select('ojs_id').limit(1);
-          if (!artErr) {
-            articlesWorks = true;
-          } else {
-            articlesErrorDetails = { code: artErr.code, message: artErr.message };
-          }
-        } catch (e: any) {
-          articlesErrorDetails = { exception: e?.message };
-        }
+          tableWorks = !tblErr;
+        } catch {}
       }
 
       return NextResponse.json({
         service: 'Untan Bookmarks Sync API v2',
-        cloudConfigured: Boolean(client),
-        urlInspection,
-        rawFetchTest,
+        cloudConnected: Boolean(client),
         rpcReady: rpcWorks,
-        rpcError: rpcErrorDetails,
         tableReady: tableWorks,
-        tableError: tableErrorDetails,
-        articlesReady: articlesWorks,
-        articlesError: articlesErrorDetails,
-        operational: rpcWorks || tableWorks,
+        status: rpcWorks || tableWorks ? 'healthy' : 'degraded',
       });
     }
 
