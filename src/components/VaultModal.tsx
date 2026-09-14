@@ -108,7 +108,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
       } else {
         setFeedback({
           type: 'error',
-          message: data.error || 'Kode tidak ditemukan. Pastikan 4 kata slang sudah sesuai.',
+          message: data.error || 'Kode tidak ditemukan. Pastikan 4 kata sandi sudah sesuai.',
         });
       }
     } catch {
@@ -363,7 +363,7 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                       type="text"
                       value={inputCode}
                       onChange={(e) => setInputCode(e.target.value)}
-                      placeholder="contoh: kopi-santai-skripsi-mantap"
+                      placeholder="contoh: kernel-router-matrix-sensor"
                       className="flex-1 px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-black border-2 border-black dark:border-white font-mono placeholder:text-slate-400 focus:outline-none shadow-[2px_2px_0px_0px_#000]"
                     />
                     <button

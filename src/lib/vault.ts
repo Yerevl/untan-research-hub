@@ -7,54 +7,82 @@
  * 3. Cross-Device Sync: Enter code on mobile/laptop or open link with `?sync=<code>`.
  */
 
-export const INDONESIAN_SLANG_WORDS: string[] = [
-  // Kampus & Pontianak
-  'untan', 'pontianak', 'khatulistiwa', 'kapuas', 'digulis', 'ayani', 'sepakat', 'reformasi',
-  'gajahmada', 'tanjungpura', 'siantan', 'jeruju', 'sungairaya', 'kotabaru', 'flamboyan', 'pancadarma',
-  'kampus', 'kuliah', 'gedung', 'rektorat', 'aula', 'fakultas', 'mipa', 'teknik', 'siskom',
-  'sisfo', 'informatika', 'lab', 'perpus', 'kantin', 'gazebo', 'pendopo', 'warkop', 'asiang',
-  'ambing', 'choipan', 'suntan', 'hujan', 'panas', 'terik', 'angin', 'sore', 'pagi', 'malam', 'senja',
+/**
+ * Computer Engineering vocabulary dictionary for 4-word memorable sync passphrases.
+ * Over 330 unique terms spanning Computer Architecture, Digital Circuits, Embedded Systems,
+ * Operating Systems, Networks, Algorithms, and Robotics (>11.6 Billion combinations).
+ */
+export const COMPUTER_ENGINEERING_WORDS: string[] = [
+  // Digital Logic, Circuits & Electronics
+  'logic', 'gate', 'circuit', 'silicon', 'diode', 'transistor', 'resistor', 'capacitor',
+  'inductor', 'voltage', 'current', 'ground', 'analog', 'digital', 'signal', 'pulse',
+  'clock', 'oscillator', 'flipflop', 'latch', 'relay', 'switch', 'inverter', 'buffer',
+  'multiplex', 'encoder', 'decoder', 'comparator', 'schematic', 'breadboard', 'pcb', 'solder',
+  'probe', 'trace', 'nand', 'nor', 'xor', 'xnor', 'adder', 'shifter', 'demux',
+  'waveform', 'capacitance', 'inductance', 'impedance', 'junction', 'anode', 'cathode',
+  'collector', 'emitter', 'drain', 'source',
 
-  // Skripsi, Riset & Akademik
-  'skripsi', 'wisuda', 'sarjana', 'gelar', 'dosen', 'pembimbing', 'penguji', 'sidang', 'seminar',
-  'proposal', 'kompre', 'revisi', 'acc', 'bab', 'abstrak', 'jurnal', 'sitasi', 'riset', 'data',
-  'metode', 'teori', 'analisis', 'uji', 'valid', 'fokus', 'pustaka', 'arsip', 'simpan', 'catat',
-  'jelajah', 'cari', 'temu', 'sukses', 'lulus', 'tuntas', 'kelar', 'beres', 'cumlaude', 'beasiswa',
-  'toefl', 'target', 'jadwal', 'deadline', 'turnitin', 'bimbingan', 'konsul', 'nilai', 'ilmu',
-  'buku', 'pulpen', 'kertas', 'map', 'fotokopi', 'print', 'jilid', 'toga', 'ijazah', 'transkrip',
-  'ipk', 'sks', 'semester', 'krs', 'khs', 'magang', 'kkn', 'studi', 'tugas', 'kuis', 'uts', 'uas',
-  'praktek', 'praktikum', 'asisten', 'asprak', 'ketua', 'panitia', 'rapat', 'publikasi',
+  // Computer Architecture & Microprocessors
+  'processor', 'cpu', 'gpu', 'alu', 'fpu', 'register', 'pipeline', 'opcode', 'operand',
+  'instruction', 'bus', 'cache', 'ram', 'rom', 'sram', 'dram', 'flash', 'eeprom',
+  'risc', 'cisc', 'core', 'thread', 'socket', 'chipset', 'microcode', 'hazard',
+  'stall', 'fetch', 'decode', 'execute', 'datapath', 'accumulator', 'counter',
+  'endian', 'multicore', 'wafer', 'nanometer', 'throughput', 'interconnect',
+  'bandwidth', 'vector',
 
-  // IT, Ngoding & Rekayasa
-  'ngoding', 'koding', 'alpro', 'basisdata', 'jaringan', 'laptop', 'wifi', 'kuota', 'sinyal',
-  'koneksi', 'server', 'cloud', 'bug', 'debug', 'error', 'deploy', 'git', 'commit', 'push',
-  'pull', 'merge', 'branch', 'terminal', 'script', 'query', 'database', 'frontend', 'backend',
-  'fullstack', 'api', 'auth', 'token', 'cache', 'build', 'syntax', 'array', 'loop', 'fungsi',
-  'boolean', 'integer', 'string', 'logic', 'sistem', 'algoritma', 'robot', 'sensor', 'iot',
-  'web', 'mobile', 'app', 'python', 'react', 'nextjs', 'code', 'cyber', 'packet', 'byte',
-  'pixel', 'design', 'prototype', 'patch', 'update', 'release', 'online', 'offline', 'link',
-  'klik', 'copy', 'paste', 'save', 'load', 'undo', 'redo', 'icon', 'button', 'matrix',
+  // Embedded Systems, Microcontrollers & IoT
+  'embedded', 'firmware', 'bios', 'boot', 'bootloader', 'uart', 'spi', 'canbus',
+  'gpio', 'pwm', 'adc', 'dac', 'dma', 'interrupt', 'timer', 'watchdog', 'sensor',
+  'actuator', 'servo', 'stepper', 'motor', 'transducer', 'telemetry', 'beacon', 'modem',
+  'antenna', 'rfid', 'nfc', 'zigbee', 'bluetooth', 'lora', 'arduino', 'cortex',
+  'fpga', 'cpld', 'asic', 'verilog', 'vhdl', 'gyroscope', 'accelerometer', 'photodiode',
+  'thermistor', 'potentiometer', 'piezo', 'display', 'oled', 'pinout', 'datasheet',
 
-  // Makanan & Tongkrongan Mahasiswa
-  'kopi', 'ngopi', 'teh', 'esteh', 'boba', 'bakso', 'seblak', 'cireng', 'geprek', 'indomie',
-  'gorengan', 'tahu', 'tempe', 'nasi', 'uduk', 'liwet', 'sambal', 'pedas', 'manis', 'gurih',
-  'renyah', 'nikmat', 'mantep', 'manteb', 'lezat', 'sotong', 'pangkong', 'lemang', 'pancong',
-  'dimsum', 'martabak', 'roti', 'keju', 'cokelat', 'susu', 'esjeruk', 'soda', 'cemilan',
-  'snack', 'jajan', 'cilok', 'batagor', 'siomay', 'pentol', 'mieayam', 'sate', 'rawon', 'soto', 'pecel',
+  // Operating Systems, Kernel & Low-Level Systems
+  'kernel', 'daemon', 'driver', 'system', 'process', 'mutex', 'semaphore', 'lock',
+  'atomic', 'deadlock', 'scheduler', 'paging', 'segment', 'virtual', 'memory', 'heap',
+  'syscall', 'trap', 'fault', 'pipe', 'fifo', 'posix', 'unix', 'linux',
+  'hypervisor', 'shell', 'root', 'fork', 'spawn', 'zombie', 'orphan', 'priority',
+  'concurrency', 'parallel', 'sync', 'spinlock', 'barrier', 'affinity', 'context',
+  'alignment', 'padding',
 
-  // Slang & Gaul Mahasiswa
-  'santai', 'santuy', 'rebahan', 'mager', 'ambis', 'gaspol', 'gaskeun', 'mantap', 'mantul',
-  'gokil', 'kece', 'gercep', 'satset', 'woles', 'kalem', 'paten', 'ciamik', 'asoy', 'jos',
-  'sabi', 'auto', 'semangat', 'juara', 'aman', 'rapi', 'cuan', 'heboh', 'nongkrong', 'kuy',
-  'mabar', 'chill', 'vibes', 'keren', 'top', 'ngacir', 'gaslur', 'sip', 'oke', 'asik', 'seru',
-  'hebat', 'solutif', 'solid', 'cadas', 'jempol', 'slay', 'gacor', 'spill', 'circle', 'relate',
-  'fomo', 'burnout', 'healing', 'estetik', 'humble', 'glowup', 'kerad', 'hype', 'mode', 'pro',
-  'suhu', 'sepuh', 'mastah', 'gagas', 'kocak', 'parah', 'adem', 'fresh', 'epic', 'legend',
-  'yoi', 'skuy', 'sans', 'cihuy', 'ajib', 'keceparah', 'gokilparah'
+  // Networking, Protocols & Telecommunications
+  'packet', 'frame', 'header', 'payload', 'trailer', 'checksum', 'parity', 'router',
+  'switch', 'gateway', 'bridge', 'hub', 'subnet', 'ethernet', 'fiber', 'copper',
+  'wireless', 'wifi', 'tcp', 'udp', 'dns', 'dhcp', 'http', 'mqtt', 'websocket',
+  'port', 'latency', 'jitter', 'ping', 'hop', 'route',
+  'topology', 'mesh', 'broadcast', 'unicast', 'multicast', 'firewall', 'proxy', 'handshake',
+  'stream', 'session', 'protocol', 'uplink', 'downlink', 'datagram', 'simplex', 'duplex',
+  'carrier', 'loopback',
+
+  // Signal Processing & Robotics
+  'sampling', 'nyquist', 'fourier', 'aliasing', 'convolution', 'impulse', 'spectral',
+  'quantization', 'decimation', 'robotics', 'kinematics', 'odometry', 'feedback',
+  'controller',
+
+  // Data Structures, Algorithms & Computing Theory
+  'array', 'matrix', 'tensor', 'string', 'struct', 'tuple', 'tree',
+  'trie', 'graph', 'node', 'edge', 'vertex', 'queue', 'deque', 'stack',
+  'hash', 'table', 'binary', 'octal', 'byte', 'nibble', 'bit', 'boolean',
+  'integer', 'float', 'double', 'pointer', 'index', 'search', 'sort', 'filter',
+  'traverse', 'recursion', 'iteration', 'greedy', 'dynamic', 'entropy',
+
+  // Security, Cryptography & Hardware Protection
+  'crypto', 'cipher', 'nonce', 'token', 'secret', 'vault', 'shield', 'armor',
+  'key', 'rsa', 'aes', 'digest', 'sandbox', 'exploit', 'patch', 'audit',
+  'privilege', 'secure', 'enclave', 'trust', 'auth', 'signature',
+
+  // Compilers, Software & Development Tools
+  'compiler', 'assembler', 'linker', 'loader', 'parser', 'lexer', 'syntax',
+  'bytecode', 'native', 'runtime', 'debugger', 'profiler', 'symbol', 'trace',
+  'dump', 'build', 'script', 'deploy', 'git', 'commit', 'branch', 'merge',
+  'diff', 'clone', 'push', 'pull', 'terminal', 'console'
 ];
 
+export const INDONESIAN_SLANG_WORDS = COMPUTER_ENGINEERING_WORDS; // backward compatibility
+
 export interface LocalVault {
-  syncCode: string | null;       // 4-word passphrase e.g. "kopi-santai-skripsi-mantap"
+  syncCode: string | null;       // 4-word passphrase e.g. "kernel-router-matrix-sensor"
   bookmarks: string[];          // array of article ojs_id
   lastSyncedAt?: string;
   hasSeenWelcome?: boolean;
@@ -66,10 +94,10 @@ const STORAGE_KEY_V2 = 'untan_bookmarks_v2';
 const STORAGE_KEY_V1 = 'untan_bookmark_vault_v1';
 
 /**
- * Generates a memorable 4-word Indonesian slang sync code
+ * Generates a memorable 4-word Computer Engineering sync code
  */
 export function generateSecretKey(): string {
-  const words = [...INDONESIAN_SLANG_WORDS];
+  const words = [...COMPUTER_ENGINEERING_WORDS];
   const selected: string[] = [];
   for (let i = 0; i < 4; i++) {
     const idx = Math.floor(Math.random() * words.length);
