@@ -42,6 +42,8 @@ export async function GET(request: NextRequest) {
       let tableWorks = false;
       let rpcErrorDetails: any = null;
       let tableErrorDetails: any = null;
+      let articlesWorks = false;
+      let articlesErrorDetails: any = null;
 
       if (client) {
         try {
@@ -66,8 +68,6 @@ export async function GET(request: NextRequest) {
           tableErrorDetails = { exception: e?.message };
         }
 
-        let articlesErrorDetails: any = null;
-        let articlesWorks = false;
         try {
           const { error: artErr } = await client.from('articles').select('ojs_id').limit(1);
           if (!artErr) {
