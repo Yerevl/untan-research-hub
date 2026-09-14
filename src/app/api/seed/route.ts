@@ -109,19 +109,24 @@ export async function GET() {
       return NextResponse.json({ success: false, error: 'Supabase client not configured' });
     }
 
-    const { count, error } = await client
+    const { data: sampleArticles, count, error } = await client
       .from('articles')
-      .select('*', { count: 'exact', head: true });
+      .select('ojs_id, title', { count: 'exact' })
+      .limit(5);
 
     const { data: buckets } = await client.storage.listBuckets();
 
     return NextResponse.json({
       success: !error,
-      articlesInSupabase: count ?? 0,
+      articlesInSupabase: count ?? (sampleArticles ? sampleArticles.length : 0),
+      sampleArticles: sampleArticles || [],
       buckets: buckets?.map((b) => b.name) || [],
-      error: error ? { code: error.code, message: error.message } : null,
+      error: error
+        ? { code: error.code, message: error.message, details: error.details, hint: error.hint }
+        : null,
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+
