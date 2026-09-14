@@ -40,24 +40,40 @@ export async function GET(request: NextRequest) {
     if (isHealthCheck) {
       let rpcWorks = false;
       let tableWorks = false;
+      let rpcErrorDetails: any = null;
+      let tableErrorDetails: any = null;
 
       if (client) {
         try {
-          const { error: rpcErr } = await client.rpc('get_bookmarks', { p_sync_code: '__healthcheck__' });
-          rpcWorks = !rpcErr || rpcErr.code === 'PGRST116';
-        } catch {}
+          const { data: rpcData, error: rpcErr } = await client.rpc('get_bookmarks', { p_sync_code: '__healthcheck__' });
+          if (!rpcErr) {
+            rpcWorks = true;
+          } else {
+            rpcErrorDetails = { code: rpcErr.code, message: rpcErr.message, details: rpcErr.details, hint: rpcErr.hint };
+          }
+        } catch (e: any) {
+          rpcErrorDetails = { exception: e?.message };
+        }
 
         try {
           const { error: tblErr } = await client.from('user_bookmarks').select('sync_code').limit(1);
-          tableWorks = !tblErr;
-        } catch {}
+          if (!tblErr) {
+            tableWorks = true;
+          } else {
+            tableErrorDetails = { code: tblErr.code, message: tblErr.message, details: tblErr.details, hint: tblErr.hint };
+          }
+        } catch (e: any) {
+          tableErrorDetails = { exception: e?.message };
+        }
       }
 
       return NextResponse.json({
         service: 'Untan Bookmarks Sync API v2',
         cloudConfigured: Boolean(client),
         rpcReady: rpcWorks,
+        rpcError: rpcErrorDetails,
         tableReady: tableWorks,
+        tableError: tableErrorDetails,
         operational: rpcWorks || tableWorks,
       });
     }
