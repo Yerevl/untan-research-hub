@@ -56,8 +56,8 @@ export const getArticles = async (filter?: {
     }
 
     const { data, error } = await query;
-    if (error) {
-      console.error('Error fetching articles from Supabase:', error.message);
+    if (error || !data || data.length === 0) {
+      if (error) console.error('Error fetching articles from Supabase:', error.message);
       return getLocalArticles(filter);
     }
 
