@@ -38,6 +38,48 @@ export async function GET(request: NextRequest) {
 
     // Healthcheck mode
     if (isHealthCheck) {
+      const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
+      const rawKey =
+        process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+        process.env.SUPABASE_ANON_KEY ||
+        '';
+
+      const urlInspection = {
+        length: rawUrl.length,
+        hasTrailingSlash: rawUrl.endsWith('/'),
+        hasWhitespace: /\s/.test(rawUrl),
+        startsWithHttps: rawUrl.startsWith('https://'),
+        cleanHost: rawUrl.replace(/https?:\/\//, '').split('/')[0],
+        keyLength: rawKey.length,
+        keyHasWhitespace: /\s/.test(rawKey),
+      };
+
+      // Test raw fetch without supabase-js
+      let rawFetchTest: any = null;
+      if (rawUrl && rawKey) {
+        try {
+          const cleanBase = rawUrl.trim().replace(/\/+$/, '');
+          const cleanKey = rawKey.trim();
+          const targetUrl = `${cleanBase}/rest/v1/articles?select=ojs_id&limit=1`;
+          const res = await fetch(targetUrl, {
+            headers: {
+              apikey: cleanKey,
+              Authorization: `Bearer ${cleanKey}`,
+              Accept: 'application/json',
+            },
+          });
+          rawFetchTest = {
+            targetUrl,
+            status: res.status,
+            statusText: res.statusText,
+            body: await res.json().catch((e) => e?.message),
+          };
+        } catch (e: any) {
+          rawFetchTest = { exception: e?.message };
+        }
+      }
+
       let rpcWorks = false;
       let tableWorks = false;
       let rpcErrorDetails: any = null;
@@ -83,6 +125,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         service: 'Untan Bookmarks Sync API v2',
         cloudConfigured: Boolean(client),
+        urlInspection,
+        rawFetchTest,
         rpcReady: rpcWorks,
         rpcError: rpcErrorDetails,
         tableReady: tableWorks,
