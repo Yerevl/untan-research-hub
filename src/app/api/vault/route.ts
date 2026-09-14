@@ -65,6 +65,19 @@ export async function GET(request: NextRequest) {
         } catch (e: any) {
           tableErrorDetails = { exception: e?.message };
         }
+
+        let articlesErrorDetails: any = null;
+        let articlesWorks = false;
+        try {
+          const { error: artErr } = await client.from('articles').select('ojs_id').limit(1);
+          if (!artErr) {
+            articlesWorks = true;
+          } else {
+            articlesErrorDetails = { code: artErr.code, message: artErr.message };
+          }
+        } catch (e: any) {
+          articlesErrorDetails = { exception: e?.message };
+        }
       }
 
       return NextResponse.json({
@@ -74,6 +87,8 @@ export async function GET(request: NextRequest) {
         rpcError: rpcErrorDetails,
         tableReady: tableWorks,
         tableError: tableErrorDetails,
+        articlesReady: articlesWorks,
+        articlesError: articlesErrorDetails,
         operational: rpcWorks || tableWorks,
       });
     }
