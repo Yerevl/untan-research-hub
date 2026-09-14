@@ -79,25 +79,73 @@ export async function GET(request: NextRequest) {
 
     const syncCode = normalizeSecretKey(rawCode);
 
-    // 1. Try Supabase RPC (PostgREST cache-immune)
+    // 1. Try Supabase RPC (PostgREST cache-immune & checks 30-day expiration)
     if (client) {
       try {
         const { data, error } = await client.rpc('get_bookmarks', { p_sync_code: syncCode });
-        if (!error && Array.isArray(data)) {
-          return NextResponse.json({ success: true, syncCode, bookmarks: data, source: 'supabase-rpc' });
+        if (!error) {
+          if (data === null) {
+            // Expired (> 30 days inactive) or not found
+            return NextResponse.json(
+              {
+                success: false,
+                expired: true,
+                error: 'Koleksi tidak ditemukan atau telah kedaluwarsa karena tidak aktif selama lebih dari 30 hari.',
+              },
+              { status: 404 }
+            );
+          }
+          if (Array.isArray(data)) {
+            return NextResponse.json({
+              success: true,
+              syncCode,
+              bookmarks: data,
+              source: 'supabase-rpc',
+              lastAccessedAt: new Date().toISOString(),
+            });
+          }
         }
       } catch {}
 
-      // 2. Try Supabase Table direct query fallback
+      // 2. Try Supabase Table direct query fallback with 30-day inactivity check
       try {
         const { data, error } = await client
           .from('user_bookmarks')
-          .select('bookmarks')
+          .select('bookmarks, last_accessed_at')
           .eq('sync_code', syncCode)
           .maybeSingle();
 
-        if (!error && data && Array.isArray(data.bookmarks)) {
-          return NextResponse.json({ success: true, syncCode, bookmarks: data.bookmarks, source: 'supabase-table' });
+        if (!error && data) {
+          const lastAccessed = data.last_accessed_at ? new Date(data.last_accessed_at).getTime() : 0;
+          const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+          if (lastAccessed && Date.now() - lastAccessed > thirtyDaysMs) {
+            // Delete expired row
+            await client.from('user_bookmarks').delete().eq('sync_code', syncCode);
+            return NextResponse.json(
+              {
+                success: false,
+                expired: true,
+                error: 'Koleksi telah kedaluwarsa karena tidak aktif selama lebih dari 30 hari.',
+              },
+              { status: 404 }
+            );
+          }
+
+          // Touch last_accessed_at
+          await client
+            .from('user_bookmarks')
+            .update({ last_accessed_at: new Date().toISOString() })
+            .eq('sync_code', syncCode);
+
+          if (Array.isArray(data.bookmarks)) {
+            return NextResponse.json({
+              success: true,
+              syncCode,
+              bookmarks: data.bookmarks,
+              source: 'supabase-table',
+              lastAccessedAt: new Date().toISOString(),
+            });
+          }
         }
       } catch {}
     }
@@ -105,7 +153,12 @@ export async function GET(request: NextRequest) {
     // 3. Fallback to local server JSON store
     const local = readLocalFallback();
     if (local[syncCode]) {
-      return NextResponse.json({ success: true, syncCode, bookmarks: local[syncCode], source: 'local-fallback' });
+      return NextResponse.json({
+        success: true,
+        syncCode,
+        bookmarks: local[syncCode],
+        source: 'local-fallback',
+      });
     }
 
     return NextResponse.json(
@@ -157,7 +210,12 @@ export async function POST(request: NextRequest) {
       if (!syncedToCloud) {
         try {
           const { error } = await client.from('user_bookmarks').upsert(
-            { sync_code: syncCode, bookmarks, updated_at: new Date().toISOString() },
+            {
+              sync_code: syncCode,
+              bookmarks,
+              updated_at: new Date().toISOString(),
+              last_accessed_at: new Date().toISOString(),
+            },
             { onConflict: 'sync_code' }
           );
           if (!error) {

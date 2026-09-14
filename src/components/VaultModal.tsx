@@ -336,6 +336,10 @@ export const VaultModal: React.FC<VaultModalProps> = ({
                       <span>{copiedLink ? 'Link Tersalin ✓' : 'Salin Link HP'}</span>
                     </button>
                   </div>
+
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 italic pt-1">
+                    ⚡ Koleksi di cloud otomatis diperbarui dan tetap aktif selama dibuka minimal sekali dalam 30 hari.
+                  </p>
                 </div>
 
                 {/* Hubungkan dari Perangkat Lain */}

@@ -29,6 +29,7 @@ import {
   LocalVault,
   getLocalVault,
   saveLocalVault,
+  clearLocalVault,
   toggleBookmarkLocal,
   normalizeSecretKey,
 } from '@/lib/vault';
@@ -127,19 +128,44 @@ export default function HomePage() {
               saveLocalVault(updated);
               setVault(updated);
               setIsVaultOpen(true);
+            } else if (data.expired) {
+              alert('Koleksi dari tautan ini telah kedaluwarsa karena tidak aktif selama lebih dari 30 hari.');
             }
           })
           .catch((e) => console.warn('URL sync import deferred:', e));
-      } else if (v.syncCode && v.bookmarks.length > 0) {
-        // 2. Background sync existing vault to cloud
-        fetch('/api/vault', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: v.syncCode,
-            bookmarks: v.bookmarks,
-          }),
-        }).catch((e) => console.warn('Auto-sync deferred:', e));
+      } else if (v.syncCode) {
+        // 2. Heartbeat & touch last_accessed_at in Supabase, keeping vault alive for another 30 days
+        fetch(`/api/vault?code=${encodeURIComponent(v.syncCode)}`)
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.expired) {
+              // Cloud vault has expired due to 30 days of inactivity
+              clearLocalVault();
+              setVault({ syncCode: null, bookmarks: [], hasSeenWelcome: false });
+              console.info('Vault has expired due to 30 days of inactivity. Local cache reset.');
+            } else if (data.success && Array.isArray(data.bookmarks)) {
+              // Remote bookmarks loaded and last_accessed_at touched on server
+              const merged = Array.from(new Set([...v.bookmarks, ...data.bookmarks]));
+              const updated: LocalVault = {
+                ...v,
+                bookmarks: merged,
+                lastSyncedAt: new Date().toLocaleTimeString('id-ID'),
+              };
+              saveLocalVault(updated);
+              setVault(updated);
+            } else if (v.bookmarks.length > 0) {
+              // If not found in cloud yet but we have local bookmarks, push them up
+              fetch('/api/vault', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  code: v.syncCode,
+                  bookmarks: v.bookmarks,
+                }),
+              }).catch((e) => console.warn('Auto-sync deferred:', e));
+            }
+          })
+          .catch((e) => console.warn('Heartbeat deferred:', e));
       }
     }
 

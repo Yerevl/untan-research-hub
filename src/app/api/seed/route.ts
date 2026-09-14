@@ -114,6 +114,14 @@ export async function GET() {
       .select('ojs_id, title', { count: 'exact' })
       .limit(5);
 
+    let bucketNames: string[] = [];
+    try {
+      const { data: buckets } = await client.storage.listBuckets();
+      if (buckets) {
+        bucketNames = buckets.map((b: { name: string }) => b.name);
+      }
+    } catch {}
+
     const localPdfDir = path.join(process.cwd(), 'public', 'storage', 'pdfs');
     const localPdfExists = fs.existsSync(localPdfDir);
     const localPdfCount = localPdfExists ? fs.readdirSync(localPdfDir).filter((f) => f.endsWith('.pdf')).length : 0;
@@ -122,7 +130,7 @@ export async function GET() {
       success: !error,
       articlesInSupabase: count ?? (sampleArticles ? sampleArticles.length : 0),
       sampleArticles: sampleArticles || [],
-      buckets: buckets?.map((b) => b.name) || [],
+      buckets: bucketNames,
       localPdfStatus: { exists: localPdfExists, count: localPdfCount },
       error: error
         ? { code: error.code, message: error.message, details: error.details, hint: error.hint }
