@@ -8,19 +8,49 @@
  */
 
 export const INDONESIAN_SLANG_WORDS: string[] = [
-  'santai', 'ngopi', 'gaspol', 'ambis', 'rebahan', 'mantap', 'gokil', 'santuy',
-  'ngoding', 'skripsi', 'wisuda', 'cuan', 'kece', 'gercep', 'heboh', 'mager',
-  'nongkrong', 'kalem', 'paten', 'ciamik', 'asoy', 'jos', 'sabi', 'woles',
-  'auto', 'fokus', 'semangat', 'juara', 'beres', 'aman', 'rapi', 'kopi',
-  'boba', 'bakso', 'seblak', 'cireng', 'untan', 'siskom', 'sisfo', 'lab',
-  'laptop', 'wifi', 'pontianak', 'khatulistiwa', 'teh', 'jurnal', 'alpro',
-  'basisdata', 'jaringan', 'koding', 'kampus', 'kuliah', 'revisi', 'sidang',
-  'seminar', 'acc', 'dosen', 'senja', 'kuy', 'mabar', 'gaskeun', 'chill',
-  'satset', 'vibes', 'keren', 'top', 'ngacir', 'mantul', 'gaslur', 'sip',
-  'oke', 'asik', 'seru', 'pedas', 'manis', 'gurih', 'renyah', 'nikmat',
-  'mantep', 'kelar', 'tuntas', 'lulus', 'sarjana', 'gelar', 'ilmu', 'riset',
-  'pustaka', 'arsip', 'simpan', 'catat', 'jelajah', 'cari', 'temu', 'sukses',
-  'hebat', 'solutif', 'solid', 'koneksi', 'sinyal', 'kuota', 'cadas', 'jempol'
+  // Kampus & Pontianak
+  'untan', 'pontianak', 'khatulistiwa', 'kapuas', 'digulis', 'ayani', 'sepakat', 'reformasi',
+  'gajahmada', 'tanjungpura', 'siantan', 'jeruju', 'sungairaya', 'kotabaru', 'flamboyan', 'pancadarma',
+  'kampus', 'kuliah', 'gedung', 'rektorat', 'aula', 'fakultas', 'mipa', 'teknik', 'siskom',
+  'sisfo', 'informatika', 'lab', 'perpus', 'kantin', 'gazebo', 'pendopo', 'warkop', 'asiang',
+  'ambing', 'choipan', 'suntan', 'hujan', 'panas', 'terik', 'angin', 'sore', 'pagi', 'malam', 'senja',
+
+  // Skripsi, Riset & Akademik
+  'skripsi', 'wisuda', 'sarjana', 'gelar', 'dosen', 'pembimbing', 'penguji', 'sidang', 'seminar',
+  'proposal', 'kompre', 'revisi', 'acc', 'bab', 'abstrak', 'jurnal', 'sitasi', 'riset', 'data',
+  'metode', 'teori', 'analisis', 'uji', 'valid', 'fokus', 'pustaka', 'arsip', 'simpan', 'catat',
+  'jelajah', 'cari', 'temu', 'sukses', 'lulus', 'tuntas', 'kelar', 'beres', 'cumlaude', 'beasiswa',
+  'toefl', 'target', 'jadwal', 'deadline', 'turnitin', 'bimbingan', 'konsul', 'nilai', 'ilmu',
+  'buku', 'pulpen', 'kertas', 'map', 'fotokopi', 'print', 'jilid', 'toga', 'ijazah', 'transkrip',
+  'ipk', 'sks', 'semester', 'krs', 'khs', 'magang', 'kkn', 'studi', 'tugas', 'kuis', 'uts', 'uas',
+  'praktek', 'praktikum', 'asisten', 'asprak', 'ketua', 'panitia', 'rapat', 'publikasi',
+
+  // IT, Ngoding & Rekayasa
+  'ngoding', 'koding', 'alpro', 'basisdata', 'jaringan', 'laptop', 'wifi', 'kuota', 'sinyal',
+  'koneksi', 'server', 'cloud', 'bug', 'debug', 'error', 'deploy', 'git', 'commit', 'push',
+  'pull', 'merge', 'branch', 'terminal', 'script', 'query', 'database', 'frontend', 'backend',
+  'fullstack', 'api', 'auth', 'token', 'cache', 'build', 'syntax', 'array', 'loop', 'fungsi',
+  'boolean', 'integer', 'string', 'logic', 'sistem', 'algoritma', 'robot', 'sensor', 'iot',
+  'web', 'mobile', 'app', 'python', 'react', 'nextjs', 'code', 'cyber', 'packet', 'byte',
+  'pixel', 'design', 'prototype', 'patch', 'update', 'release', 'online', 'offline', 'link',
+  'klik', 'copy', 'paste', 'save', 'load', 'undo', 'redo', 'icon', 'button', 'matrix',
+
+  // Makanan & Tongkrongan Mahasiswa
+  'kopi', 'ngopi', 'teh', 'esteh', 'boba', 'bakso', 'seblak', 'cireng', 'geprek', 'indomie',
+  'gorengan', 'tahu', 'tempe', 'nasi', 'uduk', 'liwet', 'sambal', 'pedas', 'manis', 'gurih',
+  'renyah', 'nikmat', 'mantep', 'manteb', 'lezat', 'sotong', 'pangkong', 'lemang', 'pancong',
+  'dimsum', 'martabak', 'roti', 'keju', 'cokelat', 'susu', 'esjeruk', 'soda', 'cemilan',
+  'snack', 'jajan', 'cilok', 'batagor', 'siomay', 'pentol', 'mieayam', 'sate', 'rawon', 'soto', 'pecel',
+
+  // Slang & Gaul Mahasiswa
+  'santai', 'santuy', 'rebahan', 'mager', 'ambis', 'gaspol', 'gaskeun', 'mantap', 'mantul',
+  'gokil', 'kece', 'gercep', 'satset', 'woles', 'kalem', 'paten', 'ciamik', 'asoy', 'jos',
+  'sabi', 'auto', 'semangat', 'juara', 'aman', 'rapi', 'cuan', 'heboh', 'nongkrong', 'kuy',
+  'mabar', 'chill', 'vibes', 'keren', 'top', 'ngacir', 'gaslur', 'sip', 'oke', 'asik', 'seru',
+  'hebat', 'solutif', 'solid', 'cadas', 'jempol', 'slay', 'gacor', 'spill', 'circle', 'relate',
+  'fomo', 'burnout', 'healing', 'estetik', 'humble', 'glowup', 'kerad', 'hype', 'mode', 'pro',
+  'suhu', 'sepuh', 'mastah', 'gagas', 'kocak', 'parah', 'adem', 'fresh', 'epic', 'legend',
+  'yoi', 'skuy', 'sans', 'cihuy', 'ajib', 'keceparah', 'gokilparah'
 ];
 
 export interface LocalVault {
